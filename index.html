@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaurav Warke | Data & Business Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C18;--bg1:#0C1120;--bg2:#101828;--card:rgba(15,22,36,.55);--card2:rgba(20,29,46,.6);
+  --teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--rose:#F43F5E;--emerald:#10B981;
+  --t1:#F0F4FF;--t2:#94A3B8;--t3:#475569;
+  --b:rgba(13,148,136,.15);--bh:rgba(13,148,136,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 3rem;display:flex;justify-content:space-between;align-items:center;transition:all .3s}
+nav.scrolled{background:rgba(8,12,24,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
+.logo{font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:800;color:var(--t1);letter-spacing:-.5px}
+.logo em{color:var(--teal);font-style:normal}
+.nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+.nav-links a{color:var(--t3);text-decoration:none;font-size:.82rem;font-weight:500;transition:color .2s;letter-spacing:.02em}
+.nav-links a:hover{color:var(--t1)}
+.nav-cta{padding:.45rem 1.25rem;background:transparent;border:1px solid var(--teal);color:var(--teal)!important;border-radius:6px;font-size:.8rem!important;font-weight:600!important;transition:all .2s!important}
+.nav-cta:hover{background:var(--teal);color:#fff!important}
+
+/* HERO — CENTERED LAYOUT */
+#home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 2rem 4rem;position:relative;overflow:hidden;gap:2.5rem}
+.noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:128px}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(13,148,136,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(13,148,136,.04) 1px,transparent 1px);background-size:48px 48px}
+/* Global 3D data-network — fixed behind the whole page */
+#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none}
+#home .hero-left,#home .hero-right{position:relative;z-index:2}
+/* lift all content above the canvas; bands stay translucent so the network bleeds through */
+nav,section,footer,.divider{position:relative;z-index:1}
+/* glass surfaces — translucent so the fluid background shows through, blurred so text stays legible */
+.data-card,.sk,.pc,.info-item,.edu-card,.r-card,.avail,.c-link,.photo-box,.pc-prob,.dc-stat{backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.hero-left{position:relative;z-index:2;max-width:780px}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .9rem;border:1px solid rgba(16,185,129,.3);border-radius:4px;font-size:.7rem;font-weight:600;color:var(--emerald);margin-bottom:1.75rem;background:rgba(16,185,129,.06);letter-spacing:.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.dot{width:5px;height:5px;background:var(--emerald);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3;transform:scale(1.3)}}
+h1{font-family:'Sora',sans-serif;font-size:clamp(2.8rem,5.5vw,4.5rem);font-weight:800;line-height:1;letter-spacing:-2.5px;margin-bottom:1rem;color:var(--t1)}
+h1 span{display:block;color:var(--teal)}
+.hero-role{font-size:1rem;color:var(--t2);font-weight:400;margin-bottom:.6rem;line-height:1.5}
+.tw-line{font-size:.9rem;color:var(--t3);margin-bottom:2.25rem;min-height:1.5rem;font-family:'JetBrains Mono',monospace}
+#tw{color:var(--teal2)}
+.cur{display:inline-block;width:2px;height:.9em;background:var(--teal);margin-left:1px;vertical-align:middle;animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-actions{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:2.5rem;justify-content:center}
+.btn-fill{padding:.7rem 1.6rem;background:var(--teal);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:.88rem;transition:all .2s;font-family:'Sora',sans-serif}
+.btn-fill:hover{background:var(--teal2);transform:translateY(-1px)}
+.btn-line{padding:.7rem 1.6rem;background:transparent;color:var(--t2);text-decoration:none;border-radius:6px;font-weight:500;font-size:.88rem;border:1px solid var(--b);transition:all .2s}
+.btn-line:hover{border-color:var(--teal);color:var(--t1)}
+.hero-socials{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.hsoc{display:flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border:1px solid var(--b);border-radius:4px;text-decoration:none;color:var(--t3);font-size:.75rem;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.hsoc:hover{border-color:var(--teal);color:var(--teal)}
+
+/* HERO RIGHT — DATA VISUAL */
+.hero-right{position:relative;z-index:2;display:flex;flex-direction:row;gap:1rem;width:100%;max-width:780px}
+.hero-right .data-card{flex:1;text-align:left}
+.data-card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;transition:all .25s}
+.data-card:hover{border-color:var(--bh)}
+.dc-label{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);margin-bottom:.6rem;font-family:'JetBrains Mono',monospace}
+.dc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.dc-metric{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px}
+.dc-change{font-size:.72rem;font-weight:600;padding:.18rem .55rem;border-radius:4px}
+.pos{color:var(--emerald);background:rgba(16,185,129,.1)}
+.bar-wrap{display:flex;flex-direction:column;gap:.45rem}
+.bar-item{display:flex;align-items:center;gap:.6rem}
+.bar-name{font-size:.68rem;color:var(--t3);width:80px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.bar-track{flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+.bar-val{font-size:.65rem;color:var(--t2);font-weight:600;font-family:'JetBrains Mono',monospace;width:30px;text-align:right}
+.dc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.dc-stat{text-align:center;padding:.75rem;background:rgba(13,148,136,.06);border-radius:8px;border:1px solid rgba(13,148,136,.1)}
+.dcs-val{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.8px}
+.dcs-lbl{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+
+/* SHARED */
+.container{max-width:1100px;margin:0 auto;padding:0 2.5rem}
+section{padding:7.5rem 0}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--b),transparent)}
+.stag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--teal);margin-bottom:.5rem;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.5rem}
+.stag::before{content:'//';opacity:.5}
+.stitle{font-family:'Sora',sans-serif;font-size:clamp(1.8rem,4vw,2.4rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:.9rem}
+.ssub{color:var(--t3);font-size:.92rem;max-width:520px;line-height:1.8;margin-bottom:3.5rem}
+
+/* ABOUT */
+.about-wrap{display:grid;grid-template-columns:280px 1fr;gap:3.5rem;align-items:start}
+.photo-col{position:sticky;top:90px}
+.photo-box{width:100%;aspect-ratio:3/4;border-radius:16px;background:var(--card2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.photo-box img{width:100%;height:100%;object-fit:cover;border-radius:16px}
+.initials{font-family:'Sora',sans-serif;font-size:4.5rem;font-weight:800;color:var(--teal);opacity:.4}
+.photo-status{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(8,12,24,.85);backdrop-filter:blur(8px);border:1px solid var(--b);border-radius:8px;padding:.6rem .85rem;display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--t2)}
+.status-dot{width:6px;height:6px;background:var(--emerald);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+.about-content .stitle{margin-bottom:.5rem}
+.about-body{color:var(--t2);font-size:.9rem;line-height:1.8;margin-bottom:1.75rem}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.75rem}
+.info-item{padding:.85rem 1rem;background:var(--card);border:1px solid var(--b);border-radius:8px;transition:border-color .2s}
+.info-item:hover{border-color:var(--bh)}
+.info-label{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;font-family:'JetBrains Mono',monospace}
+.info-val{font-size:.85rem;color:var(--t1);font-weight:600}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{padding:.3rem .8rem;border:1px solid var(--b);border-radius:100px;font-size:.72rem;color:var(--t3)}
+.chip.teal{border-color:rgba(13,148,136,.3);color:var(--teal);background:rgba(13,148,136,.06)}
+
+/* SKILLS */
+#skills{background:transparent}
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem}
+.sk{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:1.4rem;transition:all .25s}
+.sk:hover{border-color:var(--bh);transform:translateY(-2px)}
+.sk.span2{grid-column:span 2}
+.sk-icon{font-size:1.25rem;margin-bottom:.55rem}
+.sk-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--teal);margin-bottom:.65rem;font-family:'JetBrains Mono',monospace}
+.t-wrap{display:flex;flex-wrap:wrap;gap:.3rem}
+.t{padding:.2rem .55rem;border:1px solid rgba(255,255,255,.07);border-radius:4px;font-size:.66rem;color:var(--t2);font-weight:500;transition:all .15s}
+.t:hover{border-color:var(--teal);color:var(--teal)}
+.t.hi{border-color:rgba(245,158,11,.25);color:var(--amber)}
+.t.em{border-color:rgba(13,148,136,.25);color:var(--teal2)}
+
+/* PROJECTS */
+.proj-filters{display:flex;gap:.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.pf{padding:.42rem 1.1rem;border:1px solid var(--b);border-radius:100px;font-size:.76rem;font-weight:500;color:var(--t3);background:transparent;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.pf:hover{color:var(--t1);border-color:var(--teal)}
+.pf.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.pc{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;transition:all .25s;display:flex;flex-direction:column}
+.pc:hover{border-color:var(--bh);transform:translateY(-3px);box-shadow:0 12px 35px rgba(0,0,0,.3)}
+.pc.wide{grid-column:span 2}
+.pc.hidden{display:none}
+.pc-head{padding:1.4rem 1.4rem .8rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.pc-kpi{font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:.2rem}
+.pc-kpi-label{font-size:.65rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
+.pc-body{padding:1.1rem 1.4rem 1.4rem;flex:1;display:flex;flex-direction:column}
+.pc-cat{font-size:.6rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-family:'JetBrains Mono',monospace;margin-bottom:.35rem}
+.pc-title{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;letter-spacing:-.3px;margin-bottom:.5rem;line-height:1.3}
+.pc-prob{font-size:.75rem;color:var(--t3);line-height:1.5;margin-bottom:.75rem;padding:.5rem .7rem;background:rgba(13,148,136,.05);border-left:2px solid var(--teal);border-radius:0 4px 4px 0}
+.pc-desc{font-size:.8rem;color:var(--t2);line-height:1.65;margin-bottom:.9rem;flex:1}
+.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.9rem}
+.pc-tag{padding:.18rem .5rem;border:1px solid rgba(255,255,255,.06);border-radius:3px;font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.04)}
+.pc-link{font-size:.75rem;color:var(--teal);text-decoration:none;font-weight:500;transition:color .2s}
+.pc-link:hover{color:var(--teal2)}
+.view-gh{display:flex;align-items:center;gap:.6rem;margin-top:2.25rem;padding:.65rem 1.5rem;border:1px solid var(--b);border-radius:6px;color:var(--t2);text-decoration:none;font-size:.83rem;font-weight:500;width:fit-content;transition:all .2s}
+.view-gh:hover{border-color:var(--teal);color:var(--teal)}
+
+/* EXPERIENCE */
+.exp-cols{display:grid;grid-template-columns:1fr 1fr;gap:4rem}
+.tl{position:relative;padding-left:1.75rem}
+.tl::before{content:'';position:absolute;left:0;top:10px;bottom:0;width:1px;background:linear-gradient(180deg,var(--teal),transparent)}
+.ti{position:relative;padding-bottom:2.25rem}
+.ti::before{content:'';position:absolute;left:-2.1rem;top:8px;width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);box-shadow:0 0 8px rgba(13,148,136,.5)}
+.t-date{font-size:.62rem;color:var(--teal);font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
+.t-role{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:-.3px;margin-bottom:.1rem}
+.t-co{font-size:.78rem;color:var(--t3);margin-bottom:.6rem}
+.t-list{list-style:none}
+.t-list li{font-size:.8rem;color:var(--t2);padding:.15rem 0 .15rem 1rem;position:relative;line-height:1.55}
+.t-list li::before{content:'›';position:absolute;left:0;color:var(--teal);font-size:.9rem;top:0;line-height:1.55}
+.hi{color:var(--amber);font-weight:700}
+.edu-card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:1.4rem;margin-bottom:.8rem;transition:all .2s}
+.edu-card:hover{border-color:var(--bh)}
+.edu-year{font-size:.58rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.35rem;font-family:'JetBrains Mono',monospace}
+.edu-deg{font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;margin-bottom:.15rem}
+.edu-sch{font-size:.78rem;color:var(--t3);margin-bottom:.5rem}
+.gpa{display:inline-block;padding:.18rem .6rem;background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2);border-radius:4px;font-size:.68rem;color:var(--teal);font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* RESEARCH */
+.r-card{background:var(--card);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:2.25rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;transition:all .25s;position:relative;overflow:hidden}
+.r-card::after{content:'PUBLISHED';position:absolute;top:16px;right:-28px;background:rgba(245,158,11,.12);color:var(--amber);font-size:.55rem;font-weight:800;letter-spacing:.2em;padding:.25rem 2.5rem;transform:rotate(45deg);border-top:1px solid rgba(245,158,11,.2);border-bottom:1px solid rgba(245,158,11,.2)}
+.r-card:hover{border-color:rgba(245,158,11,.35);box-shadow:0 0 25px rgba(245,158,11,.07)}
+.r-badge{display:inline-block;padding:.25rem .7rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22);border-radius:4px;font-size:.6rem;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.7rem;font-family:'JetBrains Mono',monospace}
+.r-title{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:-.4px;margin-bottom:.35rem}
+.r-venue{font-size:.75rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.r-stats{display:flex;flex-direction:column;gap:.9rem;align-items:center}
+.rs{text-align:center}
+.rs-v{font-family:'Sora',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-.8px;color:var(--amber);line-height:1}
+.rs-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
+
+/* CONTACT */
+#contact{background:transparent}
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+.c-heading{font-family:'Sora',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:1rem}
+.c-heading em{color:var(--teal);font-style:normal}
+.c-sub{color:var(--t3);font-size:.88rem;line-height:1.75;margin-bottom:1.75rem}
+.c-links{display:flex;flex-direction:column;gap:.6rem}
+.c-link{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.1rem;background:var(--card);border:1px solid var(--b);border-radius:8px;text-decoration:none;color:var(--t2);font-size:.84rem;transition:all .2s}
+.c-link:hover{border-color:var(--teal);color:var(--t1);transform:translateX(4px)}
+.c-ico{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+.avail{background:var(--card);border:1px solid var(--b);border-radius:10px;overflow:hidden}
+.av-header{padding:1rem 1.25rem;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.av-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.av-live{display:flex;align-items:center;gap:.4rem;font-size:.65rem;color:var(--emerald);font-weight:600}
+.av-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.03);font-size:.78rem}
+.av-row:last-child{border-bottom:none}
+.av-lbl{color:var(--t3)}
+.badge{padding:.16rem .55rem;border-radius:3px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.badge.open{background:rgba(16,185,129,.1);color:var(--emerald);border:1px solid rgba(16,185,129,.18)}
+.badge.con{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.18)}
+
+/* FOOTER */
+footer{padding:3.5rem 0 1.5rem;border-top:1px solid var(--b)}
+.footer-inner{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:2.5rem}
+.f-brand{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;color:var(--t1);display:block;margin-bottom:.75rem}
+.f-brand em{color:var(--teal);font-style:normal}
+.f-desc{font-size:.8rem;color:var(--t3);line-height:1.65;max-width:220px;margin-bottom:1.25rem}
+.f-socials{display:flex;gap:.55rem}
+.f-soc{width:32px;height:32px;border-radius:6px;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--t3);font-size:.78rem;transition:all .2s}
+.f-soc:hover{border-color:var(--teal);color:var(--teal)}
+.f-col h5{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--t1);margin-bottom:.9rem;font-family:'JetBrains Mono',monospace}
+.f-col ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.f-col a{font-size:.8rem;color:var(--t3);text-decoration:none;transition:color .2s}
+.f-col a:hover{color:var(--teal)}
+.footer-bottom{padding-top:1.5rem;border-top:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.footer-bottom p{font-size:.72rem;color:var(--t3)}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  #home{padding:6rem 1.5rem 3rem}
+  .hero-right{flex-direction:column}
+  .nav-links{display:none}
+  nav{padding:1rem 2rem}
+  .about-wrap{grid-template-columns:1fr}
+  .photo-col{position:static;display:flex;justify-content:center}
+  .photo-box{width:200px;height:250px}
+  .skill-grid{grid-template-columns:1fr}
+  .sk.span2{grid-column:span 1}
+  .proj-grid{grid-template-columns:1fr}
+  .pc.wide{grid-column:span 1}
+  .exp-cols{grid-template-columns:1fr}
+  .contact-wrap{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .r-card{grid-template-columns:1fr}
+  .r-card::after{display:none}
+}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.u{animation:up .5s ease forwards}
+.u1{animation-delay:.1s;opacity:0}.u2{animation-delay:.2s;opacity:0}.u3{animation-delay:.3s;opacity:0}.u4{animation-delay:.4s;opacity:0}.u5{animation-delay:.5s;opacity:0}
+
+/* CASE STUDY INSPECTOR (Triple-M drawer) */
+.pc{cursor:pointer}
+.pc-open{font-size:.75rem;font-weight:500;transition:transform .2s}
+.pc:hover .pc-open{transform:translateX(3px)}
+.insp-overlay{position:fixed;inset:0;z-index:200;display:none;justify-content:flex-end}
+.insp-overlay.show{display:flex}
+.insp-scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);opacity:0;transition:opacity .3s}
+.insp-overlay.show .insp-scrim{opacity:1}
+.insp{position:relative;z-index:1;height:100%;width:100%;max-width:560px;overflow-y:auto;background:var(--bg1);border-left:1px solid var(--b);padding:2.5rem;transform:translateX(40px);opacity:0;transition:transform .35s ease,opacity .35s ease}
+.insp-overlay.show .insp{transform:translateX(0);opacity:1}
+.insp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+.insp-cat{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-family:'JetBrains Mono',monospace;margin-bottom:.5rem}
+.insp-title{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.6px;line-height:1.2}
+.insp-close{flex-shrink:0;border:1px solid var(--b);background:transparent;color:var(--t3);border-radius:6px;padding:.25rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;cursor:pointer;transition:all .2s}
+.insp-close:hover{border-color:var(--rose);color:var(--rose)}
+.insp-kpi{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;margin-bottom:1.75rem}
+.insp-kpi-v{font-family:'Sora',sans-serif;font-size:2.4rem;font-weight:800;letter-spacing:-1.5px;line-height:1}
+.insp-kpi-l{font-family:'JetBrains Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3)}
+.insp-block{margin-bottom:1.5rem}
+.insp-block-h{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:.55rem}
+.insp-block p{font-size:.83rem;line-height:1.7;color:var(--t2)}
+.insp-list{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.insp-list li{position:relative;padding-left:1rem;font-size:.83rem;line-height:1.6;color:var(--t2)}
+.insp-list li::before{content:'›';position:absolute;left:0;color:var(--teal)}
+.insp-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.5rem}
+.insp-cta{display:block;width:100%;text-align:center;background:var(--teal);color:#fff;text-decoration:none;border-radius:6px;padding:.8rem;font-family:'Sora',sans-serif;font-weight:600;font-size:.85rem;transition:background .2s}
+.insp-cta:hover{background:var(--teal2)}
+.insp-note{font-size:.7rem;color:var(--t3);text-align:center;margin-top:.7rem;font-family:'JetBrains Mono',monospace}
+body.insp-lock{overflow:hidden}
+@media(max-width:600px){.insp{padding:1.75rem 1.4rem}}
+</style>
+</head>
+<body>
+
+<!-- GLOBAL 3D DATA-NETWORK (fixed, behind all sections) -->
+<canvas id="bg3d"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo">Gaurav<em>.</em></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="mailto:gauravwarke8@gmail.com" class="nav-cta">Hire Me</a></li>
+  </ul>
+</nav>
+
+<!-- HERO — SPLIT -->
+<section id="home">
+  <div class="noise"></div>
+  <div class="grid-lines"></div>
+
+  <div class="hero-left">
+    <div class="hero-tag u"><div class="dot"></div>Open to Internships & Graduate Roles · Melbourne</div>
+    <h1 class="u u1">Gaurav<span>Warke.</span></h1>
+    <p class="hero-role u u2">Data & Business Analytics · BI · Supply Chain · FinTech</p>
+    <p class="tw-line u u3"><span id="tw"></span><span class="cur"></span></p>
+    <div class="hero-actions u u4">
+      <a href="#projects" class="btn-fill">View Projects</a>
+      <a href="#contact" class="btn-line">Let's Talk →</a>
+      <a href="mailto:gauravwarke8@gmail.com" class="btn-line">Resume ↓</a>
+    </div>
+    <div class="hero-socials u u5">
+      <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="hsoc">in/ LinkedIn</a>
+      <a href="https://github.com/GauravWarke" target="_blank" class="hsoc">gh/ GitHub</a>
+      <a href="mailto:gauravwarke8@gmail.com" class="hsoc">✉ Email</a>
+    </div>
+  </div>
+
+  <!-- RIGHT — LIVE DATA CARDS -->
+  <div class="hero-right u u3">
+    <div class="data-card">
+      <div class="dc-label">// idigitalxp · Impact Delivered</div>
+      <div class="dc-row">
+        <div class="dc-metric" style="color:var(--teal)">−30%</div>
+        <span class="dc-change pos">↑ Verified</span>
+      </div>
+      <div style="font-size:.75rem;color:var(--t3);margin-bottom:.9rem">Reporting cycle time reduction</div>
+      <div class="bar-wrap">
+        <div class="bar-item"><span class="bar-name">Reporting</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--teal)"></div></div><span class="bar-val">−30%</span></div>
+        <div class="bar-item"><span class="bar-name">Conversion</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--blue)"></div></div><span class="bar-val">+10%</span></div>
+        <div class="bar-item"><span class="bar-name">Efficiency</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--amber)"></div></div><span class="bar-val">+20%</span></div>
+      </div>
+    </div>
+    <div class="data-card">
+      <div class="dc-label">// Profile Snapshot</div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dcs-val" style="color:var(--teal)">9.36</div><div class="dcs-lbl">GPA / 10</div></div>
+        <div class="dc-stat"><div class="dcs-val" style="color:var(--amber)">1st</div><div class="dcs-lbl">Author</div></div>
+        <div class="dc-stat"><div class="dcs-val" style="color:var(--blue)">4</div><div class="dcs-lbl">Projects</div></div>
+        <div class="dc-stat"><div class="dcs-val" style="color:var(--emerald)">2+</div><div class="dcs-lbl">Yrs Exp</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-wrap">
+      <div class="photo-col">
+        <div class="photo-box">
+          <!-- To add your photo: replace <div class="initials">GW</div> with <img src="photo.jpg" alt="Gaurav Warke"> -->
+          <div class="initials">GW</div>
+          <div class="photo-status"><div class="status-dot"></div>Available for hire · Melbourne, AU</div>
+        </div>
+      </div>
+      <div class="about-content">
+        <div class="stag">About Me</div>
+        <h2 class="stitle">Analyst who codes.<br>Engineer who advises.</h2>
+        <p class="about-body">I'm a Computer Engineering graduate (9.36 GPA) completing my <strong>Master of Business Analytics at Monash University</strong> — built at the intersection of technical depth and commercial intelligence. I translate fragmented datasets into strategic decisions that drive real revenue and operational outcomes.</p>
+        <p class="about-body" style="margin-top:-.75rem">At idigitalxp, I reduced reporting cycles by 30% and lifted lead conversion by 10% — not by working harder, but by building smarter analytical systems. My engineering background means I can build the pipelines I analyse, without waiting for a data engineer to do it.</p>
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">Location</div><div class="info-val">Melbourne, Victoria</div></div>
+          <div class="info-item"><div class="info-label">University</div><div class="info-val">Monash University</div></div>
+          <div class="info-item"><div class="info-label">Degree</div><div class="info-val">M. Business Analytics</div></div>
+          <div class="info-item"><div class="info-label">Email</div><div class="info-val" style="font-size:.78rem">gauravwarke8@gmail.com</div></div>
+          <div class="info-item"><div class="info-label">Undergrad GPA</div><div class="info-val" style="color:var(--teal)">9.36 / 10.0</div></div>
+          <div class="info-item"><div class="info-label">Work Rights</div><div class="info-val" style="color:var(--emerald)">48hrs / fortnight ✓</div></div>
+        </div>
+        <div class="chips">
+          <span class="chip teal">Data Analytics</span>
+          <span class="chip teal">BI & Reporting</span>
+          <span class="chip teal">Supply Chain</span>
+          <span class="chip teal">FinTech Analytics</span>
+          <span class="chip">Published Researcher</span>
+          <span class="chip">Agile Practitioner</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="stag">Technical Stack</div>
+    <h2 class="stitle">Skills & Technologies</h2>
+    <p class="ssub">End-to-end analytical capability — from raw data to executive dashboard.</p>
+    <div class="skill-grid">
+      <div class="sk span2">
+        <div class="sk-icon">📊</div>
+        <div class="sk-title">Analytics, BI & Visualisation</div>
+        <div class="t-wrap"><span class="t hi">Power BI</span><span class="t hi">Tableau</span><span class="t hi">Excel (Advanced)</span><span class="t">Statistical Modelling</span><span class="t">Time Series Forecasting</span><span class="t">KPI Development</span><span class="t">Dashboard Design</span></div>
+      </div>
+      <div class="sk">
+        <div class="sk-icon">💻</div>
+        <div class="sk-title">Programming</div>
+        <div class="t-wrap"><span class="t hi">Python</span><span class="t hi">SQL</span><span class="t">R</span></div>
+      </div>
+      <div class="sk">
+        <div class="sk-icon">🗄️</div>
+        <div class="sk-title">Databases & Pipelines</div>
+        <div class="t-wrap"><span class="t em">PostgreSQL</span><span class="t em">MongoDB</span><span class="t em">MySQL</span><span class="t">NLP</span><span class="t">OCR</span></div>
+      </div>
+      <div class="sk">
+        <div class="sk-icon">📦</div>
+        <div class="sk-title">Supply Chain & Risk</div>
+        <div class="t-wrap"><span class="t">SCM Fundamentals</span><span class="t">Risk Identification</span><span class="t">Operational Governance</span><span class="t">Compliance</span></div>
+      </div>
+      <div class="sk">
+        <div class="sk-icon">🔄</div>
+        <div class="sk-title">Process & Delivery</div>
+        <div class="t-wrap"><span class="t hi">Agile / Scrum</span><span class="t">JIRA</span><span class="t">Trello</span><span class="t">Notion</span><span class="t">Requirement Analysis</span></div>
+      </div>
+      <div class="sk">
+        <div class="sk-icon">🤝</div>
+        <div class="sk-title">Stakeholder & Advisory</div>
+        <div class="t-wrap"><span class="t">Cross-functional Collab</span><span class="t">Executive Reporting</span><span class="t">International Coordination</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="stag">Case Studies</div>
+    <h2 class="stitle">Featured Projects</h2>
+    <p class="ssub">Production-grade systems built to solve real business problems — framed as enterprise case studies.</p>
+    <div class="proj-filters">
+      <button class="pf on" data-f="all">All</button>
+      <button class="pf" data-f="bi">Data Analytics & BI</button>
+      <button class="pf" data-f="sc">Supply Chain</button>
+      <button class="pf" data-f="ft">FinTech & Product</button>
+      <button class="pf" data-f="nlp">Automation & NLP</button>
+    </div>
+    <div class="proj-grid">
+
+      <div class="pc" data-c="nlp" data-id="reconciliation">
+        <div class="pc-head">
+          <div class="pc-kpi" style="color:var(--teal)">100%</div>
+          <div class="pc-kpi-label">Manual Entry Eliminated</div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-cat">// NLP · OCR · Finance Automation</div>
+          <h3 class="pc-title">Intelligent Expense Reconciliation Engine</h3>
+          <p class="pc-prob">▸ Finance teams waste 40%+ of processing time on manual receipt reconciliation, creating audit exposure and delayed close cycles.</p>
+          <p class="pc-desc">End-to-end pipeline ingesting receipt images via OCR, classifying transactions with an NLP model, and outputting audit-ready datasets — eliminating manual data entry entirely and compressing reconciliation lag from days to minutes.</p>
+          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">OCR</span><span class="pc-tag">NLP</span><span class="pc-tag">MongoDB</span><span class="pc-tag">Data Pipeline</span><span class="pc-tag">Finance</span></div>
+          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Automation · FinTech</span><span class="pc-link pc-open" style="color:var(--teal)">Open Inspector ↗</span></div>
+        </div>
+      </div>
+
+      <div class="pc" data-c="bi" data-id="mpi">
+        <div class="pc-head">
+          <div class="pc-kpi" style="color:var(--blue)">−30%</div>
+          <div class="pc-kpi-label">Reporting Cycle Time</div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-cat">// BI · Analytics · Performance Reporting</div>
+          <h3 class="pc-title">Market Performance Intelligence System</h3>
+          <p class="pc-prob">▸ Marketing orgs without a single source of truth make slow, gut-feel decisions instead of data-driven ones — losing conversion opportunities daily.</p>
+          <p class="pc-desc">Consolidated fragmented customer and market datasets into a unified weekly reporting framework at idigitalxp. Automated the pipeline, cutting cycle time 30% and surfacing conversion signals that translated to a 10% lead lift and 20% efficiency gain.</p>
+          <div class="pc-tags"><span class="pc-tag">Excel</span><span class="pc-tag">Analytics</span><span class="pc-tag">KPI Dashboards</span><span class="pc-tag">Market Data</span></div>
+          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Data Analytics · BI</span><span class="pc-link pc-open" style="color:var(--blue)">Open Inspector ↗</span></div>
+        </div>
+      </div>
+
+      <div class="pc" data-c="sc" data-id="demand">
+        <div class="pc-head">
+          <div class="pc-kpi" style="color:var(--emerald)">Predictive</div>
+          <div class="pc-kpi-label">vs Reactive Operations</div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-cat">// Supply Chain · Forecasting · Risk</div>
+          <h3 class="pc-title">Demand Variability & Supply Risk Forecasting</h3>
+          <p class="pc-prob">▸ Without early-warning systems, operations teams stay reactive — increasing holding costs, stockout risk, and SLA breaches.</p>
+          <p class="pc-desc">Time-series statistical model forecasting demand variability and flagging supply risk indicators early. Iterated with Agile methodology and stakeholder feedback loops; outputs structured for direct integration into supply planning dashboards.</p>
+          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">R</span><span class="pc-tag">Time Series</span><span class="pc-tag">Statistical Modelling</span></div>
+          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Supply Chain · Operations</span><span class="pc-link pc-open" style="color:var(--emerald)">Open Inspector ↗</span></div>
+        </div>
+      </div>
+
+      <div class="pc wide" data-c="ft" data-id="churn">
+        <div class="pc-head" style="display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:center">
+          <div><div class="pc-kpi" style="color:var(--rose)">30d</div><div class="pc-kpi-label">Early Churn Warning</div></div>
+          <div style="height:1px;background:rgba(255,255,255,.06)"></div>
+          <div style="display:flex;gap:1.5rem;text-align:center">
+            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--amber)">RFM</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Feature Eng.</div></div>
+            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--blue)">XGB</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Model</div></div>
+            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--teal)">BI</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Dashboard</div></div>
+          </div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-cat" style="color:var(--rose)">// FinTech · Product Analytics · Predictive ML</div>
+          <h3 class="pc-title">Customer Churn & Revenue Risk Intelligence Platform</h3>
+          <p class="pc-prob">▸ Banks and SaaS businesses lose 20–30% of revenue to preventable churn — without predictive systems, retention teams engage too late, burning CAC with zero recovery.</p>
+          <p class="pc-desc">XGBoost + logistic regression ensemble scoring churn probability per account from transactional and behavioural data. Outputs a ranked revenue-at-risk register in an interactive Power BI dashboard — flagging high-risk accounts 30 days before predicted churn. RFM feature engineering + cross-validation precision-recall optimisation to minimise false-positive outreach cost.</p>
+          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">XGBoost</span><span class="pc-tag">SQL</span><span class="pc-tag">Power BI</span><span class="pc-tag">Feature Engineering</span><span class="pc-tag">Churn Modelling</span><span class="pc-tag">FinTech</span></div>
+          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">FinTech · Product Analytics · Predictive ML</span><span class="pc-link pc-open" style="color:var(--rose)">Open Inspector ↗</span></div>
+        </div>
+      </div>
+
+    </div>
+    <a href="https://github.com/GauravWarke" target="_blank" class="view-gh">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      View All Projects on GitHub
+    </a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- EXPERIENCE + EDU -->
+<section id="experience">
+  <div class="container">
+    <div class="stag">Journey</div>
+    <h2 class="stitle">Experience & Education</h2>
+    <p class="ssub">My professional path and academic foundation — where the numbers came from.</p>
+    <div class="exp-cols">
+      <div>
+        <p style="font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.14em;margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace">// Work Experience</p>
+        <div class="tl">
+          <div class="ti">
+            <div class="t-date">Jul – Dec 2025</div>
+            <div class="t-role">Junior Data Analyst</div>
+            <div class="t-co">idigitalxp · Mumbai, India</div>
+            <ul class="t-list">
+              <li>Analysed customer and market datasets to surface trends driving product positioning decisions.</li>
+              <li>Built automated reporting framework cutting cycle time by <span class="hi">30%</span>.</li>
+              <li>Insights translated to <span class="hi">10%</span> lead conversion lift and <span class="hi">20%</span> process efficiency gain.</li>
+            </ul>
+          </div>
+          <div class="ti">
+            <div class="t-date">Feb – Jun 2024</div>
+            <div class="t-role">Outgoing Global Volunteer</div>
+            <div class="t-co">AIESEC · Mumbai, India</div>
+            <ul class="t-list">
+              <li>Managed end-to-end international placement pipeline across screening, onboarding, and partner coordination.</li>
+              <li>Grew program participation by <span class="hi">25%</span> through structured outreach campaigns.</li>
+              <li>Maintained <span class="hi">100%</span> documentation compliance across all partner projects.</li>
+            </ul>
+          </div>
+          <div class="ti">
+            <div class="t-date">May – Dec 2024</div>
+            <div class="t-role">Volunteer Leader</div>
+            <div class="t-co">Extension Work Committee · Mumbai</div>
+            <ul class="t-list">
+              <li>Led structured learning sessions in government-funded schools; coordinated volunteer groups and community education initiatives.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.14em;margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace">// Education</p>
+        <div class="edu-card" style="border-color:rgba(13,148,136,.3)">
+          <div class="edu-year">Present</div>
+          <div class="edu-deg">Master of Business Analytics</div>
+          <div class="edu-sch">Monash University · Clayton, Melbourne VIC</div>
+          <p style="font-size:.75rem;color:var(--t3);line-height:1.5">Statistical modelling, BI, machine learning, and data-driven decision frameworks.</p>
+        </div>
+        <div class="edu-card">
+          <div class="edu-year">Graduated May 2025</div>
+          <div class="edu-deg">B.E. Computer Engineering (Honours)</div>
+          <div class="edu-sch">TCET · Mumbai, India</div>
+          <span class="gpa">GPA: 9.36 / 10.0</span>
+          <p style="font-size:.75rem;color:var(--t3);margin-top:.55rem;line-height:1.5">Specialisation in AI, data systems, and cloud infrastructure.</p>
+        </div>
+        <p style="font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.14em;margin:.9rem 0 .75rem;font-family:'JetBrains Mono',monospace">// Leadership</p>
+        <div class="sk" style="margin-top:0">
+          <div class="sk-title">Operational & Community Roles</div>
+          <ul class="t-list" style="margin-top:.35rem">
+            <li>Sports Director — Rotaract Club of TCET & Mumbai Nova</li>
+            <li>Discipline Advisory Head — Computer Society of India</li>
+            <li>Team Captain — TCET Football & Tug-of-War</li>
+            <li>Lead Guitarist — <em>The Eighth Note</em></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RESEARCH -->
+<section id="research">
+  <div class="container">
+    <div class="stag">Publications</div>
+    <h2 class="stitle">Research & Publications</h2>
+    <p class="ssub">Peer-reviewed work at an international conference — a rare credential for an industry-transitioning analyst.</p>
+    <div class="r-card">
+      <div>
+        <div class="r-badge">First Author · Peer Reviewed</div>
+        <h3 class="r-title">IC-ICN 2025 — International Conference on Intelligent Computing & Networking</h3>
+        <p class="r-venue">Multicon 2025 · Thakur College of Engineering & Technology, Mumbai</p>
+        <p style="font-size:.83rem;color:var(--t3);margin-top:.8rem;line-height:1.68;max-width:540px">Contributed original first-author research accepted at a competitive international conference — demonstrating independent analytical thinking, rigorous methodology, and the ability to communicate findings to a technical peer audience. A rare credential at the graduate level.</p>
+        <a href="#contact" style="font-size:.78rem;color:var(--teal);text-decoration:none;font-weight:500;display:inline-block;margin-top:.9rem;font-family:'JetBrains Mono',monospace">// Request Full Paper →</a>
+      </div>
+      <div class="r-stats">
+        <div class="rs"><div class="rs-v">1st</div><div class="rs-l">Author</div></div>
+        <div class="rs"><div class="rs-v" style="color:var(--blue);font-size:1.3rem">Int'l</div><div class="rs-l">Conference</div></div>
+        <div class="rs"><div class="rs-v" style="color:var(--teal2);font-size:1.3rem">2025</div><div class="rs-l">Published</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-wrap">
+      <div>
+        <div class="stag">Get In Touch</div>
+        <h2 class="c-heading">Let's build<br>something <em>together.</em></h2>
+        <p class="c-sub">Open to internships, part-time, and graduate roles across Data Analytics, BI, Supply Chain, Product Analytics, and FinTech in Melbourne. Student Visa (500) — 48hrs/fortnight work rights.</p>
+        <div class="c-links">
+          <a href="mailto:gauravwarke8@gmail.com" class="c-link"><div class="c-ico" style="background:rgba(13,148,136,.1)">📧</div>gauravwarke8@gmail.com</a>
+          <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="c-link"><div class="c-ico" style="background:rgba(59,130,246,.1)">💼</div>linkedin.com/in/gaurav-warke</a>
+          <a href="tel:0420908450" class="c-link"><div class="c-ico" style="background:rgba(16,185,129,.1)">📱</div>0420 908 450</a>
+          <a href="https://github.com/GauravWarke" target="_blank" class="c-link"><div class="c-ico" style="background:rgba(255,255,255,.05)">⌨</div>github.com/GauravWarke</a>
+        </div>
+      </div>
+      <div>
+        <div class="avail">
+          <div class="av-header">
+            <span class="av-title">Availability Status</span>
+            <span class="av-live"><div class="dot"></div>Live · May 2026</span>
+          </div>
+          <div class="av-row"><span class="av-lbl">Data Analytics Internship</span><span class="badge open">OPEN</span></div>
+          <div class="av-row"><span class="av-lbl">BI / Reporting Analyst</span><span class="badge open">OPEN</span></div>
+          <div class="av-row"><span class="av-lbl">Supply Chain Analytics</span><span class="badge open">OPEN</span></div>
+          <div class="av-row"><span class="av-lbl">Product / SaaS Analytics</span><span class="badge open">OPEN</span></div>
+          <div class="av-row"><span class="av-lbl">FinTech / Banking Analytics</span><span class="badge con">CONSIDERING</span></div>
+          <div class="av-row"><span class="av-lbl">Arrangement</span><span style="font-size:.7rem;color:var(--t3);font-family:'JetBrains Mono',monospace">Part-time · Internship · Grad</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <span class="f-brand">Gaurav<em>.</em></span>
+        <p class="f-desc">Data & Business Analytics professional — turning raw data into decisions that move revenue.</p>
+        <div class="f-socials">
+          <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="f-soc">in</a>
+          <a href="https://github.com/GauravWarke" target="_blank" class="f-soc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          <a href="mailto:gauravwarke8@gmail.com" class="f-soc">✉</a>
+        </div>
+      </div>
+      <div class="f-col">
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#research">Research</a></li>
+          <li><a href="mailto:gauravwarke8@gmail.com">Resume</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#metrics">Metrics</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h5>Connect</h5>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank">LinkedIn</a></li>
+          <li><a href="https://github.com/GauravWarke" target="_blank">GitHub</a></li>
+          <li><a href="mailto:gauravwarke8@gmail.com">Email</a></li>
+          <li><a href="tel:0420908450">0420 908 450</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Gaurav Warke · Melbourne, Australia</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3)">// Built with precision. Designed to convert.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- CASE STUDY INSPECTOR (Triple-M drawer) -->
+<div class="insp-overlay" id="insp" role="dialog" aria-modal="true" aria-label="Case study inspector">
+  <div class="insp-scrim" data-close></div>
+  <aside class="insp">
+    <div class="insp-top">
+      <div>
+        <div class="insp-cat" id="insp-cat"></div>
+        <h3 class="insp-title" id="insp-title"></h3>
+      </div>
+      <button class="insp-close" data-close aria-label="Close inspector">esc ✕</button>
+    </div>
+    <div class="insp-kpi">
+      <div class="insp-kpi-v" id="insp-kpi-v"></div>
+      <div class="insp-kpi-l" id="insp-kpi-l"></div>
+    </div>
+    <div class="insp-block">
+      <div class="insp-block-h" style="color:var(--rose)">01 · Market Problem</div>
+      <p id="insp-market"></p>
+    </div>
+    <div class="insp-block">
+      <div class="insp-block-h" style="color:var(--blue)">02 · Modular Architecture</div>
+      <ul class="insp-list" id="insp-arch"></ul>
+    </div>
+    <div class="insp-block">
+      <div class="insp-block-h" style="color:var(--emerald)">03 · Measurable Metric</div>
+      <p id="insp-metric"></p>
+    </div>
+    <div class="insp-tags" id="insp-tags"></div>
+    <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank">View Source / Request Full Case Study ↗</a>
+    <p class="insp-note">// Repo link pending — wire your real GitHub URL here</p>
+  </aside>
+</div>
+
+<script>
+// SECTION ORDER — lead with Projects (Hero → Projects → About → Skills → Experience → Research → Contact)
+(function(){
+  var order=['home','projects','about','skills','experience','research','contact'];
+  var footer=document.querySelector('footer'); if(!footer) return;
+  var parent=footer.parentNode;
+  document.querySelectorAll('.divider').forEach(function(d){d.remove();});
+  order.forEach(function(id,i){
+    var s=document.getElementById(id); if(!s) return;
+    parent.insertBefore(s,footer);                       // move section into new order
+    if(i<order.length-1){
+      var d=document.createElement('div'); d.className='divider';
+      parent.insertBefore(d,footer);                     // re-insert a divider between sections
+    }
+  });
+})();
+
+// TYPEWRITER
+const p=['Master of Business Analytics @ Monash','Junior Data Analyst · idigitalxp','Supply Chain & Operations Analytics','BI & Reporting Specialist','FinTech & Product Analytics'];
+let pi=0,ci=0,del=false;
+const el=document.getElementById('tw');
+function tw(){
+  const s=p[pi];
+  el.textContent=del?s.slice(0,ci--):s.slice(0,ci++);
+  if(!del&&ci>s.length){del=true;setTimeout(tw,1500);return}
+  if(del&&ci<0){del=false;pi=(pi+1)%p.length;ci=0}
+  setTimeout(tw,del?42:78);
+}
+tw();
+
+// FILTERS
+document.querySelectorAll('.pf').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.pf').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const f=b.dataset.f;
+    document.querySelectorAll('.pc').forEach(c=>{
+      c.classList.toggle('hidden',f!=='all'&&c.dataset.c!==f);
+    });
+  });
+});
+
+// CASE STUDY INSPECTOR — Triple-M data
+const CASES={
+  reconciliation:{
+    cat:'// NLP · OCR · Finance Automation',catColor:'var(--teal)',
+    title:'Intelligent Expense-Reconciliation Engine',
+    kpi:'100%',kpiColor:'var(--teal)',kpiLabel:'Manual Entry Eliminated',
+    market:'Manual reconciliation is slow, error-prone, and an audit liability. Finance teams burn 40%+ of processing time re-keying receipts, and every hand-typed line item is a control gap that delays month-end close.',
+    arch:['OCR ingestion layer normalises heterogeneous receipt images into structured text.','NLP classifier maps line items to expense categories with confidence scoring.','Low-confidence records route to a human review queue — no silent failures.','Persists an audit-ready, append-only dataset in MongoDB — reproducible and traceable end to end.'],
+    metric:'100% of manual data entry eliminated; reconciliation lag reduced from days to minutes.',
+    tags:['Python','OCR','NLP','MongoDB','Data Pipeline','Finance']
+  },
+  mpi:{
+    cat:'// BI · Analytics · Performance Reporting',catColor:'var(--blue)',
+    title:'Market-Performance Intelligence System',
+    kpi:'−30%',kpiColor:'var(--blue)',kpiLabel:'Reporting Cycle Time',
+    market:'A reporting cycle measured in days means decisions are always made on stale data. Marketing orgs without a single source of truth make slow, gut-feel calls and lose conversion opportunities daily.',
+    arch:['Unified fragmented customer/market sources into one weekly reporting schema.','Automated the ETL + refresh path that was previously manual and brittle.','Engineered KPI definitions with stakeholders so numbers meant the same thing to every team.','Surfaced leading conversion signals, not just lagging totals.'],
+    metric:'−30% reporting cycle time, +10% lead-conversion lift, +20% process-efficiency gain (idigitalxp, verified).',
+    tags:['Excel','Analytics','KPI Dashboards','Market Data']
+  },
+  demand:{
+    cat:'// Supply Chain · Forecasting · Risk',catColor:'var(--emerald)',
+    title:'Demand-Variability & Supply-Risk Forecasting',
+    kpi:'Predictive',kpiColor:'var(--emerald)',kpiLabel:'vs Reactive Operations',
+    market:'Without early-warning systems, operations teams stay reactive — driving up holding costs, stockout risk, and SLA breaches. Every day of forecast lead time is inventory you don’t over-order and a stockout you pre-empt.',
+    arch:['Time-series decomposition isolates trend, seasonality, and irregular variance.','Statistical forecasting with confidence intervals quantifies uncertainty rather than hiding it.','Risk-indicator flags surface supply exposure before it becomes a stockout.','Delivered via Agile iterations with stakeholder feedback loops; outputs dashboard-ready.'],
+    metric:'Shifts operations from reactive to predictive — reducing holding-cost and stockout/SLA-breach exposure.',
+    tags:['Python','R','Time Series','Statistical Modelling']
+  },
+  churn:{
+    cat:'// FinTech · Product Analytics · Predictive ML',catColor:'var(--rose)',
+    title:'Customer Churn & Revenue-Risk Intelligence Platform',
+    kpi:'30d',kpiColor:'var(--rose)',kpiLabel:'Early Churn Warning',
+    market:'Banks and SaaS businesses lose 20–30% of revenue to preventable churn, and a 5% retention lift can raise profit 25%+. The pain is timing: teams find out a customer left after they leave.',
+    arch:['RFM (Recency/Frequency/Monetary) feature engineering with leakage-safe temporal splits.','XGBoost + logistic-regression ensemble; class imbalance handled via stratified sampling.','Precision-recall threshold tuned to minimise false-positive outreach cost — the metric the business pays for.','Ranked revenue-at-risk register piped into an interactive Power BI dashboard.'],
+    metric:'Flags at-risk accounts 30 days before predicted churn; PR-optimised threshold cuts wasted outreach.',
+    tags:['Python','XGBoost','SQL','Power BI','Feature Engineering','Churn Modelling']
+  }
+};
+
+const insp=document.getElementById('insp');
+function openCase(id){
+  const c=CASES[id];if(!c)return;
+  const cat=document.getElementById('insp-cat');
+  cat.textContent=c.cat;cat.style.color=c.catColor;
+  document.getElementById('insp-title').textContent=c.title;
+  const kv=document.getElementById('insp-kpi-v');
+  kv.textContent=c.kpi;kv.style.color=c.kpiColor;
+  document.getElementById('insp-kpi-l').textContent=c.kpiLabel;
+  document.getElementById('insp-market').textContent=c.market;
+  document.getElementById('insp-metric').textContent=c.metric;
+  document.getElementById('insp-arch').innerHTML=c.arch.map(a=>`<li>${a}</li>`).join('');
+  document.getElementById('insp-tags').innerHTML=c.tags.map(t=>`<span class="pc-tag">${t}</span>`).join('');
+  insp.classList.add('show');document.body.classList.add('insp-lock');
+}
+function closeCase(){insp.classList.remove('show');document.body.classList.remove('insp-lock');}
+document.querySelectorAll('.pc').forEach(card=>{
+  card.addEventListener('click',()=>openCase(card.dataset.id));
+});
+insp.querySelectorAll('[data-close]').forEach(el=>el.addEventListener('click',closeCase));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCase();});
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// SCROLL FADE
+const els=document.querySelectorAll('.sk,.pc,.ti,.edu-card,.r-card,.c-link,.avail,.info-item,.data-card');
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.08});
+els.forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(12px)';
+  el.style.transition='opacity .45s ease, transform .45s ease';
+  io.observe(el);
+});
+
+// BAR ANIMATION
+const bars=document.querySelectorAll('.bar-fill');
+const bio=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const w=e.target.style.width;
+      e.target.style.width='0';
+      setTimeout(()=>e.target.style.width=w,100);
+      bio.unobserve(e.target);
+    }
+  });
+},{threshold:.5});
+bars.forEach(b=>bio.observe(b));
+</script>
+
+<!-- THREE.JS — Global 3D data-network (full-page background) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var canvas=document.getElementById('bg3d');
+  if(!canvas||typeof THREE==='undefined') return;                  // graceful fallback → noise+grid stay
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var W=window.innerWidth, H=window.innerHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.setSize(W,H,false);
+
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(60,W/H,1,3000);
+  camera.position.z=640;
+
+  // ---- generate nodes (data points) sized to fill the viewport ----
+  var N = W<700 ? 70 : 150;
+  var BX=1100, BY=760, BZ=640;                                     // generation box
+  var pos=new Float32Array(N*3);
+  var vel=[];
+  for(var i=0;i<N;i++){
+    pos[i*3]  =(Math.random()-0.5)*BX;
+    pos[i*3+1]=(Math.random()-0.5)*BY;
+    pos[i*3+2]=(Math.random()-0.5)*BZ;
+    vel.push([(Math.random()-0.5)*0.22,(Math.random()-0.5)*0.22,(Math.random()-0.5)*0.22]);
+  }
+
+  var group=new THREE.Group();
+  scene.add(group);
+
+  // points (nodes)
+  var pGeo=new THREE.BufferGeometry();
+  pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var points=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x14B8A6,size:3.0,transparent:true,opacity:0.8,sizeAttenuation:true}));
+  group.add(points);
+
+  // connecting lines (rebuilt each frame for nearby nodes)
+  var LINK=135, LINK2=LINK*LINK, MAXSEG=N*14;
+  var linePos=new Float32Array(MAXSEG*2*3);
+  var lGeo=new THREE.BufferGeometry();
+  lGeo.setAttribute('position',new THREE.BufferAttribute(linePos,3));
+  var lines=new THREE.LineSegments(lGeo,new THREE.LineBasicMaterial({color:0x0D9488,transparent:true,opacity:0.20}));
+  group.add(lines);
+
+  // ---- fluid morphing blob: an organic liquid shape behind the network ----
+  var blobGroup=new THREE.Group(); blobGroup.position.z=-170; scene.add(blobGroup);
+  var blobGeo=new THREE.IcosahedronGeometry(330,3);                // detail 3 → smooth enough for wireframe, light to morph
+  var blobBase=blobGeo.attributes.position.array.slice(0);         // store rest positions
+  var blob=new THREE.Mesh(blobGeo,new THREE.MeshBasicMaterial({color:0x0D9488,wireframe:true,transparent:true,opacity:0.13}));
+  blobGroup.add(blob);
+  var tBlob=0;
+  function morphBlob(t){                                           // displace each vertex along its normal by layered sine "noise"
+    var arr=blobGeo.attributes.position.array;
+    for(var i=0;i<arr.length;i+=3){
+      var bx=blobBase[i],by=blobBase[i+1],bz=blobBase[i+2];
+      var len=Math.sqrt(bx*bx+by*by+bz*bz);
+      var nx=bx/len,ny=by/len,nz=bz/len;
+      var n=Math.sin(nx*2.0+t)*Math.cos(ny*2.0+t*0.8)+Math.sin(nz*2.6+t*1.3);
+      var d=len + n*30;                                            // amplitude of the fluid undulation
+      arr[i]=nx*d; arr[i+1]=ny*d; arr[i+2]=nz*d;
+    }
+    blobGeo.attributes.position.needsUpdate=true;
+  }
+
+  // ---- per-section domain themes: the network recolours + changes energy as you scroll ----
+  var THEMES={
+    home:      {c:0x14B8A6,l:0x0D9488,spin:0.0012,shape:'cloud'},   // teal  · free data-network
+    projects:  {c:0x14B8A6,l:0x0D9488,spin:0.0013,shape:'sphere'},  // teal  · orbital case studies
+    about:     {c:0x3B82F6,l:0x2563EB,spin:0.0009,shape:'cloud'},   // blue  · identity / calm
+    skills:    {c:0xF59E0B,l:0xB45309,spin:0.0017,shape:'grid'},    // amber · BI lattice
+    experience:{c:0x10B981,l:0x059669,spin:0.0010,shape:'helix'},   // green · growth / timeline
+    research:  {c:0xF59E0B,l:0xB45309,spin:0.0011,shape:'sphere'},  // amber · publications
+    contact:   {c:0x2DD4BF,l:0x0D9488,spin:0.0012,shape:'cloud'}    // teal  · invite
+  };
+
+  // ---- domain shape generators: node target positions per motif ----
+  function shapeTargets(type){
+    if(type==='cloud') return null;
+    var a=new Float32Array(N*3), i;
+    if(type==='sphere'){                                  // FinTech / research — tight orbital
+      var R=300;
+      for(i=0;i<N;i++){
+        var phi=Math.acos(1-2*(i+0.5)/N), th=Math.PI*(1+Math.sqrt(5))*i;
+        a[i*3]=R*Math.sin(phi)*Math.cos(th);
+        a[i*3+1]=R*Math.sin(phi)*Math.sin(th)*0.85;
+        a[i*3+2]=R*Math.cos(phi);
+      }
+    } else if(type==='grid'){                             // BI — structured lattice
+      var cols=Math.ceil(Math.sqrt(N)), gap=86;
+      for(i=0;i<N;i++){
+        a[i*3]=((i%cols)-cols/2)*gap;
+        a[i*3+1]=(Math.floor(i/cols)-cols/2)*gap*0.72;
+        a[i*3+2]=(((i*53)%3)-1)*70;
+      }
+    } else if(type==='helix'){                            // timeline — ascending strand
+      for(i=0;i<N;i++){
+        var t=i/N, ang=t*Math.PI*8, rad=170;
+        a[i*3]=Math.cos(ang)*rad;
+        a[i*3+1]=(t-0.5)*640;
+        a[i*3+2]=Math.sin(ang)*rad;
+      }
+    }
+    return a;
+  }
+  var SHAPES={cloud:null,sphere:shapeTargets('sphere'),grid:shapeTargets('grid'),helix:shapeTargets('helix')};
+  var targetShape=null;
+  var curC=new THREE.Color(0x14B8A6), tgtC=new THREE.Color(0x14B8A6);
+  var curL=new THREE.Color(0x0D9488), tgtL=new THREE.Color(0x0D9488);
+  var spin=0.0012, tgtSpin=0.0012;
+  if('IntersectionObserver' in window){
+    var so=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          var t=THEMES[e.target.id];
+          if(t){ tgtC.setHex(t.c); tgtL.setHex(t.l); tgtSpin=t.spin; targetShape=SHAPES[t.shape]; }
+        }
+      });
+    },{rootMargin:'-45% 0px -45% 0px'});   // active when a section crosses viewport centre
+    document.querySelectorAll('section[id]').forEach(function(s){ so.observe(s); });
+  }
+
+  // mouse parallax + scroll parallax
+  var tx=0,ty=0,sy=0;
+  window.addEventListener('mousemove',function(e){
+    tx=(e.clientX/window.innerWidth-0.5);
+    ty=(e.clientY/window.innerHeight-0.5);
+  });
+  window.addEventListener('scroll',function(){ sy=window.scrollY; });
+
+  function rebuildLines(){
+    var seg=0,a=lGeo.attributes.position.array;
+    for(var i=0;i<N;i++){
+      var ix=pos[i*3],iy=pos[i*3+1],iz=pos[i*3+2];
+      for(var j=i+1;j<N;j++){
+        var dx=ix-pos[j*3],dy=iy-pos[j*3+1],dz=iz-pos[j*3+2];
+        var d2=dx*dx+dy*dy+dz*dz;
+        if(d2<LINK2 && seg<MAXSEG){
+          var o=seg*6;
+          a[o]=ix;a[o+1]=iy;a[o+2]=iz;
+          a[o+3]=pos[j*3];a[o+4]=pos[j*3+1];a[o+5]=pos[j*3+2];
+          seg++;
+        }
+      }
+    }
+    lGeo.setDrawRange(0,seg*2);
+    lGeo.attributes.position.needsUpdate=true;
+  }
+
+  var breath=0;
+  function drift(){
+    if(targetShape){                                       // ease nodes toward the domain motif
+      breath+=0.012;
+      for(var i=0;i<N;i++){
+        var bx=Math.sin(breath+i)*4, by=Math.cos(breath+i*1.3)*4;
+        pos[i*3]   += (targetShape[i*3]  +bx - pos[i*3])   *0.03;
+        pos[i*3+1] += (targetShape[i*3+1]+by - pos[i*3+1]) *0.03;
+        pos[i*3+2] += (targetShape[i*3+2]    - pos[i*3+2]) *0.03;
+      }
+      pGeo.attributes.position.needsUpdate=true;
+      return;
+    }
+    for(var i2=0;i2<N;i2++){                                // free drift (cloud sections)
+      for(var k=0;k<3;k++){
+        var idx=i2*3+k;
+        pos[idx]+=vel[i2][k];
+        var bound = k===0 ? BX*0.55 : (k===1 ? BY*0.55 : BZ*0.55);
+        if(pos[idx]> bound || pos[idx]< -bound) vel[i2][k]*=-1;
+      }
+    }
+    pGeo.attributes.position.needsUpdate=true;
+  }
+
+  function frame(){
+    drift();
+    rebuildLines();
+    curC.lerp(tgtC,0.05); points.material.color.copy(curC);        // ease colour to section theme
+    curL.lerp(tgtL,0.05); lines.material.color.copy(curL);
+    spin += (tgtSpin-spin)*0.05; group.rotation.y += spin;         // ease spin to section energy
+    tBlob+=0.006; morphBlob(tBlob);                                // fluid undulation
+    blob.material.color.copy(curL);                                // blob shares the section colour
+    blobGroup.rotation.y -= 0.0006; blobGroup.rotation.x += 0.0003;
+    group.rotation.x += ((ty*0.30) - group.rotation.x)*0.04;       // ease toward mouse Y
+    group.rotation.z = sy*0.00007;                                 // subtle turn as you scroll
+    camera.position.x += (tx*70 - camera.position.x)*0.04;
+    camera.position.y += (-ty*45 - camera.position.y)*0.04;
+    camera.lookAt(scene.position);
+    renderer.render(scene,camera);
+    if(!reduce) requestAnimationFrame(frame);
+  }
+
+  function resize(){
+    W=window.innerWidth;H=window.innerHeight;
+    camera.aspect=W/H;camera.updateProjectionMatrix();
+    renderer.setSize(W,H,false);
+  }
+  window.addEventListener('resize',resize);
+
+  if(reduce){ rebuildLines(); morphBlob(0); renderer.render(scene,camera); }   // static frame, respects reduced-motion
+  else frame();
+})();
+</script>
+</body>
+</html>
