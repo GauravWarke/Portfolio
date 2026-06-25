@@ -4,7 +4,7 @@
 
 A single-file, zero-build interactive portfolio with a live **3D data-network** background (Three.js), per-section domain motifs, a fluid morphing shape, and a **Case Study Inspector** that frames every project as Problem → Architecture → Metric.
 
-**Live:** _add your URL here once deployed_
+**Live:** https://gauravwarke.github.io/Portfolio/
 **Contact:** gauravwarke8@gmail.com · [LinkedIn](https://www.linkedin.com/in/gaurav-warke-b5493b394) · [GitHub](https://github.com/GauravWarke)
 
 ---
@@ -30,11 +30,11 @@ git init
 git add .
 git commit -m "Portfolio"
 git branch -M main
-git remote add origin https://github.com/GauravWarke/portfolio.git
+git remote add origin https://github.com/GauravWarke/Portfolio.git
 git push -u origin main
 ```
 Then on GitHub: **Settings → Pages → Source: `main` / root → Save.**
-Your site goes live at `https://gauravwarke.github.io/portfolio/`.
+Your site goes live at `https://gauravwarke.github.io/Portfolio/`.
 
 ### Option B — Vercel (same repo)
 1. Go to [vercel.com](https://vercel.com) → **Add New → Project** → import the same `portfolio` repo.
