@@ -4,7 +4,7 @@
 
 A single-file, zero-build interactive portfolio with a live **3D data-network** background (Three.js), per-section domain motifs, a fluid morphing shape, and a **Case Study Inspector** that frames every project as Problem → Architecture → Metric.
 
-**Live:** https://gauravwarke.github.io/Portfolio/
+**Live:** https://portfolio-plum-eta-oqdpa0gzlv.vercel.app/ &nbsp;·&nbsp; mirror: https://gauravwarke.github.io/Portfolio/
 **Contact:** gauravwarke8@gmail.com · [LinkedIn](https://www.linkedin.com/in/gaurav-warke-b5493b394) · [GitHub](https://github.com/GauravWarke)
 
 ---
