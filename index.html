@@ -94,7 +94,7 @@ section{padding:7.5rem 0}
 .about-wrap{display:grid;grid-template-columns:280px 1fr;gap:3.5rem;align-items:start}
 .photo-col{position:sticky;top:90px}
 .photo-box{width:100%;aspect-ratio:3/4;border-radius:16px;background:var(--card2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.photo-box img{width:100%;height:100%;object-fit:cover;border-radius:16px}
+.photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:16px;z-index:1}
 .initials{font-family:'Sora',sans-serif;font-size:4.5rem;font-weight:800;color:var(--teal);opacity:.4}
 .photo-status{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(8,12,24,.85);backdrop-filter:blur(8px);border:1px solid var(--b);border-radius:8px;padding:.6rem .85rem;display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--t2)}
 .status-dot{width:6px;height:6px;background:var(--emerald);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
@@ -350,7 +350,8 @@ body.insp-lock{overflow:hidden}
     <div class="about-wrap">
       <div class="photo-col">
         <div class="photo-box">
-          <!-- To add your photo: replace <div class="initials">GW</div> with <img src="photo.jpg" alt="Gaurav Warke"> -->
+          <!-- Drop photo.jpg into this folder; it shows automatically, else the GW monogram remains -->
+          <img src="photo.jpg" alt="Gaurav Warke" onerror="this.remove()">
           <div class="initials">GW</div>
           <div class="photo-status"><div class="status-dot"></div>Available for hire · Melbourne, AU</div>
         </div>
