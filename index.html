@@ -724,8 +724,8 @@ body.insp-lock{overflow:hidden}
       <p id="insp-metric"></p>
     </div>
     <div class="insp-tags" id="insp-tags"></div>
-    <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank">View Source / Request Full Case Study ↗</a>
-    <p class="insp-note">// Repo link pending — wire your real GitHub URL here</p>
+    <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank">View Source on GitHub ↗</a>
+    <p class="insp-note">// Public repo — clone &amp; run it independently</p>
   </aside>
 </div>
 
@@ -780,7 +780,8 @@ const CASES={
     market:'Manual reconciliation is slow, error-prone, and an audit liability. Finance teams burn 40%+ of processing time re-keying receipts, and every hand-typed line item is a control gap that delays month-end close.',
     arch:['OCR ingestion layer normalises heterogeneous receipt images into structured text.','NLP classifier maps line items to expense categories with confidence scoring.','Low-confidence records route to a human review queue — no silent failures.','Persists an audit-ready, append-only dataset in MongoDB — reproducible and traceable end to end.'],
     metric:'100% of manual data entry eliminated; reconciliation lag reduced from days to minutes.',
-    tags:['Python','OCR','NLP','MongoDB','Data Pipeline','Finance']
+    tags:['Python','OCR','NLP','MongoDB','Data Pipeline','Finance'],
+    repo:'https://github.com/GauravWarke/expense-reconciliation-engine'
   },
   mpi:{
     cat:'// BI · Analytics · Performance Reporting',catColor:'var(--blue)',
@@ -789,7 +790,8 @@ const CASES={
     market:'A reporting cycle measured in days means decisions are always made on stale data. Marketing orgs without a single source of truth make slow, gut-feel calls and lose conversion opportunities daily.',
     arch:['Unified fragmented customer/market sources into one weekly reporting schema.','Automated the ETL + refresh path that was previously manual and brittle.','Engineered KPI definitions with stakeholders so numbers meant the same thing to every team.','Surfaced leading conversion signals, not just lagging totals.'],
     metric:'−30% reporting cycle time, +10% lead-conversion lift, +20% process-efficiency gain (idigitalxp, verified).',
-    tags:['Excel','Analytics','KPI Dashboards','Market Data']
+    tags:['Excel','Analytics','KPI Dashboards','Market Data'],
+    repo:'https://github.com/GauravWarke/market-performance-intelligence'
   },
   demand:{
     cat:'// Supply Chain · Forecasting · Risk',catColor:'var(--emerald)',
@@ -798,7 +800,8 @@ const CASES={
     market:'Without early-warning systems, operations teams stay reactive — driving up holding costs, stockout risk, and SLA breaches. Every day of forecast lead time is inventory you don’t over-order and a stockout you pre-empt.',
     arch:['Time-series decomposition isolates trend, seasonality, and irregular variance.','Statistical forecasting with confidence intervals quantifies uncertainty rather than hiding it.','Risk-indicator flags surface supply exposure before it becomes a stockout.','Delivered via Agile iterations with stakeholder feedback loops; outputs dashboard-ready.'],
     metric:'Shifts operations from reactive to predictive — reducing holding-cost and stockout/SLA-breach exposure.',
-    tags:['Python','R','Time Series','Statistical Modelling']
+    tags:['Python','R','Time Series','Statistical Modelling'],
+    repo:'https://github.com/GauravWarke/demand-supply-risk-forecasting'
   },
   churn:{
     cat:'// FinTech · Product Analytics · Predictive ML',catColor:'var(--rose)',
@@ -807,7 +810,8 @@ const CASES={
     market:'Banks and SaaS businesses lose 20–30% of revenue to preventable churn, and a 5% retention lift can raise profit 25%+. The pain is timing: teams find out a customer left after they leave.',
     arch:['RFM (Recency/Frequency/Monetary) feature engineering with leakage-safe temporal splits.','XGBoost + logistic-regression ensemble; class imbalance handled via stratified sampling.','Precision-recall threshold tuned to minimise false-positive outreach cost — the metric the business pays for.','Ranked revenue-at-risk register piped into an interactive Power BI dashboard.'],
     metric:'Flags at-risk accounts 30 days before predicted churn; PR-optimised threshold cuts wasted outreach.',
-    tags:['Python','XGBoost','SQL','Power BI','Feature Engineering','Churn Modelling']
+    tags:['Python','XGBoost','SQL','Power BI','Feature Engineering','Churn Modelling'],
+    repo:'https://github.com/GauravWarke/churn-revenue-risk-platform'
   }
 };
 
@@ -824,6 +828,7 @@ function openCase(id){
   document.getElementById('insp-metric').textContent=c.metric;
   document.getElementById('insp-arch').innerHTML=c.arch.map(a=>`<li>${a}</li>`).join('');
   document.getElementById('insp-tags').innerHTML=c.tags.map(t=>`<span class="pc-tag">${t}</span>`).join('');
+  if(c.repo)document.getElementById('insp-cta').href=c.repo;
   insp.classList.add('show');document.body.classList.add('insp-lock');
 }
 function closeCase(){insp.classList.remove('show');document.body.classList.remove('insp-lock');}
