@@ -272,6 +272,15 @@ footer{padding:3.5rem 0 1.5rem;border-top:1px solid var(--b)}
 .insp-note{font-size:.7rem;color:var(--t3);text-align:center;margin-top:.7rem;font-family:'JetBrains Mono',monospace}
 body.insp-lock{overflow:hidden}
 @media(max-width:600px){.insp{padding:1.75rem 1.4rem}}
+
+/* INTERACTIVE 3D POINTER-TILT + GLARE — hand-tuned per surface so each section reacts a little differently */
+.tilt{transform-style:preserve-3d;will-change:transform;transition:transform .2s cubic-bezier(.2,.7,.3,1)}
+.tilt.is-tilting{transition:transform .05s linear}
+.glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;opacity:0;mix-blend-mode:soft-light;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,var(--gi,.15)),transparent 42%);
+  transition:opacity .3s ease}
+.tilt.is-tilting .glare{opacity:1}
+@media(hover:none),(prefers-reduced-motion:reduce){.tilt{transform:none!important;transition:none}.glare{display:none}}
 </style>
 </head>
 <body>
@@ -350,8 +359,9 @@ body.insp-lock{overflow:hidden}
     <div class="about-wrap">
       <div class="photo-col">
         <div class="photo-box">
-          <!-- Drop photo.jpg into this folder; it shows automatically, else the GW monogram remains -->
-          <img src="photo.jpg" alt="Gaurav Warke" onerror="this.remove()">
+          <!-- Drop a photo named photo.jpg/.jpeg/.png/.webp into this folder; it shows automatically, else the GW monogram remains -->
+          <img src="photo.jpg" alt="Gaurav Warke" data-alt="photo.jpeg,photo.png,photo.webp"
+               onerror="(function(i){var f=(i.dataset.alt||'').split(',').filter(Boolean);if(f.length){i.src=f.shift();i.dataset.alt=f.join(',');}else{i.remove();}})(this)">
           <div class="initials">GW</div>
           <div class="photo-status"><div class="status-dot"></div>Available for hire · Melbourne, AU</div>
         </div>
@@ -677,7 +687,7 @@ body.insp-lock{overflow:hidden}
           <li><a href="#research">Research</a></li>
           <li><a href="mailto:gauravwarke8@gmail.com">Resume</a></li>
           <li><a href="#skills">Skills</a></li>
-          <li><a href="#metrics">Metrics</a></li>
+          <li><a href="#projects">Case Studies</a></li>
         </ul>
       </div>
       <div class="f-col">
@@ -875,6 +885,68 @@ const bio=new IntersectionObserver(entries=>{
   });
 },{threshold:.5});
 bars.forEach(b=>bio.observe(b));
+
+// INTERACTIVE 3D POINTER-TILT + GLARE
+// Each surface gets its own "feel" — projects tilt sharp, the photo leans gently, BI cards lift.
+// rAF-throttled so pointermove never thrashes layout. Skipped on touch / reduced-motion.
+(function(){
+  var mq=window.matchMedia;
+  var noHover=mq&&mq('(hover: none)').matches;
+  var reduce=mq&&mq('(prefers-reduced-motion: reduce)').matches;
+  if(noHover||reduce) return;
+  // selector -> tuning: max tilt (deg), glare intensity, hover lift (px)
+  var GROUPS=[
+    ['.pc',       {max:7,  gi:.16, lift:6}],   // projects — crisp, responsive
+    ['.data-card',{max:9,  gi:.18, lift:4}],   // hero metrics — most playful
+    ['.sk',       {max:8,  gi:.13, lift:5}],   // skills — structured lift
+    ['.photo-box',{max:5,  gi:.10, lift:0}],   // portrait — subtle, dignified
+    ['.r-card',   {max:3.5,gi:.09, lift:3}],   // research — barely there, premium
+    ['.edu-card', {max:6,  gi:.11, lift:3}]    // education — gentle
+  ];
+  GROUPS.forEach(function(g){
+    var sel=g[0], cfg=g[1];
+    document.querySelectorAll(sel).forEach(function(el){
+      el.classList.add('tilt');
+      if(getComputedStyle(el).position==='static') el.style.position='relative';
+      var glare=document.createElement('div');
+      glare.className='glare'; glare.style.setProperty('--gi',cfg.gi);
+      el.appendChild(glare);
+      var raf=0,nx=0,ny=0,gx=50,gy=50,active=false;
+      function render(){
+        raf=0;
+        el.style.transform='perspective(900px) rotateX('+(ny*cfg.max)+'deg) rotateY('+(nx*cfg.max)+'deg) translateY('+(active?-cfg.lift:0)+'px)';
+        glare.style.setProperty('--gx',gx+'%');
+        glare.style.setProperty('--gy',gy+'%');
+      }
+      el.addEventListener('pointermove',function(e){
+        var r=el.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+        nx=(px-0.5)*2; ny=-(py-0.5)*2;            // -1..1
+        gx=px*100; gy=py*100;
+        if(!raf) raf=requestAnimationFrame(render);
+      });
+      el.addEventListener('pointerenter',function(){active=true;el.classList.add('is-tilting');});
+      el.addEventListener('pointerleave',function(){
+        active=false;el.classList.remove('is-tilting');
+        if(raf){cancelAnimationFrame(raf);raf=0;}
+        nx=ny=0;el.style.transform='';           // ease back to rest via .tilt transition
+      });
+    });
+  });
+
+  // MAGNETIC BUTTONS — the CTAs lean toward the cursor, then snap back. Hand-built feel.
+  document.querySelectorAll('.btn-fill,.btn-line,.nav-cta,.hsoc').forEach(function(b){
+    b.style.transition=(b.style.transition?b.style.transition+',':'')+'transform .25s cubic-bezier(.2,.7,.3,1)';
+    var pull=10;
+    b.addEventListener('pointermove',function(e){
+      var r=b.getBoundingClientRect();
+      var dx=(e.clientX-(r.left+r.width/2))/r.width;
+      var dy=(e.clientY-(r.top+r.height/2))/r.height;
+      b.style.transform='translate('+(dx*pull)+'px,'+(dy*pull)+'px)';
+    });
+    b.addEventListener('pointerleave',function(){b.style.transform='';});
+  });
+})();
 </script>
 
 <!-- THREE.JS — Global 3D data-network (full-page background) -->
@@ -927,18 +999,24 @@ bars.forEach(b=>bio.observe(b));
   var blobGroup=new THREE.Group(); blobGroup.position.z=-170; scene.add(blobGroup);
   var blobGeo=new THREE.IcosahedronGeometry(330,3);                // detail 3 → smooth enough for wireframe, light to morph
   var blobBase=blobGeo.attributes.position.array.slice(0);         // store rest positions
+  // precompute per-vertex unit normal + radius ONCE (was recomputing a sqrt per vertex every frame)
+  var vCount=blobBase.length/3;
+  var blobN=new Float32Array(blobBase.length), blobLen=new Float32Array(vCount);
+  for(var bi=0;bi<vCount;bi++){
+    var o3=bi*3, bx0=blobBase[o3],by0=blobBase[o3+1],bz0=blobBase[o3+2];
+    var l0=Math.sqrt(bx0*bx0+by0*by0+bz0*bz0)||1;
+    blobLen[bi]=l0; blobN[o3]=bx0/l0; blobN[o3+1]=by0/l0; blobN[o3+2]=bz0/l0;
+  }
   var blob=new THREE.Mesh(blobGeo,new THREE.MeshBasicMaterial({color:0x0D9488,wireframe:true,transparent:true,opacity:0.13}));
   blobGroup.add(blob);
   var tBlob=0;
-  function morphBlob(t){                                           // displace each vertex along its normal by layered sine "noise"
+  function morphBlob(t){                                           // displace each vertex along its (precomputed) normal by layered sine "noise"
     var arr=blobGeo.attributes.position.array;
-    for(var i=0;i<arr.length;i+=3){
-      var bx=blobBase[i],by=blobBase[i+1],bz=blobBase[i+2];
-      var len=Math.sqrt(bx*bx+by*by+bz*bz);
-      var nx=bx/len,ny=by/len,nz=bz/len;
+    for(var i=0;i<vCount;i++){
+      var o=i*3, nx=blobN[o],ny=blobN[o+1],nz=blobN[o+2];
       var n=Math.sin(nx*2.0+t)*Math.cos(ny*2.0+t*0.8)+Math.sin(nz*2.6+t*1.3);
-      var d=len + n*30;                                            // amplitude of the fluid undulation
-      arr[i]=nx*d; arr[i+1]=ny*d; arr[i+2]=nz*d;
+      var d=blobLen[i] + n*30;                                     // amplitude of the fluid undulation
+      arr[o]=nx*d; arr[o+1]=ny*d; arr[o+2]=nz*d;
     }
     blobGeo.attributes.position.needsUpdate=true;
   }
