@@ -735,7 +735,8 @@ body.insp-lock{overflow:hidden}
       <p id="insp-metric"></p>
     </div>
     <div class="insp-tags" id="insp-tags"></div>
-    <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank">View Source on GitHub ↗</a>
+    <a class="insp-cta" id="insp-dash" href="#" target="_blank" style="display:none;background:linear-gradient(90deg,var(--teal),var(--teal2));margin-bottom:.6rem">⚡ Launch Live Dashboard ↗</a>
+    <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank" style="background:transparent;border:1px solid var(--b);color:var(--t2)">View Source on GitHub ↗</a>
     <p class="insp-note">// Public repo — clone &amp; run it independently</p>
   </aside>
 </div>
@@ -822,7 +823,8 @@ const CASES={
     arch:['RFM (Recency/Frequency/Monetary) feature engineering with leakage-safe temporal splits.','XGBoost + logistic-regression ensemble; class imbalance handled via stratified sampling.','Precision-recall threshold tuned to minimise false-positive outreach cost — the metric the business pays for.','Ranked revenue-at-risk register piped into an interactive Power BI dashboard.'],
     metric:'Flags at-risk accounts 30 days before predicted churn; PR-optimised threshold cuts wasted outreach.',
     tags:['Python','XGBoost','SQL','Power BI','Feature Engineering','Churn Modelling'],
-    repo:'https://github.com/GauravWarke/churn-revenue-risk-platform'
+    repo:'https://github.com/GauravWarke/churn-revenue-risk-platform',
+    dash:'dashboards/churn.html'
   }
 };
 
@@ -840,6 +842,8 @@ function openCase(id){
   document.getElementById('insp-arch').innerHTML=c.arch.map(a=>`<li>${a}</li>`).join('');
   document.getElementById('insp-tags').innerHTML=c.tags.map(t=>`<span class="pc-tag">${t}</span>`).join('');
   if(c.repo)document.getElementById('insp-cta').href=c.repo;
+  var dash=document.getElementById('insp-dash');
+  if(c.dash){dash.href=c.dash;dash.style.display='block';}else{dash.style.display='none';}
   insp.classList.add('show');document.body.classList.add('insp-lock');
 }
 function closeCase(){insp.classList.remove('show');document.body.classList.remove('insp-lock');}

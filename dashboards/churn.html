@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Churn & Revenue-Risk · Live Dashboard | Gaurav Warke</title>
+<meta name="description" content="Interactive 3D dashboard — per-merchant churn risk ranked by ARR at risk (AUD), with a live retention-ROI model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);--card2:rgba(20,29,46,.65);
+  --rose:#F43F5E;--rose2:#FB7185;--teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--emerald:#10B981;
+  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(244,63,94,.16);--bh:rgba(244,63,94,.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--rose);border-radius:2px}
+a{color:inherit}
+#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.55}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
+
+/* TOP BAR */
+.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
+.back:hover{color:var(--rose2)}
+.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--rose);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-links{display:flex;gap:.6rem}
+.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
+.top-links a:hover{border-color:var(--rose);color:var(--rose2)}
+
+/* HERO */
+.hero{padding:3.5rem 0 1.5rem;position:relative}
+.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--rose);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
+.eyebrow::before{content:'// ';opacity:.5}
+h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
+h1 em{color:var(--rose);font-style:normal}
+.lede{color:var(--t2);font-size:.98rem;max-width:640px;line-height:1.7}
+
+/* KPI STRIP */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem;margin:2.25rem 0 1rem}
+.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:transform .18s ease,border-color .2s}
+.kpi:hover{border-color:var(--bh)}
+.kpi-v{font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
+
+/* SECTION */
+.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
+.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:1.25rem}
+.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+
+/* 3D CLOUD */
+#cloudWrap{position:relative;height:420px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(244,63,94,.06),transparent 70%);border:1px solid rgba(244,63,94,.1);cursor:grab}
+#cloudWrap.drag{cursor:grabbing}
+#cloud{width:100%;height:100%;display:block}
+.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
+.lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace}
+.tip b{color:var(--rose2)}
+
+/* FILTERS */
+.filters{display:flex;gap:.4rem;flex-wrap:wrap}
+.fbtn{padding:.35rem .8rem;border:1px solid var(--b);border-radius:100px;font-size:.72rem;color:var(--t3);background:transparent;cursor:pointer;transition:all .18s;font-family:'JetBrains Mono',monospace}
+.fbtn:hover{color:var(--t1);border-color:var(--rose)}
+.fbtn.on{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* BAR CHART */
+.bars{display:flex;flex-direction:column;gap:.6rem;margin-top:.3rem}
+.brow{display:grid;grid-template-columns:96px 1fr auto;gap:.7rem;align-items:center}
+.bname{font-size:.72rem;color:var(--t2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btrack{height:22px;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden;position:relative}
+.bfill{height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.7,.3,1);background:linear-gradient(90deg,var(--rose),var(--rose2))}
+.bval{font-size:.72rem;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* SCATTER (canvas) */
+#scatter{width:100%;height:280px;display:block}
+.axis-l{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+
+/* CALCULATOR */
+.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
+.calc-top{display:flex;justify-content:space-between;align-items:baseline}
+.calc-lbl{font-size:.76rem;color:var(--t2)}
+.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--rose2);font-size:.95rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(244,63,94,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fff2}
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
+.co{background:rgba(244,63,94,.06);border:1px solid var(--b);border-radius:10px;padding:.85rem;text-align:center}
+.co-v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.8px}
+.co-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+
+/* TABLE */
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.6rem .7rem;border-bottom:1px solid var(--b);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--rose2)}
+th.num,td.num{text-align:right}
+td{padding:.55rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
+tr:hover td{background:rgba(244,63,94,.04)}
+.pill{padding:.14rem .5rem;border-radius:4px;font-size:.62rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.hi{background:rgba(244,63,94,.12);color:var(--rose2)}
+.pill.md{background:rgba(245,158,11,.12);color:var(--amber)}
+.pill.lo{background:rgba(16,185,129,.12);color:var(--emerald)}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
+
+/* NOTE + FOOTER */
+.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.4rem}
+footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
+footer a{color:var(--rose2);text-decoration:none}
+
+@media(max-width:900px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid2b{grid-template-columns:1fr}
+  h1{letter-spacing:-1px}
+}
+</style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+
+<div class="top">
+  <div class="top-in">
+    <a class="back" href="../index.html#projects">← Portfolio</a>
+    <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
+    <div class="top-links">
+      <a href="https://github.com/GauravWarke/churn-revenue-risk-platform" target="_blank" rel="noopener">Source ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">FinTech · Product Analytics · Predictive ML</div>
+    <h1>Customer Churn &<br><em>Revenue-Risk</em> Intelligence</h1>
+    <p class="lede">Every dot is a merchant. This model doesn't just predict churn — it ranks accounts by <b>ARR at risk (AUD)</b> and quantifies whether saving them pays. Drag the cloud, filter the book, and move the sliders to re-run the retention business case live.</p>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-v" style="color:var(--rose)" data-count="3369026" data-prefix="$" data-money>$0</div><div class="kpi-l">ARR at Risk</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--amber)" data-count="1494">0</div><div class="kpi-l">Merchants Flagged</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--emerald)" data-count="14.8" data-suffix="x" data-dec="1">0</div><div class="kpi-l">Retention ROI</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--blue)" data-count="0.748" data-dec="3">0</div><div class="kpi-l">ROC-AUC</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--teal2)" data-count="2000">0</div><div class="kpi-l">Accounts Scored</div></div>
+  </div>
+
+  <!-- 3D CLOUD + FILTERS -->
+  <div class="panel">
+    <div class="panel-h">
+      <div>
+        <div class="panel-title">Account Risk Cloud</div>
+        <div class="panel-sub">3D · churn probability × ARR · drag to rotate</div>
+      </div>
+      <div class="filters" id="stateFilters">
+        <button class="fbtn on" data-st="all">All states</button>
+        <button class="fbtn" data-st="VIC">VIC</button>
+        <button class="fbtn" data-st="NSW">NSW</button>
+        <button class="fbtn" data-st="QLD">QLD</button>
+        <button class="fbtn" data-st="WA">WA</button>
+        <button class="fbtn" data-st="SA">SA</button>
+      </div>
+    </div>
+    <div id="cloudWrap">
+      <canvas id="cloud"></canvas>
+      <div class="cloud-legend">
+        <span class="lg"><i style="background:#F43F5E"></i>High risk</span>
+        <span class="lg"><i style="background:#F59E0B"></i>Watch</span>
+        <span class="lg"><i style="background:#10B981"></i>Healthy</span>
+      </div>
+      <div class="cloud-hint">◐ drag to rotate · hover a point · dot size = ARR</div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- BAR: ARR at risk by industry -->
+    <div class="panel">
+      <div class="panel-h">
+        <div><div class="panel-title">ARR at Risk by Industry</div><div class="panel-sub" id="barSub">// all states</div></div>
+      </div>
+      <div class="bars" id="bars"></div>
+    </div>
+    <!-- SCATTER -->
+    <div class="panel">
+      <div class="panel-h">
+        <div><div class="panel-title">Risk vs Value</div><div class="panel-sub">churn prob → x · MRR → y</div></div>
+      </div>
+      <canvas id="scatter"></canvas>
+      <div class="note">Top-right = high probability + high value → prioritise these for Customer Success outreach.</div>
+    </div>
+  </div>
+
+  <div class="grid2b">
+    <!-- CALCULATOR -->
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Retention Business Case</div><div class="panel-sub">// live model — move the sliders</div></div></div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Save rate (campaign effectiveness)</span><span class="calc-num" id="upV">35%</span></div>
+        <input type="range" id="up" min="10" max="70" value="35">
+      </div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Outreach cost / account</span><span class="calc-num" id="cpV">$50</span></div>
+        <input type="range" id="cp" min="10" max="200" value="50">
+      </div>
+      <div class="calc-out">
+        <div class="co"><div class="co-v" style="color:var(--emerald)" id="netV">$0</div><div class="co-l">Net Benefit</div></div>
+        <div class="co"><div class="co-v" style="color:var(--rose2)" id="roiV">0x</div><div class="co-l">ROI</div></div>
+      </div>
+      <div class="note" id="calcNote"></div>
+    </div>
+    <!-- TABLE -->
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Top ARR-at-Risk Register</div><div class="panel-sub">// click a header to sort</div></div></div>
+      <div class="tbl-scroll">
+        <table id="tbl">
+          <thead><tr>
+            <th data-k="id">Merchant</th>
+            <th data-k="state">State</th>
+            <th class="num" data-k="mrr">MRR</th>
+            <th class="num" data-k="prob">Churn P</th>
+            <th class="num" data-k="risk">ARR@Risk</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU data, headline figures from the verified model run ·
+    <a href="https://github.com/GauravWarke/churn-revenue-risk-platform" target="_blank" rel="noopener">source on GitHub ↗</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ---------- deterministic synthetic book (matches the model's distribution) ---------- */
+var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry32(20260629);
+var STATES=['VIC','NSW','QLD','WA','SA'], SW=[.30,.28,.18,.14,.10];
+var INDS=['Retail','Hospitality','Health','Trades','Professional','Logistics'];
+function pick(arr,w){var r=rnd(),a=0;for(var i=0;i<arr.length;i++){a+=w?w[i]:1/arr.length;if(r<=a)return arr[i];}return arr[arr.length-1];}
+var BOOK=[];
+for(var i=0;i<180;i++){
+  var st=pick(STATES,SW), ind=INDS[(rnd()*INDS.length)|0];
+  var mrr=Math.round((300+rnd()*rnd()*6200)); // skewed low
+  var tenure=1+rnd()*46;
+  var fails=(rnd()*rnd()*9)|0, tickets=(rnd()*rnd()*11)|0, idle=(rnd()*rnd()*80)|0;
+  // churn propensity from behaviour (bounded logistic-ish)
+  var z=-0.4 + fails*0.22 + tickets*0.09 + idle*0.012 - tenure*0.015 - (mrr>3000?0.35:0);
+  var prob=1/(1+Math.exp(-z)); prob=Math.max(.02,Math.min(.97,prob+(rnd()-.5)*0.12));
+  var arr=mrr*12, risk=arr*prob;
+  BOOK.push({id:'CP-'+(4100+i),state:st,ind:ind,mrr:mrr,prob:prob,arr:arr,risk:risk});
+}
+var ARR_AT_RISK_TOTAL=3369026, FLAGGED=1494, THRESH=0.5; // verified headline anchors
+
+/* ---------- KPI count-up ---------- */
+function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
+function animateCount(el){
+  var target=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),pre=el.dataset.prefix||'',suf=el.dataset.suffix||'',money=el.dataset.money!==undefined;
+  var t0=null,dur=1300;
+  function render(v){el.textContent = money?fmtMoney(v):(pre+(dec?v.toFixed(dec):Math.round(v).toLocaleString('en-AU'))+suf);}
+  function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);render(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
+  if(reduce){render(target);return;}
+  requestAnimationFrame(step);
+  setTimeout(function(){render(target);},dur+400);   // safety net if rAF was throttled (backgrounded tab)
+}
+document.querySelectorAll('[data-count]').forEach(animateCount);
+
+/* ---------- colour by risk ---------- */
+function riskColor(p){ if(p>=.6)return '#F43F5E'; if(p>=.35)return '#F59E0B'; return '#10B981'; }
+function riskClass(p){ return p>=.6?'hi':(p>=.35?'md':'lo'); }
+
+/* ---------- state filter ---------- */
+var curState='all';
+function filtered(){ return curState==='all'?BOOK:BOOK.filter(function(d){return d.state===curState;}); }
+
+/* ---------- BAR chart ---------- */
+function renderBars(){
+  var data=filtered(), agg={};
+  INDS.forEach(function(k){agg[k]=0;});
+  data.forEach(function(d){agg[d.ind]+=d.risk;});
+  var rows=INDS.map(function(k){return [k,agg[k]];}).sort(function(a,b){return b[1]-a[1];});
+  var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
+  document.getElementById('bars').innerHTML=rows.map(function(r){
+    return '<div class="brow"><span class="bname">'+r[0]+'</span><div class="btrack"><div class="bfill" data-w="'+(r[1]/max*100)+'"></div></div><span class="bval">'+fmtMoney(r[1])+'</span></div>';
+  }).join('');
+  document.getElementById('barSub').textContent='// '+(curState==='all'?'all states':curState);
+  requestAnimationFrame(function(){document.querySelectorAll('#bars .bfill').forEach(function(f){f.style.width=f.dataset.w+'%';});});
+}
+
+/* ---------- SCATTER (canvas) ---------- */
+var sc=document.getElementById('scatter'), sctx=sc.getContext('2d');
+function sizeCanvas(cv,cx){var r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;cx.setTransform(dpr,0,0,dpr,0,0);return r;}
+function renderScatter(){
+  var r=sizeCanvas(sc,sctx),W=r.width,H=r.height,pad=34;
+  sctx.clearRect(0,0,W,H);
+  // axes
+  sctx.strokeStyle='rgba(255,255,255,.08)';sctx.lineWidth=1;
+  sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
+  sctx.fillStyle='#5B6B82';sctx.font='10px JetBrains Mono, monospace';
+  sctx.fillText('churn probability →',pad+4,H-6);
+  sctx.save();sctx.translate(12,H-pad-4);sctx.rotate(-Math.PI/2);sctx.fillText('MRR (AUD) →',0,0);sctx.restore();
+  var maxM=Math.max.apply(null,BOOK.map(function(d){return d.mrr;}));
+  filtered().forEach(function(d){
+    var x=pad+d.prob*(W-pad-14), y=(H-pad)-(d.mrr/maxM)*(H-pad-14);
+    var rad=4+Math.sqrt(d.risk)/70;
+    sctx.beginPath();sctx.arc(x,y,rad,0,7);sctx.fillStyle=riskColor(d.prob)+'cc';sctx.fill();
+  });
+  // threshold line
+  var tx=pad+THRESH*(W-pad-14);
+  sctx.strokeStyle='rgba(244,63,94,.5)';sctx.setLineDash([4,4]);
+  sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
+  sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);
+}
+
+/* ---------- TABLE ---------- */
+var sortK='risk',sortDir=-1;
+function renderTable(){
+  var data=filtered().slice().sort(function(a,b){var x=a[sortK],y=b[sortK];if(typeof x==='string')return x<y?sortDir:x>y?-sortDir:0;return (x-y)*sortDir;}).slice(0,12);
+  document.getElementById('tbody').innerHTML=data.map(function(d){
+    return '<tr><td class="mono">'+d.id+'</td><td>'+d.state+'</td><td class="num mono">'+fmtMoney(d.mrr)+'</td>'+
+      '<td class="num"><span class="pill '+riskClass(d.prob)+'">'+(d.prob*100).toFixed(0)+'%</span></td>'+
+      '<td class="num mono">'+fmtMoney(d.risk)+'</td></tr>';
+  }).join('');
+}
+document.querySelectorAll('#tbl th').forEach(function(th){
+  th.addEventListener('click',function(){var k=th.dataset.k;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='id'||k==='state')?1:-1;}renderTable();});
+});
+
+/* ---------- CALCULATOR ---------- */
+var up=document.getElementById('up'),cp=document.getElementById('cp');
+function calc(){
+  var save=+up.value/100, cost=+cp.value;
+  var recoverable=ARR_AT_RISK_TOTAL*save, campaign=FLAGGED*cost, net=recoverable-campaign, roi=campaign?net/campaign:0;
+  document.getElementById('upV').textContent=up.value+'%';
+  document.getElementById('cpV').textContent='$'+cp.value;
+  document.getElementById('netV').textContent=fmtMoney(net);
+  document.getElementById('roiV').textContent=roi.toFixed(1)+'x';
+  document.getElementById('netV').style.color=net>=0?'var(--emerald)':'var(--rose)';
+  document.getElementById('calcNote').textContent='Recoverable '+fmtMoney(recoverable)+' − campaign '+fmtMoney(campaign)+' across '+FLAGGED.toLocaleString('en-AU')+' flagged accounts.';
+}
+up.addEventListener('input',calc);cp.addEventListener('input',calc);
+
+/* ---------- state filter buttons ---------- */
+document.querySelectorAll('#stateFilters .fbtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#stateFilters .fbtn').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');curState=b.dataset.st;
+    renderBars();renderScatter();renderTable();buildCloud();
+  });
+});
+
+/* ================= 3D ACCOUNT RISK CLOUD (Three.js) ================= */
+(function(){
+  var canvas=document.getElementById('cloud'),wrap=document.getElementById('cloudWrap'),tip=document.getElementById('tip');
+  if(typeof THREE==='undefined')return;
+  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(55,W/H,1,4000);camera.position.z=560;
+  var group=new THREE.Group();scene.add(group);
+  var pts,meta=[];
+  function buildCloud(){
+    while(group.children.length)group.remove(group.children[0]);
+    var data=filtered();meta=data;
+    var n=data.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
+    var c=new THREE.Color();
+    for(var i=0;i<n;i++){
+      var d=data[i];
+      // position: x = churn prob (spread), y = value, z = random depth → an interpretable point cloud
+      pos[i*3]  =(d.prob-0.5)*760;
+      pos[i*3+1]=(Math.sqrt(d.mrr/7000)-0.5)*520;
+      pos[i*3+2]=(rnd()-0.5)*420;
+      c.set(riskColor(d.prob));col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+      siz[i]=6+Math.sqrt(d.risk)/34;
+    }
+    var g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    g.setAttribute('color',new THREE.BufferAttribute(col,3));
+    g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
+    var mat=new THREE.ShaderMaterial({
+      transparent:true,depthWrite:false,
+      vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+      fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.1,d);gl_FragColor=vec4(vC,a*0.92);}',
+      vertexColors:true
+    });
+    pts=new THREE.Points(g,mat);group.add(pts);
+  }
+  window.buildCloud=buildCloud;buildCloud();
+
+  // drag to rotate
+  var drag=false,px=0,py=0,ry=0,rx=0,vy=0.0016;
+  wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
+  wrap.addEventListener('pointermove',function(e){
+    var r=wrap.getBoundingClientRect();
+    if(drag){ry+=(e.clientX-px)*0.006;rx+=(e.clientY-py)*0.006;rx=Math.max(-1,Math.min(1,rx));px=e.clientX;py=e.clientY;}
+    // hover pick (screen-space nearest)
+    hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);
+  });
+  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
+
+  var ray=new THREE.Vector2(),proj=new THREE.Vector3();
+  function hover(mx,my,rw,rh){
+    if(!pts)return;var best=-1,bd=18;
+    var arr=pts.geometry.attributes.position.array;
+    for(var i=0;i<meta.length;i++){
+      proj.set(arr[i*3],arr[i*3+1],arr[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);
+      var sx=(proj.x*0.5+0.5)*rw, sy=(-proj.y*0.5+0.5)*rh;
+      var dd=Math.hypot(sx-mx,sy-my);
+      if(dd<bd&&proj.z<1){bd=dd;best=i;}
+    }
+    if(best>=0){var d=meta[best];
+      tip.innerHTML='<b>'+d.id+'</b> · '+d.state+'<br>'+d.ind+'<br>MRR '+fmtMoney(d.mrr)+'<br>churn '+(d.prob*100).toFixed(0)+'% · risk '+fmtMoney(d.risk);
+      tip.style.left=Math.min(mx+14,rw-170)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;
+    } else tip.style.opacity=0;
+  }
+
+  function loop(){
+    if(!drag)ry+=vy;
+    group.rotation.y+=(ry-group.rotation.y)*0.08;
+    group.rotation.x+=(rx-group.rotation.x)*0.08;
+    renderer.render(scene,camera);
+    if(!reduce)requestAnimationFrame(loop);
+  }
+  function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
+  addEventListener('resize',resize);
+  if('ResizeObserver' in window){new ResizeObserver(resize).observe(wrap);}   // fixes 0-width init & container reflow
+  if(reduce)renderer.render(scene,camera);else loop();
+})();
+
+/* ================= subtle full-page 3D backdrop ================= */
+(function(){
+  var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;
+  var W=innerWidth,H=innerHeight;
+  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
+  var sc2=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,W/H,1,2000);cam.position.z=600;
+  var N=90,p=new Float32Array(N*3);for(var i=0;i<N*3;i++)p[i]=(Math.random()-0.5)*1200;
+  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  var grp=new THREE.Points(g,new THREE.PointsMaterial({color:0xF43F5E,size:2.4,transparent:true,opacity:.5}));
+  sc2.add(grp);
+  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(sc2,cam);if(!reduce)requestAnimationFrame(f);}
+  addEventListener('resize',function(){W=innerWidth;H=innerHeight;cam.aspect=W/H;cam.updateProjectionMatrix();rn.setSize(W,H,false);});
+  if(reduce)rn.render(sc2,cam);else f();
+})();
+
+/* ---------- init ---------- */
+renderBars();renderScatter();renderTable();calc();
+addEventListener('resize',renderScatter);
+if('ResizeObserver' in window){new ResizeObserver(renderScatter).observe(sc);}  // redraw scatter on 0-width init / reflow
+</script>
+</body>
+</html>
