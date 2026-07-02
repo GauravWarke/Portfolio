@@ -3,215 +3,379 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market-Performance Intelligence · Live Dashboard | Gaurav Warke</title>
-<meta name="description" content="Interactive dashboard — GA4 + orders + ad spend unified per channel; ROAS/CAC with a live budget-reallocation model.">
+<title>Market-Performance Intelligence · Tableau-style Dashboard | Gaurav Warke</title>
+<meta name="description" content="Tableau-style analytical dashboard — GA4 + orders + ad spend unified per channel; dual-axis trend, decision quadrant, ROAS/CAC matrix, live budget-reallocation model, and a real Tableau Public embed slot.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);
-  --teal:#0D9488;--blue:#3B82F6;--blue2:#60A5FA;--amber:#F59E0B;--amber2:#FBBF24;--rose:#F43F5E;--emerald:#10B981;
-  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(59,130,246,.18);--bh:rgba(59,130,246,.42);
+  /* Tableau dark analytical */
+  --canvas:#12161C;--pane:#191F27;--card:#1B222B;--card2:#20272F;--edge:#2C343E;--edgeH:#3C4653;
+  --t-blue:#4E79A7;--t-blue2:#6B93C0;--t-orange:#F28E2B;--t-orange2:#FFB25E;--t-red:#E15759;--t-green:#59A14F;--t-teal:#76B7B2;--t-purple:#B07AA1;--t-yellow:#EDC948;
+  --t1:#E9EDF2;--t2:#9AA6B4;--t3:#68727E;--good:#59A14F;--bad:#E15759;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
-#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.5}
-.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
-.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
-.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
-.back:hover{color:var(--blue2)}
-.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--blue2);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+body{font-family:'Inter',sans-serif;background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#333c47;border-radius:8px}
+a{color:inherit}
+
+/* Tableau toolbar */
+.tbar{position:sticky;top:0;z-index:60;background:#161B22;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.8rem;padding:.5rem .95rem}
+.tbar .wb{display:flex;flex-direction:column;line-height:1.15}
+.tbar .wb b{font-size:.85rem;font-weight:700;letter-spacing:-.2px}
+.tbar .wb span{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.tbadge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:5px;padding:.26rem .55rem;font-weight:600}
+.tbadge svg{width:12px;height:12px}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--t2);text-decoration:none}
+.back:hover{color:var(--t-blue2)}
+.tbar .sp{flex:1}
+.tbtn{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--edge);border-radius:5px;padding:.32rem .62rem}
+.tbtn:hover{border-color:var(--t-blue);color:var(--t-blue2)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
-.top-links a:hover{border-color:var(--blue);color:var(--blue2)}
-.hero{padding:3.5rem 0 1.5rem}
-.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--blue2);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
-.eyebrow::before{content:'// ';opacity:.5}
-h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
-h1 em{color:var(--blue2);font-style:normal}
-.lede{color:var(--t2);font-size:.98rem;max-width:670px;line-height:1.7}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:2.25rem 0 1rem}
-.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:border-color .2s}
-.kpi:hover{border-color:var(--bh)}
-.kpi-v{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px;line-height:1}
-.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
-.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
-.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
-.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
-.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:1.25rem}
-#sceneWrap{position:relative;height:440px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,rgba(59,130,246,.06),transparent 70%);border:1px solid rgba(59,130,246,.1);cursor:grab}
+
+/* title band + BANs */
+.band{background:var(--pane);border-bottom:1px solid var(--edge);padding:.95rem 1.2rem}
+.band h1{font-family:'Sora',sans-serif;font-size:clamp(1.3rem,3vw,1.75rem);font-weight:800;letter-spacing:-.7px}
+.band h1 em{color:var(--t-blue2);font-style:normal}
+.band p{color:var(--t2);font-size:.8rem;max-width:840px;margin-top:.25rem}
+.bans{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--edge);border-bottom:1px solid var(--edge)}
+.ban{background:var(--pane);padding:.75rem 1.2rem;position:relative}
+.ban b{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px;display:block;line-height:1}
+.ban .sub{font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:.25rem}
+.ban .act{position:absolute;top:.7rem;right:1rem;font-size:.54rem;font-weight:700;font-family:'JetBrains Mono',monospace;padding:.1rem .4rem;border-radius:3px}
+.act.hold{background:rgba(78,121,167,.18);color:var(--t-blue2)}.act.cut{background:rgba(225,87,89,.18);color:var(--t-red)}.act.scale{background:rgba(89,161,79,.2);color:var(--t-green)}
+
+/* dashboard: left shelf + main */
+.dash{display:grid;grid-template-columns:250px 1fr;gap:1px;background:var(--edge)}
+.shelf{background:var(--pane);border-right:1px solid var(--edge);padding:.95rem .8rem;display:flex;flex-direction:column;gap:1rem;position:sticky;top:47px;align-self:start;height:calc(100vh - 47px);overflow-y:auto}
+.main{background:var(--canvas);padding:1rem 1.1rem;display:grid;gap:.95rem;align-content:start}
+
+/* shelf cards */
+.sh-card{border:1px solid var(--edge);border-radius:4px;background:var(--card)}
+.sh-h{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);font-weight:700;font-family:'JetBrains Mono',monospace;padding:.5rem .65rem;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.4rem}
+.sh-h .ic{width:9px;height:9px;border-radius:2px;background:var(--t-blue)}
+.sh-b{padding:.65rem}
+.param-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem}
+.param-lbl{font-size:.72rem;color:var(--t2)}
+.param-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--t-blue2);font-size:.9rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:#333c47;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--t-blue);cursor:pointer;border:2px solid #12161c;box-shadow:0 0 0 1px var(--t-blue)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--t-blue);cursor:pointer;border:2px solid #12161c}
+.param-out{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.6rem}
+.po{background:var(--card2);border:1px solid var(--edge);border-radius:5px;padding:.55rem .3rem;text-align:center}
+.po-v{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800}
+.po-l{font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-top:.15rem;font-family:'JetBrains Mono',monospace}
+.chk{display:flex;align-items:center;gap:.45rem;font-size:.74rem;color:var(--t2);padding:.28rem .35rem;border-radius:4px;cursor:pointer;user-select:none}
+.chk:hover{background:var(--card2)}
+.chk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.chk.on .tick{background:var(--t-blue);border-color:var(--t-blue)}
+.chk.on .tick::after{content:'';width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
+.chk .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.note{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.55;margin-top:.5rem}
+
+/* worksheet card */
+.ws{background:var(--card);border:1px solid var(--edge);border-radius:4px}
+.ws-h{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.55rem .85rem;border-bottom:1px solid var(--edge)}
+.ws-t{font-size:.82rem;font-weight:700}
+.ws-t .tag{color:var(--t-blue2);font-size:.55rem;font-family:'JetBrains Mono',monospace;border:1px solid #35455a;border-radius:3px;padding:.03rem .3rem;vertical-align:middle;margin-left:.3rem}
+.ws-s{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.ws-b{padding:.85rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.95rem}
+
+/* Tableau Public embed hero */
+.embed-hero{position:relative;min-height:300px;border-radius:4px;overflow:hidden;background:linear-gradient(135deg,#1a2028,#161b22)}
+#tvizHost{width:100%}
+#tvizHost tableau-viz,#tvizHost iframe{width:100%!important;min-height:420px;border:0}
+.embed-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.8rem 1.4rem;gap:.7rem;min-height:300px}
+.embed-empty .badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:100px;padding:.24rem .8rem;font-weight:600}
+.embed-empty h3{font-size:1.05rem;font-weight:800;font-family:'Sora',sans-serif}
+.embed-empty p{font-size:.74rem;color:var(--t2);max-width:560px;line-height:1.6}
+.embed-form{display:flex;gap:.5rem;width:100%;max-width:560px;margin-top:.3rem;flex-wrap:wrap;justify-content:center}
+.embed-form input{flex:1;min-width:240px;background:var(--card2);border:1px solid var(--edge);border-radius:6px;padding:.6rem .75rem;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:.74rem;outline:none}
+.embed-form input:focus{border-color:var(--t-blue)}
+.embed-form button{background:var(--t-blue);color:#fff;border:none;border-radius:6px;padding:.6rem 1rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
+.embed-form button:hover{background:#5c88b8}
+.embed-steps{font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.7;text-align:left;max-width:560px}
+.embed-steps b{color:var(--t-blue2)}
+.embed-err{font-size:.66rem;color:var(--t-red);font-family:'JetBrains Mono',monospace;min-height:1rem}
+
+/* 3D bars */
+#sceneWrap{position:relative;height:300px;border-radius:4px;overflow:hidden;background:radial-gradient(ellipse at 50% 62%,rgba(78,121,167,.08),transparent 70%);cursor:grab}
 #sceneWrap.drag{cursor:grabbing}
 #scene{width:100%;height:100%;display:block}
-.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
-.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
-.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
-.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
-.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace}
-.tip b{color:var(--blue2)}
-.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
-.calc-top{display:flex;justify-content:space-between;align-items:baseline}
-.calc-lbl{font-size:.76rem;color:var(--t2)}
-.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--blue2);font-size:.95rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(59,130,246,.5)}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff2}
-.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
-.co{background:rgba(59,130,246,.06);border:1px solid var(--b);border-radius:10px;padding:.85rem;text-align:center}
-.co-v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.8px}
-.co-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
-#roas{width:100%;height:220px;display:block}
-.tbl-scroll{overflow-x:auto}
+.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.cloud-legend{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:.28rem;font-size:.6rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.lg{display:flex;align-items:center;gap:.38rem;color:var(--t2)}.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:#0f1319;border:1px solid var(--edgeH);border-radius:7px;padding:.5rem .65rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tip b{color:var(--t-blue2)}
+
+/* canvases */
+#trend,#quad{width:100%;height:250px;display:block}
+
+/* table */
 table{width:100%;border-collapse:collapse;font-size:.76rem}
-th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.55rem .6rem;border-bottom:1px solid var(--b);white-space:nowrap}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:.5rem .6rem;border-bottom:1px solid var(--edge);white-space:nowrap}
 th.num,td.num{text-align:right}
-td{padding:.6rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
+td{padding:.55rem .6rem;border-bottom:1px solid rgba(255,255,255,.035);color:var(--t2);white-space:nowrap}
+tr:hover td{background:rgba(78,121,167,.05)}
 .mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
-.pill{padding:.16rem .55rem;border-radius:4px;font-size:.62rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.pill.scale{background:rgba(16,185,129,.12);color:var(--emerald)}
-.pill.hold{background:rgba(59,130,246,.12);color:var(--blue2)}
-.pill.cut{background:rgba(244,63,94,.12);color:var(--rose)}
-.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.5rem}
-footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
-footer a{color:var(--blue2);text-decoration:none}
-@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+.chip{display:inline-flex;align-items:center;gap:.4rem}.chip i{width:9px;height:9px;border-radius:2px}
+.pill{padding:.16rem .55rem;border-radius:4px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.scale{background:rgba(89,161,79,.16);color:var(--t-green)}.pill.hold{background:rgba(78,121,167,.18);color:var(--t-blue2)}.pill.cut{background:rgba(225,87,89,.16);color:var(--t-red)}
+
+footer{padding:1.2rem;text-align:center;color:var(--t3);font-size:.72rem;background:var(--pane);border-top:1px solid var(--edge)}
+footer a{color:var(--t-blue2);text-decoration:none}
+
+@media(max-width:960px){.dash{grid-template-columns:1fr}.shelf{position:static;height:auto;border-right:none;border-bottom:1px solid var(--edge)}.bans{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<canvas id="bg3d"></canvas>
-<div class="top"><div class="top-in">
+
+<!-- TABLEAU TOOLBAR -->
+<div class="tbar">
   <a class="back" href="../index.html#projects">← Portfolio</a>
-  <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
-  <div class="top-links"><a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">Source ↗</a></div>
-</div></div>
-
-<div class="wrap">
-  <div class="hero">
-    <div class="eyebrow">Data & BI · Performance Reporting</div>
-    <h1>Market-Performance<br><em>Intelligence</em> System</h1>
-    <p class="lede">GA4 + orders + ad spend for a Melbourne D2C brand, unified per channel over 26 weeks. Each pair of bars is a channel's spend vs revenue — the taller the revenue bar sits above spend, the better the ROAS. Drag the reallocation slider to move budget from the weak channel to the strong one and watch the revenue upside compute live.</p>
-  </div>
-
-  <div class="kpis" id="kpis">
-    <div class="kpi"><div class="kpi-v" style="color:var(--blue2)" data-count="2.02" data-dec="2" data-suffix="x">0</div><div class="kpi-l">Google ROAS · HOLD</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--rose)" data-count="1.24" data-dec="2" data-suffix="x">0</div><div class="kpi-l">Meta ROAS · CUT</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--emerald)" id="kUplift">$0</div><div class="kpi-l">Revenue Upside</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--amber2)" data-count="26">0</div><div class="kpi-l">Weeks Unified</div></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-h"><div><div class="panel-title">Spend vs Revenue by Channel</div><div class="panel-sub">3D · left bar = spend · right bar = revenue · drag to rotate · updates with reallocation</div></div></div>
-    <div id="sceneWrap">
-      <canvas id="scene"></canvas>
-      <div class="cloud-legend">
-        <span class="lg"><i style="background:#3B82F6"></i>Google Ads</span>
-        <span class="lg"><i style="background:#F59E0B"></i>Meta Ads</span>
-        <span class="lg"><i style="background:#334155"></i>Spend</span>
-      </div>
-      <div class="cloud-hint">◐ drag to rotate · hover a bar</div>
-      <div class="tip" id="tip"></div>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">Budget Reallocation</div><div class="panel-sub">// shift spend Meta → Google at their measured ROAS</div></div></div>
-      <div class="calc-row">
-        <div class="calc-top"><span class="calc-lbl">Move this % of Meta spend to Google</span><span class="calc-num" id="pcV">20%</span></div>
-        <input type="range" id="pc" min="0" max="40" value="20">
-      </div>
-      <div class="calc-out">
-        <div class="co"><div class="co-v" style="color:var(--emerald)" id="oUplift">$0</div><div class="co-l">Added Revenue</div></div>
-        <div class="co"><div class="co-v" style="color:var(--blue2)" id="oBlend">0.00x</div><div class="co-l">Blended ROAS</div></div>
-      </div>
-      <div class="note" id="reNote"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">Weekly ROAS Trend</div><div class="panel-sub">Google vs Meta · SCALE ≥ 3 · CUT &lt; 1.5</div></div></div>
-      <canvas id="roas"></canvas>
-      <div class="note">Google holds a steady ~2x; Meta drifts below the 1.5 CUT line — the signal to reallocate rather than keep funding it.</div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-h"><div><div class="panel-title">Channel Decision Matrix</div><div class="panel-sub">// the weekly source of truth</div></div></div>
-    <div class="tbl-scroll"><table><thead><tr>
-      <th>Channel</th><th class="num">Spend</th><th class="num">Revenue</th><th class="num">ROAS</th><th class="num">CAC</th><th>Action</th>
-    </tr></thead><tbody id="tbody"></tbody></table></div>
-  </div>
-
-  <footer>Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU marketing data, headline figures from the verified report run · <a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+  <div class="wb"><b>Market-Performance Intelligence</b><span>Workbook · Melbourne D2C · GA4 + orders + ad spend · 26 wks</span></div>
+  <span class="tbadge"><svg viewBox="0 0 24 24" fill="none" stroke="var(--t-blue2)" stroke-width="2"><path d="M12 3v18M3 12h18M6.5 7.5v9M17.5 7.5v9"/></svg>Tableau-style dashboard</span>
+  <div class="sp"></div>
+  <span style="font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace"><span class="live-dot"></span> live</span>
+  <a class="tbtn" href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">Source ↗</a>
 </div>
 
+<!-- TITLE + BANs -->
+<div class="band">
+  <h1>Market-Performance <em>Intelligence</em> System</h1>
+  <p>GA4 + orders + ad spend for a Melbourne D2C brand, unified per channel over 26 weeks. The question every week: where should the next marketing dollar go? Move the reallocation parameter on the left — the upside recomputes at each channel's measured ROAS.</p>
+</div>
+<div class="bans">
+  <div class="ban"><b style="color:var(--t-blue2)">2.02x</b><div class="sub">Google Ads ROAS</div><span class="act hold">HOLD</span></div>
+  <div class="ban"><b style="color:var(--t-red)">1.24x</b><div class="sub">Meta Ads ROAS</div><span class="act cut">CUT</span></div>
+  <div class="ban"><b style="color:var(--t-green)" id="banUplift">$0</b><div class="sub">Revenue Upside</div></div>
+  <div class="ban"><b style="color:var(--t-yellow)" id="banBlend">0.00x</b><div class="sub">Blended ROAS</div></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash">
+  <!-- LEFT ANALYTICS SHELF -->
+  <aside class="shelf">
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-blue)"></span>Parameter · Budget shift</div>
+      <div class="sh-b">
+        <div class="param-top"><span class="param-lbl">Meta → Google</span><span class="param-num" id="pcV">20%</span></div>
+        <input type="range" id="pc" min="0" max="40" value="20" autocomplete="off">
+        <div class="param-out">
+          <div class="po"><div class="po-v" style="color:var(--t-green)" id="oUplift">$0</div><div class="po-l">Added Rev</div></div>
+          <div class="po"><div class="po-v" style="color:var(--t-blue2)" id="oBlend">0.00x</div><div class="po-l">Blended</div></div>
+        </div>
+        <div class="note" id="reNote"></div>
+      </div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-green)"></span>Filter · Channel</div>
+      <div class="sh-b" id="chFilter"></div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-orange)"></span>Analytics · Reference lines</div>
+      <div class="sh-b">
+        <div class="chk on" data-ref="scale"><span class="tick"></span>SCALE line · ROAS 3.0</div>
+        <div class="chk on" data-ref="cut"><span class="tick"></span>CUT line · ROAS 1.5</div>
+        <div class="note">Toggle the decision thresholds on the trend and quadrant.</div>
+      </div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic"></span>Legend</div>
+      <div class="sh-b">
+        <div class="chk" style="cursor:default"><span class="sw" style="background:var(--t-blue)"></span>Google Ads</div>
+        <div class="chk" style="cursor:default"><span class="sw" style="background:var(--t-orange)"></span>Meta Ads</div>
+        <div class="note">Bubble size = weekly revenue.</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- Tableau Public embed hero -->
+    <div class="ws" id="published">
+      <div class="ws-h"><span class="ws-t">Published Interactive Viz<span class="tag">Tableau Public embed</span></span><span class="ws-s">paste your viz URL → live</span></div>
+      <div class="ws-b">
+        <div class="embed-hero">
+          <div id="tvizHost"></div>
+          <div class="embed-empty" id="embedEmpty">
+            <span class="badge">◇ Tableau Public · Embedding API v3</span>
+            <h3>Embed your live Tableau viz here</h3>
+            <p>This centerpiece is wired to the official <b>Tableau Embedding API v3</b>. Publish this workbook to <b>Tableau Public</b>, paste the viz URL below, and it renders inline — fully interactive, no code changes.</p>
+            <div class="embed-form">
+              <input type="text" id="vizUrl" placeholder="https://public.tableau.com/views/YourWorkbook/YourDashboard">
+              <button id="vizGo">Embed viz →</button>
+            </div>
+            <div class="embed-err" id="vizErr"></div>
+            <div class="embed-steps">
+              <b>1.</b> Tableau Public (desktop) → File → Save to Tableau Public<br>
+              <b>2.</b> On the published page, copy the browser URL (…/views/Workbook/Sheet)<br>
+              <b>3.</b> Paste it above → the viz embeds live in this slot
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <!-- dual-axis trend -->
+      <div class="ws">
+        <div class="ws-h"><span class="ws-t">Weekly ROAS &amp; Spend</span><span class="ws-s">dual axis · line = ROAS · area = spend</span></div>
+        <div class="ws-b"><canvas id="trend"></canvas><div class="note">Google holds a steady ~2x; Meta drifts below the 1.5 CUT line — reallocate rather than keep funding it.</div></div>
+      </div>
+      <!-- decision quadrant -->
+      <div class="ws">
+        <div class="ws-h"><span class="ws-t">Decision Quadrant</span><span class="ws-s">weekly spend × ROAS · bubble = revenue</span></div>
+        <div class="ws-b"><canvas id="quad"></canvas><div class="note">Each bubble is one channel-week. Google clusters in the HOLD band; Meta sits below CUT — the visual case to shift budget.</div></div>
+      </div>
+    </div>
+
+    <!-- 3D channel bars -->
+    <div class="ws">
+      <div class="ws-h"><span class="ws-t">Spend vs Revenue by Channel<span class="tag">custom viz</span></span><span class="ws-s">left = spend · right = revenue · updates with reallocation</span></div>
+      <div class="ws-b">
+        <div id="sceneWrap">
+          <canvas id="scene"></canvas>
+          <div class="cloud-legend"><span class="lg"><i style="background:#4E79A7"></i>Google</span><span class="lg"><i style="background:#F28E2B"></i>Meta</span><span class="lg"><i style="background:#3C4653"></i>Spend</span></div>
+          <div class="cloud-hint">◐ drag to rotate · hover a bar</div>
+          <div class="tip" id="tip"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- decision matrix -->
+    <div class="ws">
+      <div class="ws-h"><span class="ws-t">Channel Decision Matrix</span><span class="ws-s">the weekly source of truth</span></div>
+      <div class="ws-b" style="overflow-x:auto">
+        <table><thead><tr><th>Channel</th><th class="num">Spend</th><th class="num">Revenue</th><th class="num">ROAS</th><th class="num">CAC</th><th>Action</th></tr></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>Built by <a href="../index.html">Gaurav Warke</a> · Tableau-style dashboard on synthetic AU marketing data · <a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+
+<!-- Tableau Embedding API v3 (powers the live embed once a viz URL is provided) -->
+<script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
-// verified channel anchors
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 var CH={
-  google:{name:'Google Ads',spend:202070,revenue:408471,roas:2.02,cac:54.97,color:0x3B82F6},
-  meta:  {name:'Meta Ads',  spend:181600,revenue:225830,roas:1.24,cac:67.84,color:0xF59E0B}
+  google:{name:'Google Ads',spend:202070,revenue:408471,roas:2.02,cac:54.97,color:'#4E79A7'},
+  meta:  {name:'Meta Ads',  spend:181600,revenue:225830,roas:1.24,cac:67.84,color:'#F28E2B'}
 };
 function decide(roas){return roas>=3?['SCALE','scale']:(roas<1.5?['CUT','cut']:['HOLD','hold']);}
 
-/* KPI count-up */
-function animateCount(el){var t=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),suf=el.dataset.suffix||'',t0=null,dur=1300;
-  function r(v){el.textContent=(dec?v.toFixed(dec):Math.round(v))+suf;}
-  function st(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);r(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(st);}
-  if(reduce){r(t);return;}requestAnimationFrame(st);setTimeout(function(){r(t);},dur+400);}
-document.querySelectorAll('[data-count]').forEach(animateCount);
+/* ---- weekly data (drives trend + quadrant, sums to channel totals) ---- */
+var WK=26;
+function genWeeks(roasSeed,spendSeed,baseRoas,totalSpend){
+  var rr=mulberry32(roasSeed),sr=mulberry32(spendSeed),roas=[],w=[],sw=0;
+  for(var i=0;i<WK;i++){roas.push(Math.max(0.2,baseRoas+(rr()-0.5)*0.5));var ww=0.6+sr();w.push(ww);sw+=ww;}
+  var spend=w.map(function(x){return x/sw*totalSpend;});
+  var rev=spend.map(function(s,i){return s*roas[i];});
+  return {roas:roas,spend:spend,rev:rev};
+}
+var GW=genWeeks(11,71,2.02,CH.google.spend), MW=genWeeks(29,83,1.24,CH.meta.spend);
 
-/* reallocation model */
+/* ---- channel filter + reference-line toggles ---- */
+var chOn={google:true,meta:true}, refOn={scale:true,cut:true};
+
+/* ---- reallocation ---- */
 var pc=document.getElementById('pc');
 var state={gSpend:CH.google.spend,gRev:CH.google.revenue,mSpend:CH.meta.spend,mRev:CH.meta.revenue};
 function runRealloc(){
   var f=+pc.value/100, move=CH.meta.spend*f;
   state.gSpend=CH.google.spend+move; state.gRev=state.gSpend*CH.google.roas;
   state.mSpend=CH.meta.spend-move;   state.mRev=state.mSpend*CH.meta.roas;
-  var baseTotal=CH.google.spend*CH.google.roas+CH.meta.spend*CH.meta.roas; // consistent basis → 0% = $0 uplift
-  var newTotal=state.gRev+state.mRev;
-  var uplift=newTotal-baseTotal;
-  var blended=newTotal/(state.gSpend+state.mSpend);
+  var baseTotal=CH.google.spend*CH.google.roas+CH.meta.spend*CH.meta.roas;
+  var newTotal=state.gRev+state.mRev, uplift=newTotal-baseTotal, blended=newTotal/(state.gSpend+state.mSpend);
   document.getElementById('pcV').textContent=(f*100).toFixed(0)+'%';
   document.getElementById('oUplift').textContent=fmtMoney(uplift);
-  document.getElementById('kUplift').textContent=fmtMoney(uplift);
   document.getElementById('oBlend').textContent=blended.toFixed(2)+'x';
+  document.getElementById('banUplift').textContent=fmtMoney(uplift);
+  document.getElementById('banBlend').textContent=blended.toFixed(2)+'x';
   document.getElementById('reNote').textContent='Moving '+fmtMoney(move)+' from Meta (1.24x) to Google (2.02x) adds ~'+fmtMoney(uplift)+' revenue at the same total spend.';
   if(window.updateBars)window.updateBars();
 }
 pc.addEventListener('input',runRealloc);
 
-/* table */
+/* ---- channel filter UI ---- */
+function renderChFilter(){
+  document.getElementById('chFilter').innerHTML=
+    ['google','meta'].map(function(k){return '<div class="chk'+(chOn[k]?' on':'')+'" data-ch="'+k+'"><span class="tick"></span><span class="sw" style="background:'+CH[k].color+'"></span>'+CH[k].name+'</div>';}).join('');
+  document.querySelectorAll('#chFilter .chk').forEach(function(n){n.addEventListener('click',function(){var k=n.dataset.ch;chOn[k]=!chOn[k];if(!chOn.google&&!chOn.meta)chOn[k]=true;renderChFilter();renderTable();drawTrend();drawQuad();});});
+}
+
+/* ---- reference toggles ---- */
+document.querySelectorAll('.chk[data-ref]').forEach(function(n){n.addEventListener('click',function(){var k=n.dataset.ref;refOn[k]=!refOn[k];n.classList.toggle('on',refOn[k]);drawTrend();drawQuad();});});
+
+/* ---- table ---- */
 function renderTable(){
-  var rows=[['google',CH.google],['meta',CH.meta]];
+  var rows=[['google',CH.google],['meta',CH.meta]].filter(function(kv){return chOn[kv[0]];});
   document.getElementById('tbody').innerHTML=rows.map(function(kv){
     var c=kv[1],d=decide(c.roas);
-    return '<tr><td class="mono">'+c.name+'</td><td class="num mono">'+fmtMoney(c.spend)+'</td><td class="num mono">'+fmtMoney(c.revenue)+'</td><td class="num mono">'+c.roas.toFixed(2)+'x</td><td class="num mono">'+fmtMoney(c.cac)+'</td><td><span class="pill '+d[1]+'">'+d[0]+'</span></td></tr>';
+    return '<tr><td class="mono"><span class="chip"><i style="background:'+c.color+'"></i>'+c.name+'</span></td><td class="num mono">'+fmtMoney(c.spend)+'</td><td class="num mono">'+fmtMoney(c.revenue)+'</td><td class="num mono">'+c.roas.toFixed(2)+'x</td><td class="num mono">'+fmtMoney(c.cac)+'</td><td><span class="pill '+d[1]+'">'+d[0]+'</span></td></tr>';
   }).join('');
 }
 
-/* weekly ROAS canvas */
-var roas=document.getElementById('roas'),rx=roas.getContext('2d');
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-function drawRoas(){
-  var r=roas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);roas.width=r.width*dpr;roas.height=r.height*dpr;rx.setTransform(dpr,0,0,dpr,0,0);
-  var W=r.width,H=r.height,pad=30;rx.clearRect(0,0,W,H);
-  var wk=26,max=3.4;
-  function X(i){return pad+i/(wk-1)*(W-pad-8);}
-  function Y(v){return (H-pad)-v/max*(H-pad-10);}
-  rx.strokeStyle='rgba(255,255,255,.08)';rx.lineWidth=1;rx.beginPath();rx.moveTo(pad,H-pad);rx.lineTo(W-6,H-pad);rx.moveTo(pad,H-pad);rx.lineTo(pad,8);rx.stroke();
-  // SCALE (3.0) and CUT (1.5) lines
-  rx.strokeStyle='rgba(16,185,129,.35)';rx.setLineDash([4,4]);rx.beginPath();rx.moveTo(pad,Y(3));rx.lineTo(W-6,Y(3));rx.stroke();
-  rx.strokeStyle='rgba(244,63,94,.4)';rx.beginPath();rx.moveTo(pad,Y(1.5));rx.lineTo(W-6,Y(1.5));rx.stroke();rx.setLineDash([]);
-  rx.fillStyle='#5B6B82';rx.font='9px JetBrains Mono, monospace';rx.fillText('SCALE 3.0',pad+3,Y(3)-3);rx.fillText('CUT 1.5',pad+3,Y(1.5)-3);
-  function series(seed,base,color){var rnd=mulberry32(seed),pts=[];for(var i=0;i<wk;i++)pts.push(Math.max(0.2,base+(rnd()-0.5)*0.5));rx.strokeStyle=color;rx.lineWidth=2;rx.beginPath();pts.forEach(function(v,i){i?rx.lineTo(X(i),Y(v)):rx.moveTo(X(i),Y(v));});rx.stroke();}
-  series(11,2.02,'#3B82F6'); // Google
-  series(29,1.24,'#F59E0B'); // Meta
-  rx.fillStyle='#60A5FA';rx.fillText('Google',W-70,18);rx.fillStyle='#FBBF24';rx.fillText('Meta',W-70,30);
+/* ---- canvas helper ---- */
+function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
+
+/* ---- dual-axis trend (ROAS line + spend area) ---- */
+var trend=document.getElementById('trend');
+function drawTrend(){
+  var f=fitCanvas(trend);if(!f)return;var cx=f.cx,W=f.W,H=f.H,pad=32;cx.clearRect(0,0,W,H);
+  var maxR=3.4, maxS=Math.max.apply(null,GW.spend.concat(MW.spend))*1.25;
+  function X(i){return pad+i/(WK-1)*(W-pad-8);}
+  function YR(v){return (H-pad)-v/maxR*(H-pad-12);}
+  function YS(v){return (H-pad)-v/maxS*(H-pad-12);}
+  cx.strokeStyle='rgba(255,255,255,.08)';cx.lineWidth=1;cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
+  // spend area (secondary axis, faint) for visible channels
+  function area(spend,color){cx.fillStyle=color;cx.beginPath();cx.moveTo(X(0),H-pad);spend.forEach(function(v,i){cx.lineTo(X(i),YS(v));});cx.lineTo(X(WK-1),H-pad);cx.closePath();cx.fill();}
+  if(chOn.google)area(GW.spend,'rgba(78,121,167,.10)');
+  if(chOn.meta)area(MW.spend,'rgba(242,142,43,.10)');
+  // reference lines
+  cx.font='9px JetBrains Mono, monospace';
+  if(refOn.scale){cx.strokeStyle='rgba(89,161,79,.4)';cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(pad,YR(3));cx.lineTo(W-6,YR(3));cx.stroke();cx.fillStyle='#59A14F';cx.fillText('SCALE 3.0',pad+3,YR(3)-3);}
+  if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(pad,YR(1.5));cx.lineTo(W-6,YR(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT 1.5',pad+3,YR(1.5)-3);}
+  cx.setLineDash([]);
+  // ROAS lines
+  function line(roas,color){cx.strokeStyle=color;cx.lineWidth=2;cx.beginPath();roas.forEach(function(v,i){i?cx.lineTo(X(i),YR(v)):cx.moveTo(X(i),YR(v));});cx.stroke();}
+  if(chOn.google)line(GW.roas,'#6B93C0');
+  if(chOn.meta)line(MW.roas,'#FFB25E');
+  cx.fillStyle='#5B6B82';cx.fillText('ROAS →',pad+2,14);cx.fillText('wk 1',pad,H-8);cx.fillText('wk 26',W-42,H-8);
+}
+
+/* ---- decision quadrant scatter ---- */
+var quad=document.getElementById('quad');
+function drawQuad(){
+  var f=fitCanvas(quad);if(!f)return;var cx=f.cx,W=f.W,H=f.H,pad=36;cx.clearRect(0,0,W,H);
+  var allS=GW.spend.concat(MW.spend), maxS=Math.max.apply(null,allS)*1.12, maxR=3.4;
+  var maxRev=Math.max.apply(null,GW.rev.concat(MW.rev));
+  function X(v){return pad+v/maxS*(W-pad-10);}
+  function Y(v){return (H-pad)-v/maxR*(H-pad-12);}
+  // axes
+  cx.strokeStyle='rgba(255,255,255,.08)';cx.lineWidth=1;cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
+  cx.fillStyle='#5B6B82';cx.font='9px JetBrains Mono, monospace';cx.fillText('weekly spend →',pad+3,H-6);
+  cx.save();cx.translate(12,H-pad-4);cx.rotate(-Math.PI/2);cx.fillText('ROAS →',0,0);cx.restore();
+  // reference bands
+  cx.setLineDash([4,4]);
+  if(refOn.scale){cx.strokeStyle='rgba(89,161,79,.4)';cx.beginPath();cx.moveTo(pad,Y(3));cx.lineTo(W-6,Y(3));cx.stroke();cx.fillStyle='#59A14F';cx.fillText('SCALE',W-46,Y(3)-3);}
+  if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.beginPath();cx.moveTo(pad,Y(1.5));cx.lineTo(W-6,Y(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT',W-40,Y(1.5)-3);}
+  cx.setLineDash([]);
+  function plot(dat,color){for(var i=0;i<WK;i++){var rad=4+Math.sqrt(dat.rev[i]/maxRev)*11;cx.beginPath();cx.arc(X(dat.spend[i]),Y(dat.roas[i]),rad,0,7);cx.fillStyle=color;cx.fill();}}
+  if(chOn.google)plot(GW,'rgba(78,121,167,.5)');
+  if(chOn.meta)plot(MW,'rgba(242,142,43,.5)');
 }
 
 /* ================= 3D CHANNEL BARS ================= */
@@ -219,36 +383,26 @@ var updateBars=function(){};
 (function(){
   var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
   if(typeof THREE==='undefined')return;
-  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var W=wrap.clientWidth||600,H=wrap.clientHeight||300;
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
   var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(0,190,640);camera.lookAt(0,70,0);
   var group=new THREE.Group();scene.add(group);
-  var grid=new THREE.GridHelper(760,10,0x1e2b45,0x141d2e);group.add(grid);
-  var SC=0.00045; // revenue/spend → height
-  // 4 bars: [gSpend,gRev,mSpend,mRev]
+  var grid=new THREE.GridHelper(760,10,0x243247,0x18202e);group.add(grid);
+  var SC=0.00045;
   var defs=[
-    {key:'gSpend',x:-220,color:0x334155,label:'Google spend'},
-    {key:'gRev', x:-140,color:0x3B82F6,label:'Google revenue'},
-    {key:'mSpend',x:120, color:0x334155,label:'Meta spend'},
-    {key:'mRev', x:200, color:0xF59E0B,label:'Meta revenue'}
+    {key:'gSpend',x:-220,color:0x3C4653,label:'Google spend'},
+    {key:'gRev', x:-140,color:0x4E79A7,label:'Google revenue'},
+    {key:'mSpend',x:120, color:0x3C4653,label:'Meta spend'},
+    {key:'mRev', x:200, color:0xF28E2B,label:'Meta revenue'}
   ];
   var bars=defs.map(function(d){
-    var m=new THREE.Mesh(new THREE.BoxGeometry(60,1,60),new THREE.MeshBasicMaterial({color:d.color,transparent:true,opacity:.85}));
-    m.position.x=d.x;group.add(m);
-    var w=new THREE.Mesh(new THREE.BoxGeometry(61,1,61),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.08}));
-    w.position.x=d.x;group.add(w);
+    var m=new THREE.Mesh(new THREE.BoxGeometry(60,1,60),new THREE.MeshBasicMaterial({color:d.color,transparent:true,opacity:.88}));m.position.x=d.x;group.add(m);
+    var w=new THREE.Mesh(new THREE.BoxGeometry(61,1,61),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.08}));w.position.x=d.x;group.add(w);
     return {mesh:m,wire:w,def:d};
   });
-  updateBars=function(){
-    bars.forEach(function(b){
-      var val=state[b.def.key], h=Math.max(3,val*SC);
-      b.mesh.scale.y=h;b.mesh.position.y=h/2;
-      b.wire.scale.y=h;b.wire.position.y=h/2;
-    });
-  };
+  updateBars=function(){bars.forEach(function(b){var val=state[b.def.key],h=Math.max(3,val*SC);b.mesh.scale.y=h;b.mesh.position.y=h/2;b.wire.scale.y=h;b.wire.position.y=h/2;});};
   window.updateBars=updateBars;updateBars();
-
   var drag=false,px=0,py=0,ry=0.35,rxr=0,vy=0.0016;
   wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
@@ -263,21 +417,30 @@ var updateBars=function(){};
   if(reduce)renderer.render(scene,camera);else loop();
 })();
 
-/* backdrop */
-(function(){var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;var W=innerWidth,H=innerHeight;
-  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
-  var s=new THREE.Scene(),c=new THREE.PerspectiveCamera(60,W/H,1,2000);c.position.z=600;
-  var p=new Float32Array(270);for(var i=0;i<270;i++)p[i]=(Math.random()-0.5)*1200;
-  var gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(p,3));
-  var grp=new THREE.Points(gg,new THREE.PointsMaterial({color:0x3B82F6,size:2.4,transparent:true,opacity:.5}));s.add(grp);
-  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(s,c);if(!reduce)requestAnimationFrame(f);}
-  addEventListener('resize',function(){W=innerWidth;H=innerHeight;c.aspect=W/H;c.updateProjectionMatrix();rn.setSize(W,H,false);});
-  if(reduce)rn.render(s,c);else f();
+/* ---- Tableau Public embed loader (Embedding API v3) ---- */
+(function(){
+  var go=document.getElementById('vizGo'),input=document.getElementById('vizUrl'),err=document.getElementById('vizErr'),host=document.getElementById('tvizHost'),empty=document.getElementById('embedEmpty');
+  function load(){
+    var url=(input.value||'').trim();
+    if(!/^https?:\/\/(public\.tableau\.com|[\w.-]*\.?tableau\.com)\//i.test(url)){err.textContent='Enter a valid Tableau Public URL (https://public.tableau.com/views/…)';return;}
+    err.textContent='';
+    host.innerHTML='';
+    var v=document.createElement('tableau-viz');
+    v.setAttribute('src',url);v.setAttribute('toolbar','bottom');v.setAttribute('hide-tabs','');
+    host.appendChild(v);
+    empty.style.display='none';
+  }
+  go.addEventListener('click',load);
+  input.addEventListener('keydown',function(e){if(e.key==='Enter')load();});
 })();
 
-renderTable();drawRoas();runRealloc();
-addEventListener('resize',drawRoas);
-if('ResizeObserver' in window)new ResizeObserver(drawRoas).observe(roas);
+/* init */
+pc.value='20';   // guarantee the recommended-reallocation default on load (headline $28,330), even after bfcache restore
+renderChFilter();renderTable();runRealloc();
+requestAnimationFrame(function(){requestAnimationFrame(function(){drawTrend();drawQuad();});});
+setTimeout(function(){drawTrend();drawQuad();},400);
+addEventListener('resize',function(){drawTrend();drawQuad();});
+if('ResizeObserver' in window){new ResizeObserver(function(){drawTrend();}).observe(trend);new ResizeObserver(function(){drawQuad();}).observe(quad);}
 </script>
 </body>
 </html>

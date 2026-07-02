@@ -3,188 +3,306 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Expense Reconciliation · Live Dashboard | Gaurav Warke</title>
-<meta name="description" content="Interactive dashboard — receipts classified to GL accounts, GST validated for the BAS, exceptions flagged.">
+<title>Expense Reconciliation · Tableau-style Dashboard | Gaurav Warke</title>
+<meta name="description" content="Tableau-style dashboard — receipts classified to GL accounts (treemap + highlight table), GST validated for the BAS, exceptions flagged, with a live confidence gate.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);
-  --teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--rose:#F43F5E;--emerald:#10B981;
-  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(13,148,136,.18);--bh:rgba(13,148,136,.42);
-  --accent:var(--teal);--accent2:var(--teal2);
+  /* Tableau-light theme */
+  --paper:#FFFFFF;--wall:#EDEFF2;--wall2:#F4F6F8;--edge:#E1E5EB;--edgeH:#C9D0DA;
+  --ink:#1F2733;--ink2:#5A6472;--ink3:#8B94A3;
+  /* Tableau 10 palette */
+  --t-blue:#4E79A7;--t-orange:#F28E2B;--t-red:#E15759;--t-teal:#76B7B2;--t-green:#59A14F;--t-yellow:#EDC948;--t-purple:#B07AA1;--t-pink:#FF9DA7;--t-brown:#9C755F;--t-gray:#BAB0AC;
+  --ok:#59A14F;--rev:#F28E2B;--exc:#E15759;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px}
-#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.5}
-.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
-.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
-.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
-.back:hover{color:var(--teal2)}
-.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--teal2);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+body{font-family:'Inter',sans-serif;background:var(--wall);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:var(--wall)}::-webkit-scrollbar-thumb{background:#C4CCD6;border-radius:8px}
+a{color:inherit}
+
+/* Tableau top toolbar */
+.tbar{position:sticky;top:0;z-index:60;background:var(--paper);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.8rem;padding:.5rem .95rem;box-shadow:0 1px 3px rgba(20,30,50,.05)}
+.tbar .wb{display:flex;flex-direction:column;line-height:1.15}
+.tbar .wb b{font-size:.86rem;font-weight:700;letter-spacing:-.2px}
+.tbar .wb span{font-size:.64rem;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+.tbadge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue);border:1px solid #cdd9e6;background:#eef3f9;border-radius:5px;padding:.26rem .55rem;font-weight:600}
+.tbadge svg{width:12px;height:12px}
+.tbar .sp{flex:1}
+.tbtn{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--ink2);text-decoration:none;border:1px solid var(--edge);border-radius:5px;padding:.34rem .62rem;background:var(--paper);transition:all .15s}
+.tbtn:hover{border-color:var(--t-blue);color:var(--t-blue)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);display:inline-block;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
-.top-links a:hover{border-color:var(--teal);color:var(--teal2)}
-.hero{padding:3.5rem 0 1.5rem}
-.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--teal2);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
-.eyebrow::before{content:'// ';opacity:.5}
-h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
-h1 em{color:var(--teal2);font-style:normal}
-.lede{color:var(--t2);font-size:.98rem;max-width:660px;line-height:1.7}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:2.25rem 0 1rem}
-.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:border-color .2s}
-.kpi:hover{border-color:var(--bh)}
-.kpi-v{font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-1px;line-height:1}
-.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
-.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
-.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
-.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
-.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:1.25rem}
-.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-#cloudWrap{position:relative;height:420px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(13,148,136,.06),transparent 70%);border:1px solid rgba(13,148,136,.1);cursor:grab}
+
+/* title band */
+.band{background:var(--paper);border-bottom:1px solid var(--edge);padding:1.05rem 1.25rem}
+.band h1{font-family:'Sora',sans-serif;font-size:clamp(1.35rem,3vw,1.85rem);font-weight:800;letter-spacing:-.8px}
+.band h1 em{color:var(--t-orange);font-style:normal}
+.band p{color:var(--ink2);font-size:.82rem;max-width:820px;margin-top:.3rem}
+
+/* BAN row (Big Ass Numbers) */
+.bans{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--edge);border-bottom:1px solid var(--edge)}
+.ban{background:var(--paper);padding:.85rem 1.25rem;position:relative}
+.ban b{font-family:'Sora',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-1px;display:block;line-height:1}
+.ban span{font-size:.64rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;font-weight:600;font-family:'JetBrains Mono',monospace}
+.ban::after{content:'';position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--t-blue);opacity:.85}
+.ban.b2::after{background:var(--t-green)}.ban.b3::after{background:var(--t-orange)}.ban.b4::after{background:var(--t-purple)}
+
+/* dashboard grid: main + right shelf */
+.dash{display:grid;grid-template-columns:1fr 286px;gap:1px;background:var(--edge)}
+.main{background:var(--wall);padding:1rem 1.1rem;display:grid;gap:1rem;align-content:start}
+.shelf{background:var(--paper);border-left:1px solid var(--edge);padding:1rem .9rem;display:flex;flex-direction:column;gap:1.1rem}
+
+/* worksheet card */
+.ws{background:var(--paper);border:1px solid var(--edge);border-radius:3px;box-shadow:0 1px 3px rgba(20,30,50,.05)}
+.ws-h{display:flex;align-items:center;justify-content:space-between;padding:.55rem .85rem;border-bottom:1px solid var(--edge)}
+.ws-t{font-size:.82rem;font-weight:700;color:var(--ink)}
+.ws-s{font-size:.62rem;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+.ws-b{padding:.85rem}
+.row2{display:grid;grid-template-columns:1.25fr 1fr;gap:1rem}
+
+/* treemap */
+#treemap{position:relative;width:100%;height:230px}
+.tm-cell{position:absolute;border:2px solid var(--paper);border-radius:2px;overflow:hidden;cursor:default;transition:filter .15s}
+.tm-cell:hover{filter:brightness(1.08)}
+.tm-cell .l{position:absolute;left:6px;top:5px;font-size:.66rem;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);line-height:1.15}
+.tm-cell .v{position:absolute;left:6px;bottom:5px;font-size:.62rem;color:rgba(255,255,255,.92);font-family:'JetBrains Mono',monospace;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+
+/* highlight table */
+.ht{width:100%;border-collapse:collapse;font-size:.72rem}
+.ht th{font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);font-weight:700;padding:.4rem .5rem;text-align:center;border-bottom:1px solid var(--edge)}
+.ht th:first-child{text-align:left}
+.ht td{padding:0;border:1px solid var(--paper);text-align:center}
+.ht td.rl{padding:.32rem .5rem;text-align:left;color:var(--ink2);font-weight:600;white-space:nowrap}
+.ht .cell{padding:.4rem .5rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--ink);transition:background .2s}
+
+/* 3D cloud (light panel) */
+#cloudWrap{position:relative;height:260px;border-radius:3px;overflow:hidden;background:linear-gradient(180deg,#fbfcfe,#f2f5f8);cursor:grab}
 #cloudWrap.drag{cursor:grabbing}
 #cloud{width:100%;height:100%;display:block}
-.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
-.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
-.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
-.lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:160px;font-family:'JetBrains Mono',monospace}
-.tip b{color:var(--teal2)}
-.bars{display:flex;flex-direction:column;gap:.55rem;margin-top:.3rem}
-.brow{display:grid;grid-template-columns:118px 1fr auto;gap:.7rem;align-items:center}
-.bname{font-size:.7rem;color:var(--t2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.btrack{height:20px;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden}
-.bfill{height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.7,.3,1);background:linear-gradient(90deg,var(--teal),var(--teal2))}
-.bval{font-size:.7rem;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap}
-.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
-.calc-top{display:flex;justify-content:space-between;align-items:baseline}
-.calc-lbl{font-size:.76rem;color:var(--t2)}
-.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--teal2);font-size:.95rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(13,148,136,.5)}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:2px solid #fff2}
-.gate-out{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-top:.4rem}
-.go{background:rgba(13,148,136,.06);border:1px solid var(--b);border-radius:10px;padding:.75rem;text-align:center}
-.go-v{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.6px}
-.go-l{font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
-.gstbox{display:flex;gap:.5rem;align-items:center;margin:.2rem 0 1rem}
-.gstbox input[type=number]{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:8px;padding:.6rem .8rem;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:.9rem;outline:none}
-.gstbox input[type=number]:focus{border-color:var(--teal)}
-.gst-res{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem}
-.gr{text-align:center;padding:.6rem;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--b)}
-.gr-v{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem}
-.gr-l{font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;margin-top:.15rem}
-.exc{display:flex;flex-direction:column;gap:.5rem}
-.exc-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .8rem;background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:8px;font-size:.76rem}
-.exc-row .n{font-family:'JetBrains Mono',monospace;font-weight:700}
-.tbl-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.74rem}
-th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.55rem .6rem;border-bottom:1px solid var(--b);white-space:nowrap}
-th.num,td.num{text-align:right}
-td{padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
-tr:hover td{background:rgba(13,148,136,.04)}
-.pill{padding:.14rem .5rem;border-radius:4px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.pill.ok{background:rgba(16,185,129,.12);color:var(--emerald)}
-.pill.rev{background:rgba(245,158,11,.12);color:var(--amber)}
-.pill.exc{background:rgba(244,63,94,.12);color:var(--rose)}
-.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
-.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.5rem}
-footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
-footer a{color:var(--teal2);text-decoration:none}
-@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid2b{grid-template-columns:1fr}.gate-out,.gst-res{grid-template-columns:1fr 1fr 1fr}}
+.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:var(--ink3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--edgeH);border-radius:6px;padding:.5rem .6rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:170px;font-family:'JetBrains Mono',monospace;box-shadow:0 6px 20px rgba(20,30,50,.18);color:var(--ink)}
+.tip b{color:var(--t-blue)}
+
+/* shelf cards */
+.sh-card{border:1px solid var(--edge);border-radius:3px;background:var(--wall2)}
+.sh-h{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:700;font-family:'JetBrains Mono',monospace;padding:.5rem .7rem;border-bottom:1px solid var(--edge);background:var(--paper);display:flex;align-items:center;gap:.4rem}
+.sh-h .ic{width:10px;height:10px;border-radius:2px;background:var(--t-blue)}
+.sh-b{padding:.7rem}
+.param-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem}
+.param-lbl{font-size:.72rem;color:var(--ink2)}
+.param-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--t-orange);font-size:.9rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:#D6DCE4;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--t-orange)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #fff}
+.gate-out{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-top:.6rem}
+.go{background:var(--paper);border:1px solid var(--edge);border-radius:4px;padding:.5rem .3rem;text-align:center}
+.go-v{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800}
+.go-l{font-size:.5rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;margin-top:.15rem;font-family:'JetBrains Mono',monospace}
+.legend{display:flex;flex-direction:column;gap:.4rem}
+.lg{display:flex;align-items:center;gap:.45rem;font-size:.72rem;color:var(--ink2)}
+.lg i{width:11px;height:11px;border-radius:2px;flex:none}
+.glfilter{display:flex;flex-direction:column;gap:.15rem;max-height:none}
+.glchk{display:flex;align-items:center;gap:.45rem;font-size:.72rem;color:var(--ink2);padding:.24rem .3rem;border-radius:4px;cursor:pointer;user-select:none}
+.glchk:hover{background:var(--wall)}
+.glchk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none;background:#fff}
+.glchk.on .tick{background:var(--t-blue);border-color:var(--t-blue)}
+.glchk.on .tick::after{content:'';width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
+.glchk .sw{width:9px;height:9px;border-radius:2px;flex:none}
+/* GST validator */
+.gstbox{display:flex;gap:.4rem;align-items:center;margin:.1rem 0 .6rem}
+.gstbox span{color:var(--ink3);font-family:'JetBrains Mono',monospace;font-size:.8rem}
+.gstbox input{flex:1;background:#fff;border:1px solid var(--edge);border-radius:5px;padding:.5rem .6rem;color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none}
+.gstbox input:focus{border-color:var(--t-blue)}
+.gst-res{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.gr{text-align:center;padding:.45rem;border-radius:4px;background:var(--paper);border:1px solid var(--edge)}
+.gr-v{font-family:'Sora',sans-serif;font-weight:800;font-size:.98rem}
+.gr-l{font-size:.5rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;font-family:'JetBrains Mono',monospace;margin-top:.1rem}
+.note{font-size:.64rem;color:var(--ink3);font-family:'JetBrains Mono',monospace;line-height:1.55;margin-top:.5rem}
+
+/* ledger table */
+table.led{width:100%;border-collapse:collapse;font-size:.72rem}
+.led th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);padding:.45rem .55rem;border-bottom:1px solid var(--edge);white-space:nowrap;background:var(--wall2)}
+.led th.num,.led td.num{text-align:right}
+.led td{padding:.4rem .55rem;border-bottom:1px solid var(--wall);color:var(--ink2);white-space:nowrap}
+.led tr:hover td{background:#f7f9fb}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--ink)}
+.pill{padding:.12rem .5rem;border-radius:3px;font-size:.58rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.ok{background:#e7f2e5;color:#3d7a34}
+.pill.rev{background:#fdeedd;color:#b5680f}
+.pill.exc{background:#fbe4e4;color:#b23a3c}
+
+/* Tableau Public embed slot */
+.embed{background:var(--paper);border:1px dashed var(--edgeH);border-radius:4px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.4rem;gap:.5rem}
+.embed .badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue);border:1px solid #cdd9e6;background:#eef3f9;border-radius:100px;padding:.2rem .7rem;font-weight:600}
+.embed h4{font-size:.9rem;font-weight:700}
+.embed p{font-size:.72rem;color:var(--ink2);max-width:520px;line-height:1.6}
+.embed code{font-family:'JetBrains Mono',monospace;font-size:.68rem;background:var(--wall);padding:.1rem .35rem;border-radius:3px;color:var(--t-orange)}
+.tableauPlaceholder{width:100%}
+
+/* worksheet tab strip */
+.tabs{display:flex;align-items:center;gap:0;background:var(--paper);border-top:1px solid var(--edge);padding:0 .5rem;overflow-x:auto}
+.tab{font-size:.72rem;color:var(--ink2);padding:.55rem .85rem;border-right:1px solid var(--edge);white-space:nowrap;cursor:pointer;position:relative;background:none;border-top:none;border-bottom:none;border-left:none;font-family:inherit}
+.tab:first-child{border-left:1px solid var(--edge)}
+.tab.on{color:var(--t-blue);font-weight:700;background:var(--wall2)}
+.tab.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--t-blue)}
+.tab:hover{background:var(--wall2)}
+.statusbar{font-size:.6rem;color:var(--ink3);font-family:'JetBrains Mono',monospace;padding:.4rem 1rem;background:var(--paper);border-top:1px solid var(--edge);display:flex;justify-content:space-between}
+
+footer{padding:1.2rem;text-align:center;color:var(--ink3);font-size:.7rem;background:var(--paper);border-top:1px solid var(--edge)}
+footer a{color:var(--t-blue);text-decoration:none}
+
+@media(max-width:960px){
+  .dash{grid-template-columns:1fr}
+  .shelf{border-left:none;border-top:1px solid var(--edge)}
+  .bans{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
-<canvas id="bg3d"></canvas>
-<div class="top"><div class="top-in">
-  <a class="back" href="../index.html#projects">← Portfolio</a>
-  <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
-  <div class="top-links"><a href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">Source ↗</a></div>
-</div></div>
 
-<div class="wrap">
-  <div class="hero">
-    <div class="eyebrow">Automation with NLP · OCR · Finance</div>
-    <h1>Intelligent Expense-<br><em>Reconciliation</em> Engine</h1>
-    <p class="lede">Every dot is a receipt from an Australian month-end close. The model classifies each to a <b>GL account</b>, validates <b>GST for the BAS</b>, and gates anything uncertain to human review. Move the confidence gate and watch the auto-post rate trade off against review load — the core control every finance team argues about.</p>
-  </div>
-
-  <div class="kpis" id="kpis">
-    <div class="kpi"><div class="kpi-v" style="color:var(--teal2)" data-count="59" data-suffix="%">0</div><div class="kpi-l">Auto-Posted to GL</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--emerald)" data-count="91224" data-money>$0</div><div class="kpi-l">GST for the BAS</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--amber)" data-count="37.5" data-dec="1" data-suffix=" hrs">0</div><div class="kpi-l">Close Time Saved</div></div>
-    <div class="kpi"><div class="kpi-v" style="color:var(--blue)" data-count="1500">0</div><div class="kpi-l">Receipts Processed</div></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-h"><div><div class="panel-title">Receipt Classification Cloud</div><div class="panel-sub">3D · clustered by GL account · colour = routing decision · drag to rotate</div></div></div>
-    <div id="cloudWrap">
-      <canvas id="cloud"></canvas>
-      <div class="cloud-legend">
-        <span class="lg"><i style="background:#10B981"></i>Auto-posted</span>
-        <span class="lg"><i style="background:#F59E0B"></i>Review queue</span>
-        <span class="lg"><i style="background:#F43F5E"></i>Exception</span>
-      </div>
-      <div class="cloud-hint">◐ drag to rotate · hover a receipt · size = amount</div>
-      <div class="tip" id="tip"></div>
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">Spend by GL Account</div><div class="panel-sub">// where the money is classified</div></div></div>
-      <div class="bars" id="bars"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">Exception Queue</div><div class="panel-sub" id="excSub">// flagged, never silently posted</div></div></div>
-      <div class="exc" id="exc"></div>
-      <div class="note">Nothing uncertain is auto-posted — exceptions are surfaced for a human, which is exactly why the engine is trustworthy on noisy OCR.</div>
-    </div>
-  </div>
-
-  <div class="grid2b">
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">Confidence Gate</div><div class="panel-sub">// move it — trade auto-post rate vs review load</div></div></div>
-      <div class="calc-row">
-        <div class="calc-top"><span class="calc-lbl">Auto-post confidence threshold</span><span class="calc-num" id="thV">0.70</span></div>
-        <input type="range" id="th" min="50" max="95" value="70">
-      </div>
-      <div class="gate-out">
-        <div class="go"><div class="go-v" style="color:var(--emerald)" id="gAuto">0</div><div class="go-l">Auto-posted</div></div>
-        <div class="go"><div class="go-v" style="color:var(--amber)" id="gRev">0</div><div class="go-l">To review</div></div>
-        <div class="go"><div class="go-v" style="color:var(--rose)" id="gExc">0</div><div class="go-l">Exceptions</div></div>
-      </div>
-      <div class="note" id="gateNote"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-h"><div><div class="panel-title">GST / BAS Validator</div><div class="panel-sub">// AU 10% GST-inclusive → gross ÷ 11</div></div></div>
-      <div class="gstbox">
-        <span style="color:var(--t3);font-family:'JetBrains Mono',monospace">A$</span>
-        <input type="number" id="gross" value="1100" min="0" step="10">
-      </div>
-      <div class="gst-res">
-        <div class="gr"><div class="gr-v" style="color:var(--teal2)" id="gstAmt">$0</div><div class="gr-l">GST</div></div>
-        <div class="gr"><div class="gr-v" style="color:var(--t1)" id="netAmt">$0</div><div class="gr-l">Net (ex-GST)</div></div>
-        <div class="gr"><div class="gr-v" style="color:var(--emerald)" id="gstValid">✓</div><div class="gr-l">Check</div></div>
-      </div>
-      <div class="note">Enter a GST-inclusive total; the engine derives GST for the BAS. A mismatch vs the printed GST line is what trips the <b>GST_MISMATCH</b> flag.</div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-h"><div><div class="panel-title">Sample Ledger</div><div class="panel-sub">// first rows of the audit-ready output</div></div></div>
-    <div class="tbl-scroll"><table><thead><tr>
-      <th>Vendor</th><th>GL Account</th><th class="num">Gross</th><th class="num">GST</th><th class="num">Conf.</th><th>Status</th>
-    </tr></thead><tbody id="tbody"></tbody></table></div>
-  </div>
-
-  <footer>Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU receipts, headline figures from the verified pipeline run · <a href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+<!-- TABLEAU TOOLBAR -->
+<div class="tbar">
+  <a class="tbtn" href="../index.html#projects">← Portfolio</a>
+  <div class="wb"><b>Expense Reconciliation — Month-End Close</b><span>Workbook · AU FY close · 1 dashboard, 4 sheets</span></div>
+  <span class="tbadge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--t-blue)" stroke-width="2"><path d="M12 3v18M3 12h18M6.5 7.5v9M17.5 7.5v9M12 6.5h.01M12 17.5h.01"/></svg>
+    Tableau-style dashboard
+  </span>
+  <div class="sp"></div>
+  <span style="font-size:.64rem;color:var(--ink3);font-family:'JetBrains Mono',monospace"><span class="live-dot"></span> live</span>
+  <a class="tbtn" href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">Source ↗</a>
 </div>
+
+<!-- TITLE BAND -->
+<div class="band">
+  <h1>Intelligent Expense-<em>Reconciliation</em> Engine</h1>
+  <p>Every receipt from an Australian month-end close, classified to a <b>GL account</b>, GST validated for the <b>BAS</b>, and anything uncertain gated to human review. Move the confidence gate on the right — every sheet re-computes.</p>
+</div>
+
+<!-- BANs -->
+<div class="bans">
+  <div class="ban"><b style="color:var(--t-blue)" id="banAuto">59%</b><span>Auto-Posted to GL</span></div>
+  <div class="ban b2"><b style="color:var(--t-green)" id="banGst">$91,224</b><span>GST for the BAS</span></div>
+  <div class="ban b3"><b style="color:var(--t-orange)">37.5 hrs</b><span>Close Time Saved</span></div>
+  <div class="ban b4"><b style="color:var(--t-purple)" id="banRec">1,500</b><span>Receipts Processed</span></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash">
+  <div class="main">
+
+    <!-- treemap + highlight table -->
+    <div class="row2">
+      <div class="ws">
+        <div class="ws-h"><span class="ws-t">Spend by GL Account</span><span class="ws-s">treemap · size = spend</span></div>
+        <div class="ws-b"><div id="treemap"></div></div>
+      </div>
+      <div class="ws">
+        <div class="ws-h"><span class="ws-t">Routing by GL Account</span><span class="ws-s">highlight table · shade = count</span></div>
+        <div class="ws-b" style="overflow-x:auto"><table class="ht" id="ht"></table></div>
+      </div>
+    </div>
+
+    <!-- receipt cloud -->
+    <div class="ws">
+      <div class="ws-h"><span class="ws-t">Receipt Classification Cloud <span style="color:var(--t-blue);font-size:.56rem;border:1px solid #cdd9e6;border-radius:3px;padding:.03rem .3rem">custom viz</span></span><span class="ws-s">clustered by GL · colour = routing · drag to rotate</span></div>
+      <div class="ws-b">
+        <div id="cloudWrap">
+          <canvas id="cloud"></canvas>
+          <div class="cloud-hint">◐ drag to rotate · hover a receipt · size = amount</div>
+          <div class="tip" id="tip"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ledger -->
+    <div class="ws">
+      <div class="ws-h"><span class="ws-t">Sample Ledger</span><span class="ws-s">audit-ready output</span></div>
+      <div class="ws-b" style="overflow-x:auto">
+        <table class="led"><thead><tr><th>Vendor</th><th>GL Account</th><th class="num">Gross</th><th class="num">GST</th><th class="num">Conf.</th><th>Status</th></tr></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- Tableau Public embed slot -->
+    <div class="ws" id="published">
+      <div class="ws-h"><span class="ws-t">Published to Tableau Public</span><span class="ws-s">live embed slot</span></div>
+      <div class="ws-b">
+        <div class="embed" id="embedSlot">
+          <span class="badge">◇ Tableau Public embed</span>
+          <h4>Drop your live Tableau viz here</h4>
+          <p>This slot is wired for a real <b>Tableau Public</b> embed. Publish the workbook from Tableau Public (desktop), copy its <b>Embed Code</b>, and paste it in place of this block — it renders inline, fully interactive. See the <code>&lt;!-- TABLEAU EMBED --&gt;</code> comment in the source for the exact spot.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT FILTER SHELF -->
+  <aside class="shelf">
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-orange)"></span>Parameter · Confidence gate</div>
+      <div class="sh-b">
+        <div class="param-top"><span class="param-lbl">Auto-post threshold</span><span class="param-num" id="thV">0.70</span></div>
+        <input type="range" id="th" min="50" max="95" value="70" autocomplete="off">
+        <div class="gate-out">
+          <div class="go"><div class="go-v" style="color:var(--ok)" id="gAuto">0</div><div class="go-l">Auto</div></div>
+          <div class="go"><div class="go-v" style="color:var(--rev)" id="gRev">0</div><div class="go-l">Review</div></div>
+          <div class="go"><div class="go-v" style="color:var(--exc)" id="gExc">0</div><div class="go-l">Except.</div></div>
+        </div>
+        <div class="note" id="gateNote"></div>
+      </div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic"></span>Legend · Routing</div>
+      <div class="sh-b legend">
+        <span class="lg"><i style="background:var(--ok)"></i>Auto-posted to GL</span>
+        <span class="lg"><i style="background:var(--rev)"></i>Sent to review queue</span>
+        <span class="lg"><i style="background:var(--exc)"></i>Exception (never posted)</span>
+      </div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-green)"></span>Filter · GL Account</div>
+      <div class="sh-b"><div class="glfilter" id="glFilter"></div></div>
+    </div>
+
+    <div class="sh-card">
+      <div class="sh-h"><span class="ic" style="background:var(--t-teal)"></span>GST / BAS Validator</div>
+      <div class="sh-b">
+        <div class="gstbox"><span>A$</span><input type="number" id="gross" value="1100" min="0" step="10" autocomplete="off"></div>
+        <div class="gst-res">
+          <div class="gr"><div class="gr-v" style="color:var(--t-teal)" id="gstAmt">$0</div><div class="gr-l">GST</div></div>
+          <div class="gr"><div class="gr-v" style="color:var(--ink)" id="netAmt">$0</div><div class="gr-l">Net ex-GST</div></div>
+        </div>
+        <div class="note">GST-inclusive total ÷ 11 = GST for the BAS. A mismatch vs the printed GST line trips <b>GST_MISMATCH</b>.</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- worksheet tabs -->
+<div class="tabs" id="tabs">
+  <button class="tab on" data-go="published0">▦ Dashboard</button>
+  <button class="tab" data-go="treemap">▣ Spend by GL</button>
+  <button class="tab" data-go="ht">▤ Routing</button>
+  <button class="tab" data-go="published">◇ Published</button>
+</div>
+<div class="statusbar"><span id="stat">1,500 marks · synthetic AU receipts · headline figures from the verified pipeline run</span><span>Tableau-style · built by Gaurav Warke</span></div>
+
+<footer>Built by <a href="../index.html">Gaurav Warke</a> · Tableau-style dashboard on synthetic AU receipts · <a href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+
+<!--
+  TABLEAU EMBED — to go live with a REAL Tableau Public viz:
+  1. Open Tableau Public (desktop), build/open this workbook, File → Save to Tableau Public.
+  2. On the published viz page click "Share" → "Embed Code", copy it.
+  3. Replace the <div class="embed" id="embedSlot">...</div> block above with the copied
+     <div class='tableauPlaceholder'> ... </div><script ...></script> snippet.
+  It will render inline, fully interactive, no code changes needed.
+-->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -192,128 +310,165 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 var rnd=mulberry32(20260630);
 function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
+function fmtK(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':(n>=1e3?'$'+(n/1e3).toFixed(0)+'k':'$'+Math.round(n));}
 
 var GL=['Office Supplies','Travel','Software / SaaS','Meals & Ent.','Utilities','Professional Fees','Fuel','Marketing'];
+var GLC=['#4E79A7','#F28E2B','#59A14F','#E15759','#76B7B2','#B07AA1','#9C755F','#EDC948']; // Tableau 10 per GL
 var VEND=['Officeworks','Qantas','Atlassian','Grill\'d','AGL Energy','Deloitte AU','BP Australia','Canva','Bunnings','Telstra','Uber AU','Coles'];
-var N=1500;
-var RECS=[];
+var N=1500, RECS=[];
 for(var i=0;i<N;i++){
   var gl=(rnd()*GL.length)|0;
   var gross=Math.round(20+rnd()*rnd()*2600);
   var conf=Math.min(.99,Math.max(.40,0.742+ (rnd()-0.5)*0.38 + (gross<800?0.05:-0.03)));
-  var abn=rnd()>0.07;               // ~7% missing ABN
-  var gstMissing=rnd()<0.055;
-  var overLimit=gross>2000;         // policy cap
+  var abn=rnd()>0.07, gstMissing=rnd()<0.055, overLimit=gross>2000;
   RECS.push({id:i,vendor:VEND[(rnd()*VEND.length)|0],gl:gl,gross:gross,gst:gross/11,conf:conf,abn:abn,gstMissing:gstMissing,over:overLimit});
 }
-var GST_TOTAL=91224.08;             // verified anchor
+var GST_TOTAL=91224.08;
 
-/* ---- routing given a confidence threshold ---- */
-function route(r,th){
-  if(r.over) return 'exc';          // OVER_LIMIT
-  if(!r.abn) return 'exc';          // NO_ABN
-  if(r.gstMissing) return 'exc';    // GST_MISSING
-  if(r.conf < th) return 'rev';     // low confidence → review
-  return 'ok';                      // auto-posted
-}
+function route(r,th){ if(r.over)return 'exc'; if(!r.abn)return 'exc'; if(r.gstMissing)return 'exc'; if(r.conf<th)return 'rev'; return 'ok'; }
 var curTh=0.70;
 
-/* ---- KPI count-up ---- */
-function animateCount(el){
-  var target=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),pre=el.dataset.prefix||'',suf=el.dataset.suffix||'',money=el.dataset.money!==undefined,t0=null,dur=1300;
-  function render(v){el.textContent=money?fmtMoney(v):(pre+(dec?v.toFixed(dec):Math.round(v).toLocaleString('en-AU'))+suf);}
-  function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);render(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
-  if(reduce){render(target);return;}requestAnimationFrame(step);setTimeout(function(){render(target);},dur+400);
-}
-document.querySelectorAll('[data-count]').forEach(animateCount);
+/* GL filter state */
+var glOn=GL.map(function(){return true;});
+function glSel(r){return glOn[r.gl];}
+function selRecs(){return RECS.filter(glSel);}
 
-/* ---- bars: spend by GL ---- */
-function renderBars(){
-  var agg=GL.map(function(){return 0;});
-  RECS.forEach(function(r){agg[r.gl]+=r.gross;});
-  var rows=GL.map(function(g,i){return [g,agg[i]];}).sort(function(a,b){return b[1]-a[1];});
-  var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
-  document.getElementById('bars').innerHTML=rows.map(function(r){
-    return '<div class="brow"><span class="bname">'+r[0]+'</span><div class="btrack"><div class="bfill" data-w="'+(r[1]/max*100)+'"></div></div><span class="bval">'+fmtMoney(r[1])+'</span></div>';
+/* ---- BANs (respond to GL filter + gate) ---- */
+function renderBANs(){
+  var sel=selRecs();
+  var auto=0; sel.forEach(function(r){if(route(r,curTh)==='ok')auto++;});
+  document.getElementById('banAuto').textContent=sel.length?Math.round(auto/sel.length*100)+'%':'0%';
+  document.getElementById('banRec').textContent=sel.length.toLocaleString('en-AU');
+  // GST scales with selected share of spend
+  var selGross=sel.reduce(function(a,r){return a+r.gross;},0), allGross=RECS.reduce(function(a,r){return a+r.gross;},0);
+  var gst=GST_TOTAL*(allGross?selGross/allGross:0);
+  document.getElementById('banGst').textContent=fmtMoney(gst);
+  document.getElementById('stat').textContent=sel.length.toLocaleString('en-AU')+' marks · '+GL.filter(function(_,i){return glOn[i];}).length+' of 8 GL accounts · gate '+curTh.toFixed(2);
+}
+
+/* ---- squarified treemap ---- */
+function squarify(nodes,X,Y,W,H){
+  nodes=nodes.slice().sort(function(a,b){return b.value-a.value;});
+  var total=nodes.reduce(function(s,n){return s+n.value;},0)||1;
+  var scale=(W*H)/total; nodes.forEach(function(n){n.area=n.value*scale;});
+  var rects=[], fx=X,fy=Y,fw=W,fh=H, row=[], i=0;
+  function worst(r,len){var sum=0,mn=Infinity,mx=0;for(var k=0;k<r.length;k++){var a=r[k].area;sum+=a;if(a<mn)mn=a;if(a>mx)mx=a;}var l2=len*len,s2=sum*sum;return Math.max(l2*mx/s2,s2/(l2*mn));}
+  function lay(r){
+    var sum=r.reduce(function(s,n){return s+n.area;},0), k;
+    if(fw>=fh){var cw=sum/fh, yy=fy; for(k=0;k<r.length;k++){var ch=r[k].area/cw; rects.push({node:r[k],x:fx,y:yy,w:cw,h:ch}); yy+=ch;} fx+=cw; fw-=cw;}
+    else {var rh=sum/fw, xx=fx; for(k=0;k<r.length;k++){var rw=r[k].area/rh; rects.push({node:r[k],x:xx,y:fy,w:rw,h:rh}); xx+=rw;} fy+=rh; fh-=rh;}
+  }
+  while(i<nodes.length){
+    var len=Math.min(fw,fh);
+    if(row.length===0){row.push(nodes[i]);i++;continue;}
+    if(worst(row.concat([nodes[i]]),len)<=worst(row,len)){row.push(nodes[i]);i++;}
+    else{lay(row);row=[];}
+  }
+  if(row.length)lay(row);
+  return rects;
+}
+function renderTreemap(){
+  var el=document.getElementById('treemap'); var W=el.clientWidth, H=el.clientHeight||230;
+  if(W<50)return;   // container not laid out yet (avoid stale/narrow tiling)
+  var agg=GL.map(function(){return 0;}); RECS.forEach(function(r){if(glSel(r))agg[r.gl]+=r.gross;});
+  var nodes=GL.map(function(g,i){return {name:g,value:agg[i],ci:i};}).filter(function(n){return n.value>0;});
+  var rects=squarify(nodes,0,0,W,H);
+  el.innerHTML=rects.map(function(R){
+    var big=R.w>62&&R.h>34;
+    return '<div class="tm-cell" style="left:'+R.x+'px;top:'+R.y+'px;width:'+R.w+'px;height:'+R.h+'px;background:'+GLC[R.node.ci]+'" title="'+R.node.name+' · '+fmtMoney(R.node.value)+'">'+
+      (big?'<span class="l">'+R.node.name+'</span><span class="v">'+fmtK(R.node.value)+'</span>':'')+'</div>';
   }).join('');
-  requestAnimationFrame(function(){document.querySelectorAll('#bars .bfill').forEach(function(f){f.style.width=f.dataset.w+'%';});});
 }
 
-/* ---- exception breakdown ---- */
-function renderExc(){
-  var over=0,noabn=0,gstm=0;
-  RECS.forEach(function(r){ if(r.over)over++; else if(!r.abn)noabn++; else if(r.gstMissing)gstm++; });
-  document.getElementById('exc').innerHTML=
-    '<div class="exc-row"><span>OVER_LIMIT <span style="color:var(--t3)">· gross &gt; $2,000</span></span><span class="n" style="color:var(--rose)">'+over+'</span></div>'+
-    '<div class="exc-row"><span>NO_ABN <span style="color:var(--t3)">· supplier ABN missing</span></span><span class="n" style="color:var(--rose)">'+noabn+'</span></div>'+
-    '<div class="exc-row"><span>GST_MISSING <span style="color:var(--t3)">· no GST line</span></span><span class="n" style="color:var(--rose)">'+gstm+'</span></div>';
+/* ---- highlight table (GL x routing, shaded by count) ---- */
+function renderHT(){
+  var cols=['ok','rev','exc'], colLbl={ok:'Auto',rev:'Review',exc:'Exception'}, colBase={ok:[89,161,79],rev:[242,142,43],exc:[225,87,89]};
+  var mtx=GL.map(function(){return {ok:0,rev:0,exc:0};});
+  RECS.forEach(function(r){ if(glSel(r)) mtx[r.gl][route(r,curTh)]++; });
+  var maxByCol={ok:1,rev:1,exc:1}; mtx.forEach(function(m){cols.forEach(function(c){if(m[c]>maxByCol[c])maxByCol[c]=m[c];});});
+  var html='<thead><tr><th>GL Account</th>'+cols.map(function(c){return '<th>'+colLbl[c]+'</th>';}).join('')+'</tr></thead><tbody>';
+  GL.forEach(function(g,i){
+    if(!glOn[i])return;
+    html+='<tr><td class="rl">'+g+'</td>'+cols.map(function(c){
+      var v=mtx[i][c], t=v/maxByCol[c], rgb=colBase[c], a=(0.12+t*0.78).toFixed(2);
+      var ink=t>0.55?'#fff':'#1F2733';
+      return '<td class="cell" style="background:rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+a+');color:'+ink+'">'+v+'</td>';
+    }).join('')+'</tr>';
+  });
+  document.getElementById('ht').innerHTML=html+'</tbody>';
+}
+
+/* ---- GL filter UI ---- */
+function renderGLFilter(){
+  document.getElementById('glFilter').innerHTML=GL.map(function(g,i){
+    return '<div class="glchk'+(glOn[i]?' on':'')+'" data-i="'+i+'"><span class="tick"></span><span class="sw" style="background:'+GLC[i]+'"></span>'+g+'</div>';
+  }).join('');
+  document.querySelectorAll('#glFilter .glchk').forEach(function(n){
+    n.addEventListener('click',function(){var i=+n.dataset.i; glOn[i]=!glOn[i]; if(glOn.every(function(x){return !x;}))glOn[i]=true; refreshFiltered();});
+  });
 }
 
 /* ---- gate ---- */
 var th=document.getElementById('th');
 function renderGate(){
   curTh=+th.value/100;
-  var a=0,r=0,e=0;
-  RECS.forEach(function(x){var s=route(x,curTh);if(s==='ok')a++;else if(s==='rev')r++;else e++;});
+  var a=0,r=0,e=0; selRecs().forEach(function(x){var s=route(x,curTh);if(s==='ok')a++;else if(s==='rev')r++;else e++;});
   document.getElementById('thV').textContent=curTh.toFixed(2);
-  document.getElementById('gAuto').textContent=a;
-  document.getElementById('gRev').textContent=r;
-  document.getElementById('gExc').textContent=e;
-  document.getElementById('gateNote').textContent='At '+curTh.toFixed(2)+' confidence: '+(a/N*100).toFixed(0)+'% auto-posted. Raise the gate for safer posting but a heavier review queue.';
-  if(window.recolorCloud)window.recolorCloud();
-  renderTable();
+  document.getElementById('gAuto').textContent=a; document.getElementById('gRev').textContent=r; document.getElementById('gExc').textContent=e;
+  var tot=a+r+e;
+  document.getElementById('gateNote').textContent='At '+curTh.toFixed(2)+': '+(tot?Math.round(a/tot*100):0)+'% auto-posted. Raise the gate → safer posting, heavier review queue.';
 }
-th.addEventListener('input',renderGate);
+th.addEventListener('input',function(){renderGate();renderBANs();renderHT();renderTable();if(window.recolorCloud)window.recolorCloud();});
 
 /* ---- GST validator ---- */
 var gross=document.getElementById('gross');
-function gstCalc(){
-  var g=Math.max(0,+gross.value||0), gst=g/11, net=g-gst;
-  document.getElementById('gstAmt').textContent=fmtMoney(gst);
-  document.getElementById('netAmt').textContent=fmtMoney(net);
-  document.getElementById('gstValid').textContent = g>0 ? '✓' : '—';
-}
+function gstCalc(){var g=Math.max(0,+gross.value||0),gst=g/11,net=g-gst;document.getElementById('gstAmt').textContent=fmtMoney(gst);document.getElementById('netAmt').textContent=fmtMoney(net);}
 gross.addEventListener('input',gstCalc);
 
-/* ---- table ---- */
+/* ---- ledger ---- */
 var statusPill={ok:'<span class="pill ok">AUTO-POST</span>',rev:'<span class="pill rev">REVIEW</span>',exc:'<span class="pill exc">EXCEPTION</span>'};
 function renderTable(){
-  var rows=RECS.slice(0,12);
-  document.getElementById('tbody').innerHTML=rows.map(function(r){
-    var s=route(r,curTh);
+  var rows=selRecs().slice(0,12);
+  document.getElementById('tbody').innerHTML=rows.map(function(r){var s=route(r,curTh);
     return '<tr><td class="mono">'+r.vendor+'</td><td>'+GL[r.gl]+'</td><td class="num mono">'+fmtMoney(r.gross)+'</td><td class="num mono">'+fmtMoney(r.gst)+'</td><td class="num">'+r.conf.toFixed(2)+'</td><td>'+statusPill[s]+'</td></tr>';
   }).join('');
 }
 
-/* ================= 3D RECEIPT CLOUD ================= */
+/* ---- refresh when GL filter changes ---- */
+function refreshFiltered(){renderGLFilter();renderBANs();renderTreemap();renderHT();renderGate();renderTable();if(window.recolorCloud)window.recolorCloud();}
+
+/* ---- worksheet tabs (scroll to sheet) ---- */
+document.querySelectorAll('#tabs .tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('#tabs .tab').forEach(function(x){x.classList.remove('on');}); t.classList.add('on');
+    var go=t.dataset.go;
+    var target = go==='published'?document.getElementById('published'):(go==='treemap'?document.getElementById('treemap'):(go==='ht'?document.getElementById('ht'):document.querySelector('.main')));
+    if(target)target.scrollIntoView({behavior:'smooth',block:go==='published'?'center':'start'});
+  });
+});
+
+/* ================= 3D RECEIPT CLOUD (light) ================= */
 (function(){
   var canvas=document.getElementById('cloud'),wrap=document.getElementById('cloudWrap'),tip=document.getElementById('tip');
   if(typeof THREE==='undefined')return;
-  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var W=wrap.clientWidth||600,H=wrap.clientHeight||260;
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
   var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,W/H||1,1,4000);camera.position.z=560;
   var group=new THREE.Group();scene.add(group);
-  // cluster centres per GL account on a ring
   var centres=GL.map(function(_,i){var a=i/GL.length*Math.PI*2;return [Math.cos(a)*300,Math.sin(a)*300*0.7,(rnd()-0.5)*160];});
   var n=RECS.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
-  for(var i=0;i<n;i++){
-    var r=RECS[i],c=centres[r.gl];
-    pos[i*3]=c[0]+(rnd()-0.5)*150; pos[i*3+1]=c[1]+(rnd()-0.5)*150; pos[i*3+2]=c[2]+(rnd()-0.5)*150;
-    siz[i]=5+Math.sqrt(r.gross)/9;
-  }
+  for(var i=0;i<n;i++){var r=RECS[i],c=centres[r.gl];pos[i*3]=c[0]+(rnd()-0.5)*150;pos[i*3+1]=c[1]+(rnd()-0.5)*150;pos[i*3+2]=c[2]+(rnd()-0.5)*150;siz[i]=5+Math.sqrt(r.gross)/9;}
   var g=new THREE.BufferGeometry();
-  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  g.setAttribute('color',new THREE.BufferAttribute(col,3));
-  g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
   var mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,vertexColors:true,
     vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
-    fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.12,d);gl_FragColor=vec4(vC,a*0.92);}'});
+    fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.12,d);gl_FragColor=vec4(vC,a*0.95);}'});
   var pts=new THREE.Points(g,mat);group.add(pts);
-  var C={ok:new THREE.Color('#10B981'),rev:new THREE.Color('#F59E0B'),exc:new THREE.Color('#F43F5E')};
-  function recolor(){var a=g.attributes.color.array;for(var i=0;i<n;i++){var c=C[route(RECS[i],curTh)];a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.attributes.color.needsUpdate=true;}
+  var C={ok:new THREE.Color('#59A14F'),rev:new THREE.Color('#F28E2B'),exc:new THREE.Color('#E15759')},dim=new THREE.Color('#C9D0DA');
+  var baseSiz=siz.slice();
+  function recolor(){var a=g.attributes.color.array,sz=g.attributes.asize.array;for(var i=0;i<n;i++){var r=RECS[i];if(glOn[r.gl]){var c=C[route(r,curTh)];a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;sz[i]=baseSiz[i];}else{a[i*3]=dim.r;a[i*3+1]=dim.g;a[i*3+2]=dim.b;sz[i]=baseSiz[i]*0.4;}}g.attributes.color.needsUpdate=true;g.attributes.asize.needsUpdate=true;}
   window.recolorCloud=recolor;recolor();
-
   var drag=false,px=0,py=0,ry=0,rx=0.15,vy=0.0016;
   wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
@@ -321,10 +476,10 @@ function renderTable(){
   wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
   var proj=new THREE.Vector3();
   function hover(mx,my,rw,rh){var best=-1,bd=16,arr=g.attributes.position.array;
-    for(var i=0;i<n;i++){proj.set(arr[i*3],arr[i*3+1],arr[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd&&proj.z<1){bd=dd;best=i;}}
+    for(var i=0;i<n;i++){if(!glOn[RECS[i].gl])continue;proj.set(arr[i*3],arr[i*3+1],arr[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd&&proj.z<1){bd=dd;best=i;}}
     if(best>=0){var r=RECS[best],st=route(r,curTh),lbl={ok:'auto-posted',rev:'review',exc:'exception'}[st];
       tip.innerHTML='<b>'+r.vendor+'</b><br>'+GL[r.gl]+'<br>gross '+fmtMoney(r.gross)+' · GST '+fmtMoney(r.gst)+'<br>conf '+r.conf.toFixed(2)+' → '+lbl;
-      tip.style.left=Math.min(mx+14,rw-180)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
+      tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
     else tip.style.opacity=0;
   }
   function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
@@ -333,19 +488,15 @@ function renderTable(){
   if(reduce)renderer.render(scene,camera);else loop();
 })();
 
-/* ---- subtle backdrop ---- */
-(function(){var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;var W=innerWidth,H=innerHeight;
-  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
-  var s=new THREE.Scene(),c=new THREE.PerspectiveCamera(60,W/H,1,2000);c.position.z=600;
-  var p=new Float32Array(270);for(var i=0;i<270;i++)p[i]=(Math.random()-0.5)*1200;
-  var gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(p,3));
-  var grp=new THREE.Points(gg,new THREE.PointsMaterial({color:0x0D9488,size:2.4,transparent:true,opacity:.5}));s.add(grp);
-  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(s,c);if(!reduce)requestAnimationFrame(f);}
-  addEventListener('resize',function(){W=innerWidth;H=innerHeight;c.aspect=W/H;c.updateProjectionMatrix();rn.setSize(W,H,false);});
-  if(reduce)rn.render(s,c);else f();
-})();
-
-renderBars();renderExc();renderGate();gstCalc();renderTable();
+/* ---- init ---- */
+th.value='70';gross.value='1100';   // stable defaults on load (60% auto-post, GST $100 on $1,100), even after bfcache restore
+renderGLFilter();renderBANs();renderTreemap();renderHT();renderGate();gstCalc();renderTable();
+addEventListener('resize',function(){renderTreemap();});
+if('ResizeObserver' in window){new ResizeObserver(function(){renderTreemap();}).observe(document.getElementById('treemap'));}
+// re-tile once layout + fonts have settled (treemap needs the final container width)
+requestAnimationFrame(function(){requestAnimationFrame(renderTreemap);});
+addEventListener('load',renderTreemap);
+setTimeout(renderTreemap,600);
 </script>
 </body>
 </html>
