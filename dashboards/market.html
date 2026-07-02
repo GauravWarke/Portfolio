@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market-Performance Intelligence · Live Dashboard | Gaurav Warke</title>
+<meta name="description" content="Interactive dashboard — GA4 + orders + ad spend unified per channel; ROAS/CAC with a live budget-reallocation model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);
+  --teal:#0D9488;--blue:#3B82F6;--blue2:#60A5FA;--amber:#F59E0B;--amber2:#FBBF24;--rose:#F43F5E;--emerald:#10B981;
+  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(59,130,246,.18);--bh:rgba(59,130,246,.42);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.5}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
+.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
+.back:hover{color:var(--blue2)}
+.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--blue2);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
+.top-links a:hover{border-color:var(--blue);color:var(--blue2)}
+.hero{padding:3.5rem 0 1.5rem}
+.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--blue2);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
+.eyebrow::before{content:'// ';opacity:.5}
+h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
+h1 em{color:var(--blue2);font-style:normal}
+.lede{color:var(--t2);font-size:.98rem;max-width:670px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:2.25rem 0 1rem}
+.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:border-color .2s}
+.kpi:hover{border-color:var(--bh)}
+.kpi-v{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
+.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
+.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:1.25rem}
+#sceneWrap{position:relative;height:440px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,rgba(59,130,246,.06),transparent 70%);border:1px solid rgba(59,130,246,.1);cursor:grab}
+#sceneWrap.drag{cursor:grabbing}
+#scene{width:100%;height:100%;display:block}
+.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
+.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace}
+.tip b{color:var(--blue2)}
+.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
+.calc-top{display:flex;justify-content:space-between;align-items:baseline}
+.calc-lbl{font-size:.76rem;color:var(--t2)}
+.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--blue2);font-size:.95rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(59,130,246,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--blue);cursor:pointer;border:2px solid #fff2}
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
+.co{background:rgba(59,130,246,.06);border:1px solid var(--b);border-radius:10px;padding:.85rem;text-align:center}
+.co-v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.8px}
+.co-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+#roas{width:100%;height:220px;display:block}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.55rem .6rem;border-bottom:1px solid var(--b);white-space:nowrap}
+th.num,td.num{text-align:right}
+td{padding:.6rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
+.pill{padding:.16rem .55rem;border-radius:4px;font-size:.62rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.scale{background:rgba(16,185,129,.12);color:var(--emerald)}
+.pill.hold{background:rgba(59,130,246,.12);color:var(--blue2)}
+.pill.cut{background:rgba(244,63,94,.12);color:var(--rose)}
+.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.5rem}
+footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
+footer a{color:var(--blue2);text-decoration:none}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+<div class="top"><div class="top-in">
+  <a class="back" href="../index.html#projects">← Portfolio</a>
+  <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
+  <div class="top-links"><a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">Source ↗</a></div>
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Data & BI · Performance Reporting</div>
+    <h1>Market-Performance<br><em>Intelligence</em> System</h1>
+    <p class="lede">GA4 + orders + ad spend for a Melbourne D2C brand, unified per channel over 26 weeks. Each pair of bars is a channel's spend vs revenue — the taller the revenue bar sits above spend, the better the ROAS. Drag the reallocation slider to move budget from the weak channel to the strong one and watch the revenue upside compute live.</p>
+  </div>
+
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-v" style="color:var(--blue2)" data-count="2.02" data-dec="2" data-suffix="x">0</div><div class="kpi-l">Google ROAS · HOLD</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--rose)" data-count="1.24" data-dec="2" data-suffix="x">0</div><div class="kpi-l">Meta ROAS · CUT</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--emerald)" id="kUplift">$0</div><div class="kpi-l">Revenue Upside</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--amber2)" data-count="26">0</div><div class="kpi-l">Weeks Unified</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Spend vs Revenue by Channel</div><div class="panel-sub">3D · left bar = spend · right bar = revenue · drag to rotate · updates with reallocation</div></div></div>
+    <div id="sceneWrap">
+      <canvas id="scene"></canvas>
+      <div class="cloud-legend">
+        <span class="lg"><i style="background:#3B82F6"></i>Google Ads</span>
+        <span class="lg"><i style="background:#F59E0B"></i>Meta Ads</span>
+        <span class="lg"><i style="background:#334155"></i>Spend</span>
+      </div>
+      <div class="cloud-hint">◐ drag to rotate · hover a bar</div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Budget Reallocation</div><div class="panel-sub">// shift spend Meta → Google at their measured ROAS</div></div></div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Move this % of Meta spend to Google</span><span class="calc-num" id="pcV">20%</span></div>
+        <input type="range" id="pc" min="0" max="40" value="20">
+      </div>
+      <div class="calc-out">
+        <div class="co"><div class="co-v" style="color:var(--emerald)" id="oUplift">$0</div><div class="co-l">Added Revenue</div></div>
+        <div class="co"><div class="co-v" style="color:var(--blue2)" id="oBlend">0.00x</div><div class="co-l">Blended ROAS</div></div>
+      </div>
+      <div class="note" id="reNote"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Weekly ROAS Trend</div><div class="panel-sub">Google vs Meta · SCALE ≥ 3 · CUT &lt; 1.5</div></div></div>
+      <canvas id="roas"></canvas>
+      <div class="note">Google holds a steady ~2x; Meta drifts below the 1.5 CUT line — the signal to reallocate rather than keep funding it.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Channel Decision Matrix</div><div class="panel-sub">// the weekly source of truth</div></div></div>
+    <div class="tbl-scroll"><table><thead><tr>
+      <th>Channel</th><th class="num">Spend</th><th class="num">Revenue</th><th class="num">ROAS</th><th class="num">CAC</th><th>Action</th>
+    </tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+
+  <footer>Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU marketing data, headline figures from the verified report run · <a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
+// verified channel anchors
+var CH={
+  google:{name:'Google Ads',spend:202070,revenue:408471,roas:2.02,cac:54.97,color:0x3B82F6},
+  meta:  {name:'Meta Ads',  spend:181600,revenue:225830,roas:1.24,cac:67.84,color:0xF59E0B}
+};
+function decide(roas){return roas>=3?['SCALE','scale']:(roas<1.5?['CUT','cut']:['HOLD','hold']);}
+
+/* KPI count-up */
+function animateCount(el){var t=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),suf=el.dataset.suffix||'',t0=null,dur=1300;
+  function r(v){el.textContent=(dec?v.toFixed(dec):Math.round(v))+suf;}
+  function st(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);r(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(st);}
+  if(reduce){r(t);return;}requestAnimationFrame(st);setTimeout(function(){r(t);},dur+400);}
+document.querySelectorAll('[data-count]').forEach(animateCount);
+
+/* reallocation model */
+var pc=document.getElementById('pc');
+var state={gSpend:CH.google.spend,gRev:CH.google.revenue,mSpend:CH.meta.spend,mRev:CH.meta.revenue};
+function runRealloc(){
+  var f=+pc.value/100, move=CH.meta.spend*f;
+  state.gSpend=CH.google.spend+move; state.gRev=state.gSpend*CH.google.roas;
+  state.mSpend=CH.meta.spend-move;   state.mRev=state.mSpend*CH.meta.roas;
+  var baseTotal=CH.google.spend*CH.google.roas+CH.meta.spend*CH.meta.roas; // consistent basis → 0% = $0 uplift
+  var newTotal=state.gRev+state.mRev;
+  var uplift=newTotal-baseTotal;
+  var blended=newTotal/(state.gSpend+state.mSpend);
+  document.getElementById('pcV').textContent=(f*100).toFixed(0)+'%';
+  document.getElementById('oUplift').textContent=fmtMoney(uplift);
+  document.getElementById('kUplift').textContent=fmtMoney(uplift);
+  document.getElementById('oBlend').textContent=blended.toFixed(2)+'x';
+  document.getElementById('reNote').textContent='Moving '+fmtMoney(move)+' from Meta (1.24x) to Google (2.02x) adds ~'+fmtMoney(uplift)+' revenue at the same total spend.';
+  if(window.updateBars)window.updateBars();
+}
+pc.addEventListener('input',runRealloc);
+
+/* table */
+function renderTable(){
+  var rows=[['google',CH.google],['meta',CH.meta]];
+  document.getElementById('tbody').innerHTML=rows.map(function(kv){
+    var c=kv[1],d=decide(c.roas);
+    return '<tr><td class="mono">'+c.name+'</td><td class="num mono">'+fmtMoney(c.spend)+'</td><td class="num mono">'+fmtMoney(c.revenue)+'</td><td class="num mono">'+c.roas.toFixed(2)+'x</td><td class="num mono">'+fmtMoney(c.cac)+'</td><td><span class="pill '+d[1]+'">'+d[0]+'</span></td></tr>';
+  }).join('');
+}
+
+/* weekly ROAS canvas */
+var roas=document.getElementById('roas'),rx=roas.getContext('2d');
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function drawRoas(){
+  var r=roas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);roas.width=r.width*dpr;roas.height=r.height*dpr;rx.setTransform(dpr,0,0,dpr,0,0);
+  var W=r.width,H=r.height,pad=30;rx.clearRect(0,0,W,H);
+  var wk=26,max=3.4;
+  function X(i){return pad+i/(wk-1)*(W-pad-8);}
+  function Y(v){return (H-pad)-v/max*(H-pad-10);}
+  rx.strokeStyle='rgba(255,255,255,.08)';rx.lineWidth=1;rx.beginPath();rx.moveTo(pad,H-pad);rx.lineTo(W-6,H-pad);rx.moveTo(pad,H-pad);rx.lineTo(pad,8);rx.stroke();
+  // SCALE (3.0) and CUT (1.5) lines
+  rx.strokeStyle='rgba(16,185,129,.35)';rx.setLineDash([4,4]);rx.beginPath();rx.moveTo(pad,Y(3));rx.lineTo(W-6,Y(3));rx.stroke();
+  rx.strokeStyle='rgba(244,63,94,.4)';rx.beginPath();rx.moveTo(pad,Y(1.5));rx.lineTo(W-6,Y(1.5));rx.stroke();rx.setLineDash([]);
+  rx.fillStyle='#5B6B82';rx.font='9px JetBrains Mono, monospace';rx.fillText('SCALE 3.0',pad+3,Y(3)-3);rx.fillText('CUT 1.5',pad+3,Y(1.5)-3);
+  function series(seed,base,color){var rnd=mulberry32(seed),pts=[];for(var i=0;i<wk;i++)pts.push(Math.max(0.2,base+(rnd()-0.5)*0.5));rx.strokeStyle=color;rx.lineWidth=2;rx.beginPath();pts.forEach(function(v,i){i?rx.lineTo(X(i),Y(v)):rx.moveTo(X(i),Y(v));});rx.stroke();}
+  series(11,2.02,'#3B82F6'); // Google
+  series(29,1.24,'#F59E0B'); // Meta
+  rx.fillStyle='#60A5FA';rx.fillText('Google',W-70,18);rx.fillStyle='#FBBF24';rx.fillText('Meta',W-70,30);
+}
+
+/* ================= 3D CHANNEL BARS ================= */
+var updateBars=function(){};
+(function(){
+  var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
+  if(typeof THREE==='undefined')return;
+  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(0,190,640);camera.lookAt(0,70,0);
+  var group=new THREE.Group();scene.add(group);
+  var grid=new THREE.GridHelper(760,10,0x1e2b45,0x141d2e);group.add(grid);
+  var SC=0.00045; // revenue/spend → height
+  // 4 bars: [gSpend,gRev,mSpend,mRev]
+  var defs=[
+    {key:'gSpend',x:-220,color:0x334155,label:'Google spend'},
+    {key:'gRev', x:-140,color:0x3B82F6,label:'Google revenue'},
+    {key:'mSpend',x:120, color:0x334155,label:'Meta spend'},
+    {key:'mRev', x:200, color:0xF59E0B,label:'Meta revenue'}
+  ];
+  var bars=defs.map(function(d){
+    var m=new THREE.Mesh(new THREE.BoxGeometry(60,1,60),new THREE.MeshBasicMaterial({color:d.color,transparent:true,opacity:.85}));
+    m.position.x=d.x;group.add(m);
+    var w=new THREE.Mesh(new THREE.BoxGeometry(61,1,61),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.08}));
+    w.position.x=d.x;group.add(w);
+    return {mesh:m,wire:w,def:d};
+  });
+  updateBars=function(){
+    bars.forEach(function(b){
+      var val=state[b.def.key], h=Math.max(3,val*SC);
+      b.mesh.scale.y=h;b.mesh.position.y=h/2;
+      b.wire.scale.y=h;b.wire.position.y=h/2;
+    });
+  };
+  window.updateBars=updateBars;updateBars();
+
+  var drag=false,px=0,py=0,ry=0.35,rxr=0,vy=0.0016;
+  wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
+  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){ry+=(e.clientX-px)*0.006;rxr+=(e.clientY-py)*0.005;rxr=Math.max(-0.5,Math.min(0.9,rxr));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
+  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
+  var proj=new THREE.Vector3();
+  function hover(mx,my,rw,rh){var best=-1,bd=48;for(var i=0;i<bars.length;i++){var b=bars[i];proj.set(b.mesh.position.x,b.mesh.position.y,0).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}
+    if(best>=0){var b=bars[best];tip.innerHTML='<b>'+b.def.label+'</b><br>'+fmtMoney(state[b.def.key]);tip.style.left=Math.min(mx+14,rw-160)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}else tip.style.opacity=0;}
+  function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rxr-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
+  function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
+  addEventListener('resize',resize);if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);
+  if(reduce)renderer.render(scene,camera);else loop();
+})();
+
+/* backdrop */
+(function(){var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;var W=innerWidth,H=innerHeight;
+  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
+  var s=new THREE.Scene(),c=new THREE.PerspectiveCamera(60,W/H,1,2000);c.position.z=600;
+  var p=new Float32Array(270);for(var i=0;i<270;i++)p[i]=(Math.random()-0.5)*1200;
+  var gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(p,3));
+  var grp=new THREE.Points(gg,new THREE.PointsMaterial({color:0x3B82F6,size:2.4,transparent:true,opacity:.5}));s.add(grp);
+  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(s,c);if(!reduce)requestAnimationFrame(f);}
+  addEventListener('resize',function(){W=innerWidth;H=innerHeight;c.aspect=W/H;c.updateProjectionMatrix();rn.setSize(W,H,false);});
+  if(reduce)rn.render(s,c);else f();
+})();
+
+renderTable();drawRoas();runRealloc();
+addEventListener('resize',drawRoas);
+if('ResizeObserver' in window)new ResizeObserver(drawRoas).observe(roas);
+</script>
+</body>
+</html>
