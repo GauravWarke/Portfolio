@@ -193,6 +193,11 @@ footer a{color:var(--emer2);text-decoration:none}
         <div id="sceneWrap">
           <canvas id="scene"></canvas>
           <div class="cloud-legend"><span class="lg"><i style="background:#F43F5E"></i>Below reorder point</span><span class="lg"><i style="background:#10B981"></i>Healthy cover</span></div>
+          <div class="axes-key" style="position:absolute;top:10px;left:10px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--t2);line-height:1.55;pointer-events:none;background:rgba(10,15,26,.6);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
+            <div><b style="color:#34D399">X</b> = SKU</div>
+            <div><b style="color:#60A5FA">Y</b> = units (stock / reorder)</div>
+            <div><b style="color:#FBBF24">Z</b> = lead time (days)</div>
+          </div>
           <div class="cloud-hint">◐ drag to rotate · hover/click a tower</div>
           <div class="tip" id="tip"></div>
         </div>
@@ -413,7 +418,19 @@ document.querySelectorAll('#pagetabs .ptab').forEach(function(tab,idx){
   });
 });
 
-/* ================= 3D INVENTORY TOWERS ================= */
+/* ---- shared 3D axis helpers (camera-facing text sprites + axis lines) ---- */
+function makeTextSprite(txt,color,fs){
+  fs=fs||40;var pad=10,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  ctx.font='bold '+fs+'px "JetBrains Mono", monospace';var w=Math.ceil(ctx.measureText(txt).width);
+  cv.width=w+pad*2;cv.height=fs+pad*2;ctx.font='bold '+fs+'px "JetBrains Mono", monospace';
+  ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(txt,pad,cv.height/2);
+  var tex=new THREE.CanvasTexture(cv);tex.needsUpdate=true;
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+  var sc=0.42;sp.scale.set(cv.width*sc,cv.height*sc,1);return sp;
+}
+function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([a,b]);return new THREE.Line(g,new THREE.LineBasicMaterial({color:color,transparent:true,opacity:op||0.55}));}
+
+/* ================= 3D INVENTORY TOWERS (X=SKU · Y=units · Z=lead time) ================= */
 var updateTowers=function(){}, highlightTower=function(){};
 (function(){
   var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
@@ -426,11 +443,13 @@ var updateTowers=function(){}, highlightTower=function(){};
   var grid=new THREE.GridHelper(760,12,0x1b3a34,0x14261f);group.add(grid);
   var GAP=120, x0=-(SKUS.length-1)*GAP/2, SC=0.045, towers=[];
   var green=new THREE.Color('#10B981'), red=new THREE.Color('#F43F5E');
+  function leadZ(lead){return ((lead-5)/9-0.5)*300;}   // base lead 5→-150 … 14→+150 (depth = lead time)
   SKUS.forEach(function(s,i){
-    var g=new THREE.Group();g.position.x=x0+i*GAP;group.add(g);
+    var g=new THREE.Group();g.position.x=x0+i*GAP;g.position.z=leadZ(s.lead);group.add(g);
     var oMesh=new THREE.Mesh(new THREE.BoxGeometry(60,1,60),new THREE.MeshBasicMaterial({color:0x64748b,wireframe:true,transparent:true,opacity:.5}));g.add(oMesh);
     var fMat=new THREE.MeshBasicMaterial({color:0x10B981,transparent:true,opacity:.82});
     var fMesh=new THREE.Mesh(new THREE.BoxGeometry(52,1,52),fMat);g.add(fMesh);
+    var lbl=makeTextSprite(s.sku,'#93A3B4',30);lbl.position.set(0,-24,34);g.add(lbl);
     towers.push({g:g,o:oMesh,f:fMesh,fMat:fMat,i:i});
   });
   updateTowers=function(){
@@ -439,6 +458,17 @@ var updateTowers=function(){}, highlightTower=function(){};
   };
   highlightTower=function(){towers.forEach(function(t){t.f.material.opacity=(t.i===sel?1:0.82);t.o.material.opacity=(t.i===sel?0.85:0.5);});};
   updateTowers();
+  // ---- labelled axes ----
+  (function(){
+    var AX=x0-90, EX=x0+GAP*(SKUS.length-1)+90, EY=430, ZN=-185, ZP=185;
+    group.add(axisLine(new THREE.Vector3(AX,0,ZN),new THREE.Vector3(EX,0,ZN),0x34D399));
+    group.add(axisLine(new THREE.Vector3(AX,0,ZN),new THREE.Vector3(AX,EY,ZN),0x3B82F6));
+    group.add(axisLine(new THREE.Vector3(AX,0,ZN),new THREE.Vector3(AX,0,ZP),0xF59E0B));
+    var sx=makeTextSprite('X: SKU','#34D399');sx.position.set(EX+30,6,ZN);group.add(sx);
+    var sy=makeTextSprite('Y: UNITS','#60A5FA');sy.position.set(AX,EY+20,ZN);group.add(sy);
+    var sz=makeTextSprite('Z: LEAD TIME','#FBBF24');sz.position.set(AX,6,ZP+30);group.add(sz);
+    [0.33,0.66,1].forEach(function(t){var u=Math.round(t*EY/SC/1000);var s=makeTextSprite(u+'k u','#5C6C7E',26);s.position.set(AX-34,t*EY,ZN);group.add(s);});
+  })();
   var drag=false,px=0,py=0,ry=0.5,rx=0,vy=0.0018,moved=false;
   wrap.addEventListener('pointerdown',function(e){drag=true;moved=false;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
@@ -446,7 +476,7 @@ var updateTowers=function(){}, highlightTower=function(){};
   wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
   wrap.addEventListener('click',function(e){if(moved)return;var r=wrap.getBoundingClientRect();var i=pick(e.clientX-r.left,e.clientY-r.top,r.width,r.height);if(i>=0){sel=i;renderTable();drawForecast();updateDetail();renderSmallMult();highlightTower();}});
   var proj=new THREE.Vector3();
-  function screenOf(i){var t=towers[i];proj.set(t.g.position.x,t.f.position.y,0).applyMatrix4(group.matrixWorld).project(camera);return proj;}
+  function screenOf(i){var t=towers[i];proj.set(t.g.position.x,t.f.position.y,t.g.position.z).applyMatrix4(group.matrixWorld).project(camera);return proj;}
   function pick(mx,my,rw,rh){var best=-1,bd=48;for(var i=0;i<towers.length;i++){var p=screenOf(i);var sx=(p.x*0.5+0.5)*rw,sy=(-p.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}return best;}
   function hover(mx,my,rw,rh){var i=pick(mx,my,rw,rh);if(i>=0){var r=rows[i];tip.innerHTML='<b>'+r.sku+'</b><br>stock '+r.stock+' · reorder '+r.rp+'<br>daily '+r.daily+' · lead '+r.lead+'d<br>'+(r.status==='REORDER'?'order '+r.order+' → '+fmtMoney(r.value):'healthy cover');tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}else tip.style.opacity=0;}
   function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}

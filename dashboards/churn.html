@@ -215,6 +215,11 @@ footer a{color:var(--rose2);text-decoration:none}
             <span class="lg"><i style="background:#F59E0B"></i>Watch</span>
             <span class="lg"><i style="background:#10B981"></i>Healthy</span>
           </div>
+          <div class="axes-key" style="position:absolute;bottom:8px;right:12px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--t2);line-height:1.55;pointer-events:none;background:rgba(11,15,26,.6);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
+            <div><b style="color:#FB7185">X</b> = churn probability</div>
+            <div><b style="color:#34D399">Y</b> = MRR (AUD)</div>
+            <div><b style="color:#60A5FA">Z</b> = tenure (months)</div>
+          </div>
           <div class="cloud-hint">◐ drag to rotate · hover a point</div>
           <div class="tip" id="tip"></div>
         </div>
@@ -303,7 +308,7 @@ for(var i=0;i<180;i++){
   var z=-0.4 + fails*0.22 + tickets*0.09 + idle*0.012 - tenure*0.015 - (mrr>3000?0.35:0);
   var prob=1/(1+Math.exp(-z)); prob=Math.max(.02,Math.min(.97,prob+(rnd()-.5)*0.12));
   var arr=mrr*12, risk=arr*prob;
-  BOOK.push({id:'CP-'+(4100+i),state:st,ind:ind,mrr:mrr,prob:prob,arr:arr,risk:risk,band:prob>=.6?'High':(prob>=.35?'Watch':'Healthy')});
+  BOOK.push({id:'CP-'+(4100+i),state:st,ind:ind,mrr:mrr,prob:prob,arr:arr,risk:risk,tenure:tenure,band:prob>=.6?'High':(prob>=.35?'Watch':'Healthy')});
 }
 var ARR_AT_RISK_TOTAL=3369026, FLAGGED=1494, THRESH=0.5, ROC=0.748;
 
@@ -460,6 +465,18 @@ up.addEventListener('input',calc);cp.addEventListener('input',calc);
 /* ---------- master refresh ---------- */
 function refreshAll(){renderSlicers();renderKPIs();renderBars();renderScatter();renderTable();buildCloud();}
 
+/* ---- shared 3D axis helpers (camera-facing text sprites + axis lines) ---- */
+function makeTextSprite(txt,color,fs){
+  fs=fs||40;var pad=10,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  ctx.font='bold '+fs+'px "JetBrains Mono", monospace';var w=Math.ceil(ctx.measureText(txt).width);
+  cv.width=w+pad*2;cv.height=fs+pad*2;ctx.font='bold '+fs+'px "JetBrains Mono", monospace';
+  ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(txt,pad,cv.height/2);
+  var tex=new THREE.CanvasTexture(cv);tex.needsUpdate=true;
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+  var sc=0.42;sp.scale.set(cv.width*sc,cv.height*sc,1);return sp;
+}
+function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([a,b]);return new THREE.Line(g,new THREE.LineBasicMaterial({color:color,transparent:true,opacity:op||0.55}));}
+
 /* ================= 3D ACCOUNT RISK CLOUD ================= */
 var buildCloud=function(){};
 (function(){
@@ -471,17 +488,17 @@ var buildCloud=function(){};
   var scene=new THREE.Scene();
   var camera=new THREE.PerspectiveCamera(55,W/H,1,4000);camera.position.z=560;
   var group=new THREE.Group();scene.add(group);
-  var pts,meta=[];
+  var pts=null,meta=[];
   function build(){
-    while(group.children.length)group.remove(group.children[0]);
+    if(pts){group.remove(pts);pts.geometry.dispose();pts.material.dispose();}   // keep axes; swap only the points
     var data=filtered();meta=data;
     var n=data.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
     var c=new THREE.Color();
     for(var i=0;i<n;i++){
       var d=data[i];
-      pos[i*3]  =(d.prob-0.5)*760;
-      pos[i*3+1]=(Math.sqrt(d.mrr/7000)-0.5)*520;
-      pos[i*3+2]=(mulberry32(i*97+7)()-0.5)*420;
+      pos[i*3]  =(d.prob-0.5)*760;                    // X = churn probability
+      pos[i*3+1]=(Math.sqrt(d.mrr/7000)-0.5)*520;     // Y = MRR (value)
+      pos[i*3+2]=(d.tenure/48-0.5)*440;               // Z = account tenure (months)
       c.set(riskColor(d.prob));col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
       siz[i]=6+Math.sqrt(d.risk)/34;
     }
@@ -498,6 +515,17 @@ var buildCloud=function(){};
     pts=new THREE.Points(g,mat);group.add(pts);
   }
   buildCloud=build;build();
+
+  // ---- labelled axes (added once; persist across rebuilds) ----
+  (function(){
+    var AX=-400,AY=-280,AZ=-240, EX=400,EY=280,EZ=240;
+    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(EX,AY,AZ),0xF43F5E));
+    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,EY,AZ),0x34D399));
+    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,AY,EZ),0x60A5FA));
+    var sx=makeTextSprite('X: CHURN PROB','#FB7185');sx.position.set(EX+30,AY,AZ);group.add(sx);
+    var sy=makeTextSprite('Y: MRR (AUD)','#34D399');sy.position.set(AX,EY+22,AZ);group.add(sy);
+    var sz=makeTextSprite('Z: TENURE (mo)','#60A5FA');sz.position.set(AX,AY,EZ+30);group.add(sz);
+  })();
 
   var drag=false,px=0,py=0,ry=0,rx=0,vy=0.0016;
   wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
