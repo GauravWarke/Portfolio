@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demand & Supply-Risk · Live Dashboard | Gaurav Warke</title>
+<meta name="description" content="Interactive dashboard — per-SKU demand forecast, safety stock, reorder points and a costed AUD purchase-order plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);
+  --teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--rose:#F43F5E;--emerald:#10B981;--emer2:#34D399;
+  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(16,185,129,.18);--bh:rgba(16,185,129,.42);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--emerald);border-radius:2px}
+#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.5}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
+.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
+.back:hover{color:var(--emer2)}
+.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--emer2);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
+.top-links a:hover{border-color:var(--emerald);color:var(--emer2)}
+.hero{padding:3.5rem 0 1.5rem}
+.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--emer2);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
+.eyebrow::before{content:'// ';opacity:.5}
+h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
+h1 em{color:var(--emer2);font-style:normal}
+.lede{color:var(--t2);font-size:.98rem;max-width:660px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:2.25rem 0 1rem}
+.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:border-color .2s}
+.kpi:hover{border-color:var(--bh)}
+.kpi-v{font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
+.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
+.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:1.25rem}
+#sceneWrap{position:relative;height:440px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,rgba(16,185,129,.06),transparent 70%);border:1px solid rgba(16,185,129,.1);cursor:grab}
+#sceneWrap.drag{cursor:grabbing}
+#scene{width:100%;height:100%;display:block}
+.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
+.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:170px;font-family:'JetBrains Mono',monospace}
+.tip b{color:var(--emer2)}
+.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
+.calc-top{display:flex;justify-content:space-between;align-items:baseline}
+.calc-lbl{font-size:.76rem;color:var(--t2)}
+.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--emer2);font-size:.95rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--emerald);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(16,185,129,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--emerald);cursor:pointer;border:2px solid #fff2}
+.calc-out{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
+.co{background:rgba(16,185,129,.06);border:1px solid var(--b);border-radius:10px;padding:.85rem;text-align:center}
+.co-v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.8px}
+.co-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+#fc{width:100%;height:210px;display:block}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.74rem}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.55rem .6rem;border-bottom:1px solid var(--b);white-space:nowrap;cursor:pointer}
+th:hover{color:var(--emer2)}
+th.num,td.num{text-align:right}
+td{padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
+tr.sel td{background:rgba(16,185,129,.07)}
+tr:hover td{background:rgba(16,185,129,.04)}
+.pill{padding:.14rem .5rem;border-radius:4px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.re{background:rgba(244,63,94,.12);color:var(--rose)}
+.pill.ok{background:rgba(16,185,129,.12);color:var(--emerald)}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
+.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.5rem}
+footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
+footer a{color:var(--emer2);text-decoration:none}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+<div class="top"><div class="top-in">
+  <a class="back" href="../index.html#projects">← Portfolio</a>
+  <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
+  <div class="top-links"><a href="https://github.com/GauravWarke/demand-supply-risk-forecasting" target="_blank" rel="noopener">Source ↗</a></div>
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Supply Chain Management · Forecasting</div>
+    <h1>Demand-Variability &<br><em>Supply-Risk</em> Forecasting</h1>
+    <p class="lede">Each tower is a SKU for an Australian beverage distributor before the summer peak. The solid fill is current stock; the outline is the reorder point. When stock drops below the line, the SKU turns red. Move service level and supplier lead time — safety stock, reorder points, and the costed PO plan (AUD) re-compute live.</p>
+  </div>
+
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-v" style="color:var(--rose)" id="kReorder">0 / 6</div><div class="kpi-l">SKUs Need Reorder</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--emer2)" id="kPO">$0</div><div class="kpi-l">Purchase-Order Plan</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--amber)" id="kSL">95%</div><div class="kpi-l">Service Level</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--blue)" data-count="6">0</div><div class="kpi-l">SKUs Tracked</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Inventory vs Reorder Point</div><div class="panel-sub">3D · fill = current stock · outline = reorder point · click a tower to inspect</div></div></div>
+    <div id="sceneWrap">
+      <canvas id="scene"></canvas>
+      <div class="cloud-legend">
+        <span class="lg"><i style="background:#F43F5E"></i>Below reorder point</span>
+        <span class="lg"><i style="background:#10B981"></i>Healthy cover</span>
+      </div>
+      <div class="cloud-hint">◐ drag to rotate · hover/click a SKU tower</div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Reorder Simulator</div><div class="panel-sub">// what if service targets rise or suppliers slip?</div></div></div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Target service level</span><span class="calc-num" id="slV">95%</span></div>
+        <input type="range" id="sl" min="90" max="99" value="95">
+      </div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Supplier lead-time buffer</span><span class="calc-num" id="lbV">+0 days</span></div>
+        <input type="range" id="lb" min="0" max="10" value="0">
+      </div>
+      <div class="calc-out">
+        <div class="co"><div class="co-v" style="color:var(--rose)" id="oReorder">0</div><div class="co-l">SKUs to Reorder</div></div>
+        <div class="co"><div class="co-v" style="color:var(--emer2)" id="oPO">$0</div><div class="co-l">Total PO Value</div></div>
+      </div>
+      <div class="note" id="simNote"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title" id="fcTitle">Forecast · COLA-330</div><div class="panel-sub">history + 30-day forecast · reorder line</div></div></div>
+      <canvas id="fc"></canvas>
+      <div class="note">Solid = observed demand · dashed = Holt-Winters forecast · horizontal line = reorder point. Click any tower or table row to switch SKU.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Reorder Plan</div><div class="panel-sub">// click a header to sort · click a row to inspect</div></div></div>
+    <div class="tbl-scroll"><table><thead><tr>
+      <th data-k="sku">SKU</th><th class="num" data-k="daily">Daily</th><th class="num" data-k="lead">Lead</th>
+      <th class="num" data-k="ss">Safety</th><th class="num" data-k="rp">Reorder Pt</th><th class="num" data-k="stock">Stock</th>
+      <th data-k="status">Status</th><th class="num" data-k="value">Order (AUD)</th>
+    </tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+
+  <footer>Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU demand, headline figures from the verified forecast run · <a href="https://github.com/GauravWarke/demand-supply-risk-forecasting" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
+var HORIZON=30;
+var ZT={90:1.28,91:1.34,92:1.41,93:1.48,94:1.56,95:1.65,96:1.75,97:1.88,98:2.05,99:2.33};
+
+// SKU master (daily forecast, daily sigma, base lead, unit cost AUD, current stock)
+var SKUS=[
+  {sku:'COLA-330', daily:560, sigma:90,  lead:10, cost:1.35, stock:5200},
+  {sku:'LEMON-600',daily:334, sigma:70,  lead:7,  cost:1.85, stock:1500},
+  {sku:'GINGER-BR',daily:192, sigma:55,  lead:14, cost:2.67, stock:1800},
+  {sku:'WATER-1L', daily:800, sigma:100, lead:5,  cost:0.45, stock:9000},
+  {sku:'TONIC-200',daily:150, sigma:40,  lead:9,  cost:1.05, stock:4500},
+  {sku:'ENERGY-250',daily:220,sigma:60,  lead:12, cost:1.80, stock:6000}
+];
+var sel=0;
+
+function compute(sl, leadBuf){
+  var z=ZT[sl]||1.65;
+  return SKUS.map(function(s){
+    var lead=s.lead+leadBuf;
+    var ss=z*s.sigma*Math.sqrt(lead);
+    var rp=Math.round(s.daily*lead+ss);
+    var status=s.stock<rp?'REORDER':'ok';
+    // only raise a PO for SKUs actually below their reorder point
+    var order=status==='REORDER'?Math.max(0,Math.round(rp+s.daily*HORIZON-s.stock)):0;
+    return {sku:s.sku,daily:s.daily,lead:lead,ss:Math.round(ss),rp:rp,stock:s.stock,status:status,value:order*s.cost,order:order,cost:s.cost};
+  });
+}
+var rows=compute(95,0);
+
+/* KPI count-up for static ones */
+function animateCount(el){var t=parseFloat(el.dataset.count),t0=null,dur=1200;function st(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(st);}if(reduce){el.textContent=t;return;}requestAnimationFrame(st);setTimeout(function(){el.textContent=t;},dur+400);}
+document.querySelectorAll('[data-count]').forEach(animateCount);
+
+/* ---- simulator ---- */
+var sl=document.getElementById('sl'), lb=document.getElementById('lb');
+function runSim(){
+  var slv=+sl.value, lbv=+lb.value;
+  rows=compute(slv,lbv);
+  var need=rows.filter(function(r){return r.status==='REORDER';});
+  var po=rows.reduce(function(a,r){return a+r.value;},0);
+  document.getElementById('slV').textContent=slv+'%';
+  document.getElementById('lbV').textContent='+'+lbv+' days';
+  document.getElementById('kSL').textContent=slv+'%';
+  document.getElementById('oReorder').textContent=need.length;
+  document.getElementById('kReorder').textContent=need.length+' / 6';
+  document.getElementById('oPO').textContent=fmtMoney(po);
+  document.getElementById('kPO').textContent=fmtMoney(po);
+  document.getElementById('simNote').textContent='At '+slv+'% service and +'+lbv+'d lead, '+need.length+' of 6 SKUs breach their reorder point. Higher service or slower suppliers = more safety stock = bigger PO.';
+  renderTable();updateTowers();drawForecast();
+}
+sl.addEventListener('input',runSim);lb.addEventListener('input',runSim);
+
+/* ---- table ---- */
+var sortK='value',sortDir=-1;
+function renderTable(){
+  var data=rows.slice().sort(function(a,b){var x=a[sortK],y=b[sortK];if(typeof x==='string')return x<y?sortDir:x>y?-sortDir:0;return (x-y)*sortDir;});
+  document.getElementById('tbody').innerHTML=data.map(function(r){
+    var i=SKUS.map(function(s){return s.sku;}).indexOf(r.sku);
+    return '<tr data-i="'+i+'" class="'+(i===sel?'sel':'')+'"><td class="mono">'+r.sku+'</td><td class="num">'+r.daily+'</td><td class="num">'+r.lead+'d</td><td class="num mono">'+r.ss+'</td><td class="num mono">'+r.rp+'</td><td class="num mono">'+r.stock+'</td><td>'+(r.status==='REORDER'?'<span class="pill re">REORDER</span>':'<span class="pill ok">OK</span>')+'</td><td class="num mono">'+fmtMoney(r.value)+'</td></tr>';
+  }).join('');
+  [].forEach.call(document.querySelectorAll('#tbody tr'),function(tr){tr.addEventListener('click',function(){sel=+tr.dataset.i;renderTable();drawForecast();highlightTower();});});
+}
+document.querySelectorAll('th[data-k]').forEach(function(th){th.addEventListener('click',function(){var k=th.dataset.k;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='sku'||k==='status')?1:-1;}renderTable();});});
+
+/* ---- forecast canvas ---- */
+var fc=document.getElementById('fc'),fx=fc.getContext('2d');
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function drawForecast(){
+  var r=fc.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);fc.width=r.width*dpr;fc.height=r.height*dpr;fx.setTransform(dpr,0,0,dpr,0,0);
+  var W=r.width,H=r.height,pad=30;fx.clearRect(0,0,W,H);
+  var s=SKUS[sel],row=rows[sel]; document.getElementById('fcTitle').textContent='Forecast · '+s.sku;
+  var rnd=mulberry32(1000+sel*7),hist=45,pts=[];
+  for(var d=0;d<hist;d++){var season=1+0.18*Math.sin(d/7*6.283);var v=s.daily*season*(0.85+rnd()*0.3);pts.push(v);}
+  var fpts=[];for(var d2=0;d2<HORIZON;d2++){var season2=1+0.22*Math.sin((hist+d2)/7*6.283);fpts.push(s.daily*season2*1.05);}
+  var all=pts.concat(fpts),max=Math.max.apply(null,all)*1.15,min=0;
+  function X(i){return pad+i/(all.length-1)*(W-pad-8);}
+  function Y(v){return (H-pad)-(v-min)/(max-min)*(H-pad-10);}
+  // axes
+  fx.strokeStyle='rgba(255,255,255,.08)';fx.lineWidth=1;fx.beginPath();fx.moveTo(pad,H-pad);fx.lineTo(W-6,H-pad);fx.moveTo(pad,H-pad);fx.lineTo(pad,8);fx.stroke();
+  // reorder-point line (as daily-equivalent: rp/lead)
+  var rpDaily=row.rp/row.lead, yl=Y(rpDaily);
+  fx.strokeStyle='rgba(244,63,94,.55)';fx.setLineDash([4,4]);fx.beginPath();fx.moveTo(pad,yl);fx.lineTo(W-6,yl);fx.stroke();fx.setLineDash([]);
+  fx.fillStyle='#FB7185';fx.font='9px JetBrains Mono, monospace';fx.fillText('reorder cover',pad+4,yl-4);
+  // history solid
+  fx.strokeStyle='#34D399';fx.lineWidth=2;fx.beginPath();pts.forEach(function(v,i){i?fx.lineTo(X(i),Y(v)):fx.moveTo(X(i),Y(v));});fx.stroke();
+  // forecast dashed
+  fx.strokeStyle='#14B8A6';fx.setLineDash([5,4]);fx.beginPath();fx.moveTo(X(hist-1),Y(pts[hist-1]));fpts.forEach(function(v,i){fx.lineTo(X(hist+i),Y(v));});fx.stroke();fx.setLineDash([]);
+  // divider now
+  fx.strokeStyle='rgba(255,255,255,.12)';fx.beginPath();fx.moveTo(X(hist-1),8);fx.lineTo(X(hist-1),H-pad);fx.stroke();
+  fx.fillStyle='#5B6B82';fx.fillText('now',X(hist-1)+3,16);
+}
+
+/* ================= 3D INVENTORY TOWERS ================= */
+var updateTowers=function(){}, highlightTower=function(){};
+(function(){
+  var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
+  if(typeof THREE==='undefined')return;
+  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(0,180,620);camera.lookAt(0,60,0);
+  var group=new THREE.Group();scene.add(group);
+  // ground grid
+  var grid=new THREE.GridHelper(760,12,0x1b3a34,0x14261f);grid.position.y=0;group.add(grid);
+  var GAP=120, x0=-(SKUS.length-1)*GAP/2, SC=0.045; // stock→height scale
+  var towers=[];
+  var green=new THREE.Color('#10B981'), red=new THREE.Color('#F43F5E');
+  SKUS.forEach(function(s,i){
+    var g=new THREE.Group();g.position.x=x0+i*GAP;group.add(g);
+    // outline = reorder point (wireframe)
+    var oMat=new THREE.MeshBasicMaterial({color:0x64748b,wireframe:true,transparent:true,opacity:.5});
+    var oMesh=new THREE.Mesh(new THREE.BoxGeometry(60,1,60),oMat);g.add(oMesh);
+    // fill = current stock (solid)
+    var fMat=new THREE.MeshBasicMaterial({color:0x10B981,transparent:true,opacity:.82});
+    var fMesh=new THREE.Mesh(new THREE.BoxGeometry(52,1,52),fMat);g.add(fMesh);
+    towers.push({g:g,o:oMesh,f:fMesh,fMat:fMat,i:i});
+  });
+  updateTowers=function(){
+    rows.forEach(function(r,i){
+      var t=towers[i];
+      var hStock=Math.max(2,r.stock*SC), hRP=Math.max(2,r.rp*SC);
+      t.f.scale.y=hStock; t.f.position.y=hStock/2;
+      t.o.scale.y=hRP;    t.o.position.y=hRP/2;
+      t.fMat.color.copy(r.status==='REORDER'?red:green);
+    });
+    highlightTower();
+  };
+  highlightTower=function(){towers.forEach(function(t){t.f.material.opacity=(t.i===sel?1:0.82);t.o.material.opacity=(t.i===sel?0.85:0.5);});};
+  updateTowers();
+
+  var drag=false,px=0,py=0,ry=0.5,rx=0,vy=0.0018,moved=false;
+  wrap.addEventListener('pointerdown',function(e){drag=true;moved=false;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
+  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){var dx=e.clientX-px;if(Math.abs(dx)>3)moved=true;ry+=dx*0.006;rx+=(e.clientY-py)*0.005;rx=Math.max(-0.6,Math.min(0.9,rx));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
+  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
+  wrap.addEventListener('click',function(e){if(moved)return;var r=wrap.getBoundingClientRect();var i=pick(e.clientX-r.left,e.clientY-r.top,r.width,r.height);if(i>=0){sel=i;renderTable();drawForecast();highlightTower();}});
+  var proj=new THREE.Vector3();
+  function screenOf(i){var t=towers[i];proj.set(t.g.position.x,t.f.position.y,0).applyMatrix4(group.matrixWorld).project(camera);return proj;}
+  function pick(mx,my,rw,rh){var best=-1,bd=48;for(var i=0;i<towers.length;i++){var p=screenOf(i);var sx=(p.x*0.5+0.5)*rw,sy=(-p.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}return best;}
+  function hover(mx,my,rw,rh){var i=pick(mx,my,rw,rh);if(i>=0){var r=rows[i];tip.innerHTML='<b>'+r.sku+'</b><br>stock '+r.stock+' · reorder '+r.rp+'<br>daily '+r.daily+' · lead '+r.lead+'d<br>'+(r.status==='REORDER'?'order '+r.order+' → '+fmtMoney(r.value):'healthy cover');tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}else tip.style.opacity=0;}
+  function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
+  function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
+  addEventListener('resize',resize);if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);
+  if(reduce)renderer.render(scene,camera);else loop();
+})();
+
+/* backdrop */
+(function(){var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;var W=innerWidth,H=innerHeight;
+  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
+  var s=new THREE.Scene(),c=new THREE.PerspectiveCamera(60,W/H,1,2000);c.position.z=600;
+  var p=new Float32Array(270);for(var i=0;i<270;i++)p[i]=(Math.random()-0.5)*1200;
+  var gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(p,3));
+  var grp=new THREE.Points(gg,new THREE.PointsMaterial({color:0x10B981,size:2.4,transparent:true,opacity:.5}));s.add(grp);
+  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(s,c);if(!reduce)requestAnimationFrame(f);}
+  addEventListener('resize',function(){W=innerWidth;H=innerHeight;c.aspect=W/H;c.updateProjectionMatrix();rn.setSize(W,H,false);});
+  if(reduce)rn.render(s,c);else f();
+})();
+
+runSim();
+addEventListener('resize',drawForecast);
+if('ResizeObserver' in window)new ResizeObserver(drawForecast).observe(fc);
+</script>
+</body>
+</html>
