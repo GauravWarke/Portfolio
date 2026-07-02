@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Reconciliation · Live Dashboard | Gaurav Warke</title>
+<meta name="description" content="Interactive dashboard — receipts classified to GL accounts, GST validated for the BAS, exceptions flagged.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C18;--bg1:#0C1120;--card:rgba(15,22,36,.6);
+  --teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--rose:#F43F5E;--emerald:#10B981;
+  --t1:#F0F4FF;--t2:#94A3B8;--t3:#5B6B82;--b:rgba(13,148,136,.18);--bh:rgba(13,148,136,.42);
+  --accent:var(--teal);--accent2:var(--teal2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px}
+#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.5}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 1.5rem}
+.top{position:sticky;top:0;z-index:50;background:rgba(8,12,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--b)}
+.top-in{max-width:1180px;margin:0 auto;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.back{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--t2);text-decoration:none;font-family:'JetBrains Mono',monospace;transition:color .2s}
+.back:hover{color:var(--teal2)}
+.top-tag{font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--teal2);border:1px solid var(--b);border-radius:100px;padding:.25rem .8rem;text-transform:uppercase;letter-spacing:.12em;display:flex;align-items:center;gap:.45rem}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.top-links a{font-size:.74rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--b);border-radius:6px;padding:.4rem .8rem;transition:all .2s}
+.top-links a:hover{border-color:var(--teal);color:var(--teal2)}
+.hero{padding:3.5rem 0 1.5rem}
+.eyebrow{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--teal2);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
+.eyebrow::before{content:'// ';opacity:.5}
+h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.5vw,3.1rem);font-weight:800;letter-spacing:-1.6px;line-height:1.05;margin-bottom:.8rem}
+h1 em{color:var(--teal2);font-style:normal}
+.lede{color:var(--t2);font-size:.98rem;max-width:660px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin:2.25rem 0 1rem}
+.kpi{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.1rem;backdrop-filter:blur(8px);transition:border-color .2s}
+.kpi:hover{border-color:var(--bh)}
+.kpi-v{font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-1px;line-height:1}
+.kpi-l{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem;font-family:'JetBrains Mono',monospace}
+.panel{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px);margin-bottom:1.25rem}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.panel-title{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:-.4px}
+.panel-sub{font-size:.74rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:1.25rem}
+.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+#cloudWrap{position:relative;height:420px;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(13,148,136,.06),transparent 70%);border:1px solid rgba(13,148,136,.1);cursor:grab}
+#cloudWrap.drag{cursor:grabbing}
+#cloud{width:100%;height:100%;display:block}
+.cloud-hint{position:absolute;bottom:10px;left:12px;font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+.cloud-legend{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:.35rem;font-size:.65rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
+.lg{display:flex;align-items:center;gap:.4rem;color:var(--t2)}
+.lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.94);border:1px solid var(--bh);border-radius:8px;padding:.55rem .7rem;font-size:.7rem;opacity:0;transition:opacity .15s;z-index:5;min-width:160px;font-family:'JetBrains Mono',monospace}
+.tip b{color:var(--teal2)}
+.bars{display:flex;flex-direction:column;gap:.55rem;margin-top:.3rem}
+.brow{display:grid;grid-template-columns:118px 1fr auto;gap:.7rem;align-items:center}
+.bname{font-size:.7rem;color:var(--t2);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btrack{height:20px;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden}
+.bfill{height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.7,.3,1);background:linear-gradient(90deg,var(--teal),var(--teal2))}
+.bval{font-size:.7rem;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.calc-row{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
+.calc-top{display:flex;justify-content:space-between;align-items:baseline}
+.calc-lbl{font-size:.76rem;color:var(--t2)}
+.calc-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--teal2);font-size:.95rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:2px solid #fff2;box-shadow:0 0 8px rgba(13,148,136,.5)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:2px solid #fff2}
+.gate-out{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-top:.4rem}
+.go{background:rgba(13,148,136,.06);border:1px solid var(--b);border-radius:10px;padding:.75rem;text-align:center}
+.go-v{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.6px}
+.go-l{font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem;font-family:'JetBrains Mono',monospace}
+.gstbox{display:flex;gap:.5rem;align-items:center;margin:.2rem 0 1rem}
+.gstbox input[type=number]{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:8px;padding:.6rem .8rem;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:.9rem;outline:none}
+.gstbox input[type=number]:focus{border-color:var(--teal)}
+.gst-res{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem}
+.gr{text-align:center;padding:.6rem;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--b)}
+.gr-v{font-family:'Sora',sans-serif;font-weight:800;font-size:1.05rem}
+.gr-l{font-size:.55rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-family:'JetBrains Mono',monospace;margin-top:.15rem}
+.exc{display:flex;flex-direction:column;gap:.5rem}
+.exc-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .8rem;background:rgba(255,255,255,.03);border:1px solid var(--b);border-radius:8px;font-size:.76rem}
+.exc-row .n{font-family:'JetBrains Mono',monospace;font-weight:700}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.74rem}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:.55rem .6rem;border-bottom:1px solid var(--b);white-space:nowrap}
+th.num,td.num{text-align:right}
+td{padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2);white-space:nowrap}
+tr:hover td{background:rgba(13,148,136,.04)}
+.pill{padding:.14rem .5rem;border-radius:4px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.pill.ok{background:rgba(16,185,129,.12);color:var(--emerald)}
+.pill.rev{background:rgba(245,158,11,.12);color:var(--amber)}
+.pill.exc{background:rgba(244,63,94,.12);color:var(--rose)}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
+.note{font-size:.72rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.5rem}
+footer{padding:2.5rem 0;text-align:center;color:var(--t3);font-size:.74rem;border-top:1px solid var(--b);margin-top:1.5rem}
+footer a{color:var(--teal2);text-decoration:none}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.grid2b{grid-template-columns:1fr}.gate-out,.gst-res{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<canvas id="bg3d"></canvas>
+<div class="top"><div class="top-in">
+  <a class="back" href="../index.html#projects">← Portfolio</a>
+  <span class="top-tag"><span class="live-dot"></span>Live Interactive Dashboard</span>
+  <div class="top-links"><a href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">Source ↗</a></div>
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Automation with NLP · OCR · Finance</div>
+    <h1>Intelligent Expense-<br><em>Reconciliation</em> Engine</h1>
+    <p class="lede">Every dot is a receipt from an Australian month-end close. The model classifies each to a <b>GL account</b>, validates <b>GST for the BAS</b>, and gates anything uncertain to human review. Move the confidence gate and watch the auto-post rate trade off against review load — the core control every finance team argues about.</p>
+  </div>
+
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-v" style="color:var(--teal2)" data-count="59" data-suffix="%">0</div><div class="kpi-l">Auto-Posted to GL</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--emerald)" data-count="91224" data-money>$0</div><div class="kpi-l">GST for the BAS</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--amber)" data-count="37.5" data-dec="1" data-suffix=" hrs">0</div><div class="kpi-l">Close Time Saved</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:var(--blue)" data-count="1500">0</div><div class="kpi-l">Receipts Processed</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Receipt Classification Cloud</div><div class="panel-sub">3D · clustered by GL account · colour = routing decision · drag to rotate</div></div></div>
+    <div id="cloudWrap">
+      <canvas id="cloud"></canvas>
+      <div class="cloud-legend">
+        <span class="lg"><i style="background:#10B981"></i>Auto-posted</span>
+        <span class="lg"><i style="background:#F59E0B"></i>Review queue</span>
+        <span class="lg"><i style="background:#F43F5E"></i>Exception</span>
+      </div>
+      <div class="cloud-hint">◐ drag to rotate · hover a receipt · size = amount</div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Spend by GL Account</div><div class="panel-sub">// where the money is classified</div></div></div>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Exception Queue</div><div class="panel-sub" id="excSub">// flagged, never silently posted</div></div></div>
+      <div class="exc" id="exc"></div>
+      <div class="note">Nothing uncertain is auto-posted — exceptions are surfaced for a human, which is exactly why the engine is trustworthy on noisy OCR.</div>
+    </div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">Confidence Gate</div><div class="panel-sub">// move it — trade auto-post rate vs review load</div></div></div>
+      <div class="calc-row">
+        <div class="calc-top"><span class="calc-lbl">Auto-post confidence threshold</span><span class="calc-num" id="thV">0.70</span></div>
+        <input type="range" id="th" min="50" max="95" value="70">
+      </div>
+      <div class="gate-out">
+        <div class="go"><div class="go-v" style="color:var(--emerald)" id="gAuto">0</div><div class="go-l">Auto-posted</div></div>
+        <div class="go"><div class="go-v" style="color:var(--amber)" id="gRev">0</div><div class="go-l">To review</div></div>
+        <div class="go"><div class="go-v" style="color:var(--rose)" id="gExc">0</div><div class="go-l">Exceptions</div></div>
+      </div>
+      <div class="note" id="gateNote"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><div><div class="panel-title">GST / BAS Validator</div><div class="panel-sub">// AU 10% GST-inclusive → gross ÷ 11</div></div></div>
+      <div class="gstbox">
+        <span style="color:var(--t3);font-family:'JetBrains Mono',monospace">A$</span>
+        <input type="number" id="gross" value="1100" min="0" step="10">
+      </div>
+      <div class="gst-res">
+        <div class="gr"><div class="gr-v" style="color:var(--teal2)" id="gstAmt">$0</div><div class="gr-l">GST</div></div>
+        <div class="gr"><div class="gr-v" style="color:var(--t1)" id="netAmt">$0</div><div class="gr-l">Net (ex-GST)</div></div>
+        <div class="gr"><div class="gr-v" style="color:var(--emerald)" id="gstValid">✓</div><div class="gr-l">Check</div></div>
+      </div>
+      <div class="note">Enter a GST-inclusive total; the engine derives GST for the BAS. A mismatch vs the printed GST line is what trips the <b>GST_MISMATCH</b> flag.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div><div class="panel-title">Sample Ledger</div><div class="panel-sub">// first rows of the audit-ready output</div></div></div>
+    <div class="tbl-scroll"><table><thead><tr>
+      <th>Vendor</th><th>GL Account</th><th class="num">Gross</th><th class="num">GST</th><th class="num">Conf.</th><th>Status</th>
+    </tr></thead><tbody id="tbody"></tbody></table></div>
+  </div>
+
+  <footer>Built by <a href="../index.html">Gaurav Warke</a> · synthetic AU receipts, headline figures from the verified pipeline run · <a href="https://github.com/GauravWarke/expense-reconciliation-engine" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var rnd=mulberry32(20260630);
+function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
+
+var GL=['Office Supplies','Travel','Software / SaaS','Meals & Ent.','Utilities','Professional Fees','Fuel','Marketing'];
+var VEND=['Officeworks','Qantas','Atlassian','Grill\'d','AGL Energy','Deloitte AU','BP Australia','Canva','Bunnings','Telstra','Uber AU','Coles'];
+var N=1500;
+var RECS=[];
+for(var i=0;i<N;i++){
+  var gl=(rnd()*GL.length)|0;
+  var gross=Math.round(20+rnd()*rnd()*2600);
+  var conf=Math.min(.99,Math.max(.40,0.742+ (rnd()-0.5)*0.38 + (gross<800?0.05:-0.03)));
+  var abn=rnd()>0.07;               // ~7% missing ABN
+  var gstMissing=rnd()<0.055;
+  var overLimit=gross>2000;         // policy cap
+  RECS.push({id:i,vendor:VEND[(rnd()*VEND.length)|0],gl:gl,gross:gross,gst:gross/11,conf:conf,abn:abn,gstMissing:gstMissing,over:overLimit});
+}
+var GST_TOTAL=91224.08;             // verified anchor
+
+/* ---- routing given a confidence threshold ---- */
+function route(r,th){
+  if(r.over) return 'exc';          // OVER_LIMIT
+  if(!r.abn) return 'exc';          // NO_ABN
+  if(r.gstMissing) return 'exc';    // GST_MISSING
+  if(r.conf < th) return 'rev';     // low confidence → review
+  return 'ok';                      // auto-posted
+}
+var curTh=0.70;
+
+/* ---- KPI count-up ---- */
+function animateCount(el){
+  var target=parseFloat(el.dataset.count),dec=+(el.dataset.dec||0),pre=el.dataset.prefix||'',suf=el.dataset.suffix||'',money=el.dataset.money!==undefined,t0=null,dur=1300;
+  function render(v){el.textContent=money?fmtMoney(v):(pre+(dec?v.toFixed(dec):Math.round(v).toLocaleString('en-AU'))+suf);}
+  function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);render(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
+  if(reduce){render(target);return;}requestAnimationFrame(step);setTimeout(function(){render(target);},dur+400);
+}
+document.querySelectorAll('[data-count]').forEach(animateCount);
+
+/* ---- bars: spend by GL ---- */
+function renderBars(){
+  var agg=GL.map(function(){return 0;});
+  RECS.forEach(function(r){agg[r.gl]+=r.gross;});
+  var rows=GL.map(function(g,i){return [g,agg[i]];}).sort(function(a,b){return b[1]-a[1];});
+  var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
+  document.getElementById('bars').innerHTML=rows.map(function(r){
+    return '<div class="brow"><span class="bname">'+r[0]+'</span><div class="btrack"><div class="bfill" data-w="'+(r[1]/max*100)+'"></div></div><span class="bval">'+fmtMoney(r[1])+'</span></div>';
+  }).join('');
+  requestAnimationFrame(function(){document.querySelectorAll('#bars .bfill').forEach(function(f){f.style.width=f.dataset.w+'%';});});
+}
+
+/* ---- exception breakdown ---- */
+function renderExc(){
+  var over=0,noabn=0,gstm=0;
+  RECS.forEach(function(r){ if(r.over)over++; else if(!r.abn)noabn++; else if(r.gstMissing)gstm++; });
+  document.getElementById('exc').innerHTML=
+    '<div class="exc-row"><span>OVER_LIMIT <span style="color:var(--t3)">· gross &gt; $2,000</span></span><span class="n" style="color:var(--rose)">'+over+'</span></div>'+
+    '<div class="exc-row"><span>NO_ABN <span style="color:var(--t3)">· supplier ABN missing</span></span><span class="n" style="color:var(--rose)">'+noabn+'</span></div>'+
+    '<div class="exc-row"><span>GST_MISSING <span style="color:var(--t3)">· no GST line</span></span><span class="n" style="color:var(--rose)">'+gstm+'</span></div>';
+}
+
+/* ---- gate ---- */
+var th=document.getElementById('th');
+function renderGate(){
+  curTh=+th.value/100;
+  var a=0,r=0,e=0;
+  RECS.forEach(function(x){var s=route(x,curTh);if(s==='ok')a++;else if(s==='rev')r++;else e++;});
+  document.getElementById('thV').textContent=curTh.toFixed(2);
+  document.getElementById('gAuto').textContent=a;
+  document.getElementById('gRev').textContent=r;
+  document.getElementById('gExc').textContent=e;
+  document.getElementById('gateNote').textContent='At '+curTh.toFixed(2)+' confidence: '+(a/N*100).toFixed(0)+'% auto-posted. Raise the gate for safer posting but a heavier review queue.';
+  if(window.recolorCloud)window.recolorCloud();
+  renderTable();
+}
+th.addEventListener('input',renderGate);
+
+/* ---- GST validator ---- */
+var gross=document.getElementById('gross');
+function gstCalc(){
+  var g=Math.max(0,+gross.value||0), gst=g/11, net=g-gst;
+  document.getElementById('gstAmt').textContent=fmtMoney(gst);
+  document.getElementById('netAmt').textContent=fmtMoney(net);
+  document.getElementById('gstValid').textContent = g>0 ? '✓' : '—';
+}
+gross.addEventListener('input',gstCalc);
+
+/* ---- table ---- */
+var statusPill={ok:'<span class="pill ok">AUTO-POST</span>',rev:'<span class="pill rev">REVIEW</span>',exc:'<span class="pill exc">EXCEPTION</span>'};
+function renderTable(){
+  var rows=RECS.slice(0,12);
+  document.getElementById('tbody').innerHTML=rows.map(function(r){
+    var s=route(r,curTh);
+    return '<tr><td class="mono">'+r.vendor+'</td><td>'+GL[r.gl]+'</td><td class="num mono">'+fmtMoney(r.gross)+'</td><td class="num mono">'+fmtMoney(r.gst)+'</td><td class="num">'+r.conf.toFixed(2)+'</td><td>'+statusPill[s]+'</td></tr>';
+  }).join('');
+}
+
+/* ================= 3D RECEIPT CLOUD ================= */
+(function(){
+  var canvas=document.getElementById('cloud'),wrap=document.getElementById('cloudWrap'),tip=document.getElementById('tip');
+  if(typeof THREE==='undefined')return;
+  var W=wrap.clientWidth,H=wrap.clientHeight;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,W/H||1,1,4000);camera.position.z=560;
+  var group=new THREE.Group();scene.add(group);
+  // cluster centres per GL account on a ring
+  var centres=GL.map(function(_,i){var a=i/GL.length*Math.PI*2;return [Math.cos(a)*300,Math.sin(a)*300*0.7,(rnd()-0.5)*160];});
+  var n=RECS.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
+  for(var i=0;i<n;i++){
+    var r=RECS[i],c=centres[r.gl];
+    pos[i*3]=c[0]+(rnd()-0.5)*150; pos[i*3+1]=c[1]+(rnd()-0.5)*150; pos[i*3+2]=c[2]+(rnd()-0.5)*150;
+    siz[i]=5+Math.sqrt(r.gross)/9;
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
+  var mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,vertexColors:true,
+    vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
+    fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.12,d);gl_FragColor=vec4(vC,a*0.92);}'});
+  var pts=new THREE.Points(g,mat);group.add(pts);
+  var C={ok:new THREE.Color('#10B981'),rev:new THREE.Color('#F59E0B'),exc:new THREE.Color('#F43F5E')};
+  function recolor(){var a=g.attributes.color.array;for(var i=0;i<n;i++){var c=C[route(RECS[i],curTh)];a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.attributes.color.needsUpdate=true;}
+  window.recolorCloud=recolor;recolor();
+
+  var drag=false,px=0,py=0,ry=0,rx=0.15,vy=0.0016;
+  wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
+  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){ry+=(e.clientX-px)*0.006;rx+=(e.clientY-py)*0.006;rx=Math.max(-1,Math.min(1,rx));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
+  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
+  var proj=new THREE.Vector3();
+  function hover(mx,my,rw,rh){var best=-1,bd=16,arr=g.attributes.position.array;
+    for(var i=0;i<n;i++){proj.set(arr[i*3],arr[i*3+1],arr[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd&&proj.z<1){bd=dd;best=i;}}
+    if(best>=0){var r=RECS[best],st=route(r,curTh),lbl={ok:'auto-posted',rev:'review',exc:'exception'}[st];
+      tip.innerHTML='<b>'+r.vendor+'</b><br>'+GL[r.gl]+'<br>gross '+fmtMoney(r.gross)+' · GST '+fmtMoney(r.gst)+'<br>conf '+r.conf.toFixed(2)+' → '+lbl;
+      tip.style.left=Math.min(mx+14,rw-180)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
+    else tip.style.opacity=0;
+  }
+  function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
+  function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
+  addEventListener('resize',resize);if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);
+  if(reduce)renderer.render(scene,camera);else loop();
+})();
+
+/* ---- subtle backdrop ---- */
+(function(){var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;var W=innerWidth,H=innerHeight;
+  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
+  var s=new THREE.Scene(),c=new THREE.PerspectiveCamera(60,W/H,1,2000);c.position.z=600;
+  var p=new Float32Array(270);for(var i=0;i<270;i++)p[i]=(Math.random()-0.5)*1200;
+  var gg=new THREE.BufferGeometry();gg.setAttribute('position',new THREE.BufferAttribute(p,3));
+  var grp=new THREE.Points(gg,new THREE.PointsMaterial({color:0x0D9488,size:2.4,transparent:true,opacity:.5}));s.add(grp);
+  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(s,c);if(!reduce)requestAnimationFrame(f);}
+  addEventListener('resize',function(){W=innerWidth;H=innerHeight;c.aspect=W/H;c.updateProjectionMatrix();rn.setSize(W,H,false);});
+  if(reduce)rn.render(s,c);else f();
+})();
+
+renderBars();renderExc();renderGate();gstCalc();renderTable();
+</script>
+</body>
+</html>
