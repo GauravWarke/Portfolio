@@ -9,17 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Tableau-light theme */
-  --paper:#FFFFFF;--wall:#EDEFF2;--wall2:#F4F6F8;--edge:#E1E5EB;--edgeH:#C9D0DA;
-  --ink:#1F2733;--ink2:#5A6472;--ink3:#8B94A3;
+  /* Tableau dark theme — matches the other dashboards */
+  --paper:#1B222B;--wall:#12161C;--wall2:#191F27;--edge:#2C343E;--edgeH:#3C4653;
+  --ink:#E9EDF2;--ink2:#9AA6B4;--ink3:#68727E;
   /* Tableau 10 palette */
-  --t-blue:#4E79A7;--t-orange:#F28E2B;--t-red:#E15759;--t-teal:#76B7B2;--t-green:#59A14F;--t-yellow:#EDC948;--t-purple:#B07AA1;--t-pink:#FF9DA7;--t-brown:#9C755F;--t-gray:#BAB0AC;
+  --t-blue:#4E79A7;--t-blue2:#6B93C0;--t-orange:#F28E2B;--t-red:#E15759;--t-teal:#76B7B2;--t-green:#59A14F;--t-yellow:#EDC948;--t-purple:#B07AA1;--t-pink:#FF9DA7;--t-brown:#9C755F;--t-gray:#BAB0AC;
   --ok:#59A14F;--rev:#F28E2B;--exc:#E15759;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--wall);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:var(--wall)}::-webkit-scrollbar-thumb{background:#C4CCD6;border-radius:8px}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:var(--wall)}::-webkit-scrollbar-thumb{background:#333c47;border-radius:8px}
 a{color:inherit}
 
 /* Tableau top toolbar */
@@ -27,7 +27,7 @@ a{color:inherit}
 .tbar .wb{display:flex;flex-direction:column;line-height:1.15}
 .tbar .wb b{font-size:.86rem;font-weight:700;letter-spacing:-.2px}
 .tbar .wb span{font-size:.64rem;color:var(--ink3);font-family:'JetBrains Mono',monospace}
-.tbadge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue);border:1px solid #cdd9e6;background:#eef3f9;border-radius:5px;padding:.26rem .55rem;font-weight:600}
+.tbadge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:5px;padding:.26rem .55rem;font-weight:600}
 .tbadge svg{width:12px;height:12px}
 .tbar .sp{flex:1}
 .tbtn{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--ink2);text-decoration:none;border:1px solid var(--edge);border-radius:5px;padding:.34rem .62rem;background:var(--paper);transition:all .15s}
@@ -78,12 +78,12 @@ a{color:inherit}
 .ht .cell{padding:.4rem .5rem;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--ink);transition:background .2s}
 
 /* 3D cloud (light panel) */
-#cloudWrap{position:relative;height:260px;border-radius:3px;overflow:hidden;background:linear-gradient(180deg,#fbfcfe,#f2f5f8);cursor:grab}
+#cloudWrap{position:relative;height:260px;border-radius:3px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(78,121,167,.08),transparent 70%);cursor:grab}
 #cloudWrap.drag{cursor:grabbing}
 #cloud{width:100%;height:100%;display:block}
 .cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:var(--ink3);font-family:'JetBrains Mono',monospace;pointer-events:none}
-.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--edgeH);border-radius:6px;padding:.5rem .6rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:170px;font-family:'JetBrains Mono',monospace;box-shadow:0 6px 20px rgba(20,30,50,.18);color:var(--ink)}
-.tip b{color:var(--t-blue)}
+.tip{position:absolute;pointer-events:none;background:#0f1319;border:1px solid var(--edgeH);border-radius:6px;padding:.5rem .6rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:170px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 24px rgba(0,0,0,.5);color:var(--ink)}
+.tip b{color:var(--t-blue2)}
 
 /* shelf cards */
 .sh-card{border:1px solid var(--edge);border-radius:3px;background:var(--wall2)}
@@ -94,8 +94,8 @@ a{color:inherit}
 .param-lbl{font-size:.72rem;color:var(--ink2)}
 .param-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--t-orange);font-size:.9rem}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:#D6DCE4;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--t-orange)}
-input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #fff}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #12161c;box-shadow:0 0 0 1px var(--t-orange)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--t-orange);cursor:pointer;border:2px solid #12161c}
 .gate-out{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-top:.6rem}
 .go{background:var(--paper);border:1px solid var(--edge);border-radius:4px;padding:.5rem .3rem;text-align:center}
 .go-v{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800}
@@ -106,14 +106,14 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .glfilter{display:flex;flex-direction:column;gap:.15rem;max-height:none}
 .glchk{display:flex;align-items:center;gap:.45rem;font-size:.72rem;color:var(--ink2);padding:.24rem .3rem;border-radius:4px;cursor:pointer;user-select:none}
 .glchk:hover{background:var(--wall)}
-.glchk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none;background:#fff}
+.glchk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--wall2)}
 .glchk.on .tick{background:var(--t-blue);border-color:var(--t-blue)}
 .glchk.on .tick::after{content:'';width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
 .glchk .sw{width:9px;height:9px;border-radius:2px;flex:none}
 /* GST validator */
 .gstbox{display:flex;gap:.4rem;align-items:center;margin:.1rem 0 .6rem}
 .gstbox span{color:var(--ink3);font-family:'JetBrains Mono',monospace;font-size:.8rem}
-.gstbox input{flex:1;background:#fff;border:1px solid var(--edge);border-radius:5px;padding:.5rem .6rem;color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none}
+.gstbox input{flex:1;background:var(--wall2);border:1px solid var(--edge);border-radius:5px;padding:.5rem .6rem;color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:.85rem;outline:none}
 .gstbox input:focus{border-color:var(--t-blue)}
 .gst-res{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
 .gr{text-align:center;padding:.45rem;border-radius:4px;background:var(--paper);border:1px solid var(--edge)}
@@ -135,7 +135,7 @@ table.led{width:100%;border-collapse:collapse;font-size:.72rem}
 
 /* Tableau Public embed slot */
 .embed{background:var(--paper);border:1px dashed var(--edgeH);border-radius:4px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.4rem;gap:.5rem}
-.embed .badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue);border:1px solid #cdd9e6;background:#eef3f9;border-radius:100px;padding:.2rem .7rem;font-weight:600}
+.embed .badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:100px;padding:.2rem .7rem;font-weight:600}
 .embed h4{font-size:.9rem;font-weight:700}
 .embed p{font-size:.72rem;color:var(--ink2);max-width:520px;line-height:1.6}
 .embed code{font-family:'JetBrains Mono',monospace;font-size:.68rem;background:var(--wall);padding:.1rem .35rem;border-radius:3px;color:var(--t-orange)}
@@ -208,14 +208,14 @@ footer a{color:var(--t-blue);text-decoration:none}
 
     <!-- receipt cloud -->
     <div class="ws">
-      <div class="ws-h"><span class="ws-t">Receipt Classification Cloud <span style="color:var(--t-blue);font-size:.56rem;border:1px solid #cdd9e6;border-radius:3px;padding:.03rem .3rem">custom viz</span></span><span class="ws-s">clustered by GL · colour = routing · drag to rotate</span></div>
+      <div class="ws-h"><span class="ws-t">Receipt Classification Cloud <span style="color:var(--t-blue2);font-size:.56rem;border:1px solid #35455a;border-radius:3px;padding:.03rem .3rem">custom viz · 3D</span></span><span class="ws-s">X=amount · Y=confidence · Z=GL · drag to rotate</span></div>
       <div class="ws-b">
         <div id="cloudWrap">
           <canvas id="cloud"></canvas>
-          <div class="axes-key" style="position:absolute;top:8px;right:10px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--ink2);line-height:1.55;pointer-events:none;background:rgba(255,255,255,.82);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
-            <div><b style="color:#4E79A7">X</b> = amount (AUD)</div>
+          <div class="axes-key" style="position:absolute;top:8px;right:10px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--ink2);line-height:1.55;pointer-events:none;background:rgba(15,19,25,.68);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
+            <div><b style="color:#6B93C0">X</b> = amount (AUD)</div>
             <div><b style="color:#59A14F">Y</b> = confidence</div>
-            <div><b style="color:#B07AA1">Z</b> = GL account</div>
+            <div><b style="color:#C58ABF">Z</b> = GL account</div>
           </div>
           <div class="cloud-hint">◐ drag to rotate · hover a receipt · size = amount</div>
           <div class="tip" id="tip"></div>
@@ -396,7 +396,7 @@ function renderHT(){
     if(!glOn[i])return;
     html+='<tr><td class="rl">'+g+'</td>'+cols.map(function(c){
       var v=mtx[i][c], t=v/maxByCol[c], rgb=colBase[c], a=(0.12+t*0.78).toFixed(2);
-      var ink=t>0.55?'#fff':'#1F2733';
+      var ink=t>0.5?'#0f1319':'#E9EDF2';
       return '<td class="cell" style="background:rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+a+');color:'+ink+'">'+v+'</td>';
     }).join('')+'</tr>';
   });
@@ -471,7 +471,7 @@ function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([
   var W=wrap.clientWidth||600,H=wrap.clientHeight||260;
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
-  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,W/H||1,1,4000);camera.position.z=560;
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,W/H||1,1,4000);camera.position.set(60,120,720);camera.lookAt(0,0,0);
   var group=new THREE.Group();scene.add(group);
   var maxGross=Math.max.apply(null,RECS.map(function(r){return r.gross;}));
   var n=RECS.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
@@ -487,21 +487,27 @@ function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([
     vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
     fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.12,d);gl_FragColor=vec4(vC,a*0.95);}'});
   var pts=new THREE.Points(g,mat);group.add(pts);
-  // ---- labelled axes ----
+  // ---- plot frame: floor grid + ticked, labelled axes ----
   (function(){
-    var AX=-380,AY=-235,AZ=-260, EX=380,EY=235,EZ=260;
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(EX,AY,AZ),0x4E79A7));
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,EY,AZ),0x59A14F));
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,AY,EZ),0xB07AA1));
-    var sx=makeTextSprite('X: AMOUNT (AUD)','#35547C');sx.position.set(EX+34,AY,AZ);group.add(sx);
-    var sy=makeTextSprite('Y: CONFIDENCE','#3D7A34');sy.position.set(AX,EY+22,AZ);group.add(sy);
-    var sz=makeTextSprite('Z: GL ACCOUNT','#835980');sz.position.set(AX,AY,EZ+30);group.add(sz);
+    var HX=360,HY=205,HZ=235;
+    var gm=new THREE.LineBasicMaterial({color:0x2a3648,transparent:true,opacity:.4}),tk='#8794a8',k;
+    for(k=-1;k<=1;k+=0.5){group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(k*HX,-HY,-HZ),new THREE.Vector3(k*HX,-HY,HZ)]),gm));}
+    for(k=-1;k<=1;k+=0.5){group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-HX,-HY,k*HZ),new THREE.Vector3(HX,-HY,k*HZ)]),gm));}
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(HX,-HY,-HZ),0x4E79A7,.7));   // X
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,HY,-HZ),0x59A14F,.7));   // Y
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,-HY,HZ),0xB07AA1,.7));   // Z
+    [0,0.25,0.5,0.75,1].forEach(function(fp){var s=makeTextSprite('$'+Math.round(fp*maxGross),tk,24);s.position.set((fp-0.5)*720,-HY-26,-HZ);group.add(s);});
+    [0.5,0.7,0.9].forEach(function(cf){var s=makeTextSprite(cf.toFixed(2),tk,24);s.position.set(-HX-42,(cf-0.7)*640,-HZ);group.add(s);});
+    [0,3,7].forEach(function(gi){var s=makeTextSprite(GL[gi].split(' ')[0],tk,22);s.position.set(-HX-6,-HY-26,(gi/(GL.length-1)-0.5)*470);group.add(s);});
+    var sx=makeTextSprite('AMOUNT (AUD)','#8FB0D4',30);sx.position.set(HX+96,-HY,-HZ);group.add(sx);
+    var sy=makeTextSprite('CONFIDENCE','#7DC178',30);sy.position.set(-HX,HY+30,-HZ);group.add(sy);
+    var sz=makeTextSprite('GL ACCOUNT','#C58ABF',30);sz.position.set(-HX,-HY-26,HZ+86);group.add(sz);
   })();
   var C={ok:new THREE.Color('#59A14F'),rev:new THREE.Color('#F28E2B'),exc:new THREE.Color('#E15759')},dim=new THREE.Color('#C9D0DA');
   var baseSiz=siz.slice();
   function recolor(){var a=g.attributes.color.array,sz=g.attributes.asize.array;for(var i=0;i<n;i++){var r=RECS[i];if(glOn[r.gl]){var c=C[route(r,curTh)];a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;sz[i]=baseSiz[i];}else{a[i*3]=dim.r;a[i*3+1]=dim.g;a[i*3+2]=dim.b;sz[i]=baseSiz[i]*0.4;}}g.attributes.color.needsUpdate=true;g.attributes.asize.needsUpdate=true;}
   window.recolorCloud=recolor;recolor();
-  var drag=false,px=0,py=0,ry=0,rx=0.15,vy=0.0016;
+  var drag=false,px=0,py=0,ry=-0.35,rx=0.22,vy=0.0016;
   wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
   wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){ry+=(e.clientX-px)*0.006;rx+=(e.clientY-py)*0.006;rx=Math.max(-1,Math.min(1,rx));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});

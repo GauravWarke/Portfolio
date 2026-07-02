@@ -1073,5 +1073,201 @@ bars.forEach(b=>bio.observe(b));
   else frame();
 })();
 </script>
+
+<!-- ============================================================
+     SENIOR-POLISH MODULE — scroll progress · ⌘K command palette ·
+     voice assistant (narration + commands) · section numbering.
+     Self-contained: own styles + logic, reuses the site's tokens.
+     ============================================================ -->
+<div id="scrollProgress" aria-hidden="true"></div>
+
+<!-- Command palette -->
+<div id="cmdk" hidden role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="cmdk-backdrop" data-close></div>
+  <div class="cmdk-panel" role="document">
+    <div class="cmdk-in"><span class="cmdk-ic">⌘</span><input id="cmdkInput" type="text" placeholder="Type a command or jump to a section…" aria-label="Command search" autocomplete="off"></div>
+    <ul id="cmdkList" role="listbox"></ul>
+    <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> navigate</span><span><kbd>⏎</kbd> select</span><span><kbd>esc</kbd> close</span></div>
+  </div>
+</div>
+
+<!-- Voice assistant -->
+<div id="voiceDock">
+  <div id="voicePanel" hidden>
+    <div class="vx-h"><span class="vx-live"></span>Voice assistant</div>
+    <button class="vx-btn" id="vxMic" type="button">🎙<span>Voice command</span></button>
+    <button class="vx-btn" id="vxNarrate" type="button">🔊<span>Listen to intro</span></button>
+    <div id="vxStatus">Ask me to navigate — hands-free.</div>
+    <div class="vx-cmds">Try “projects” · “skills” · “open demand dashboard” · “read about you” · “stop”</div>
+  </div>
+  <button id="voiceFab" type="button" aria-label="Open voice assistant" title="Voice assistant">🎙</button>
+</div>
+
+<style>
+:root{--vx:var(--teal,#14b8a6)}
+#scrollProgress{position:fixed;top:0;left:0;height:3px;width:0;z-index:1000;background:linear-gradient(90deg,var(--teal,#14b8a6),var(--blue,#3b82f6));box-shadow:0 0 10px rgba(20,184,166,.6);transition:width .1s linear}
+/* section numbering */
+.stag-num{font-family:'JetBrains Mono',monospace;font-weight:700;opacity:.55;margin-right:.55rem;letter-spacing:.05em}
+/* ⌘K nav hint */
+.cmdk-hint{display:inline-flex;align-items:center;gap:.35rem;font-family:'JetBrains Mono',monospace;font-size:.66rem;color:var(--t2,#94a3b8);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:.28rem .5rem;cursor:pointer;transition:all .18s}
+.cmdk-hint:hover{border-color:var(--vx);color:var(--vx)}
+.cmdk-hint kbd{font-family:inherit}
+/* command palette */
+#cmdk{position:fixed;inset:0;z-index:1100;display:flex;align-items:flex-start;justify-content:center}
+#cmdk[hidden]{display:none}
+.cmdk-backdrop{position:absolute;inset:0;background:rgba(4,8,16,.6);backdrop-filter:blur(6px);animation:cmdkFade .18s ease}
+.cmdk-panel{position:relative;margin-top:12vh;width:min(600px,92vw);background:#0e1424;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;animation:cmdkPop .2s cubic-bezier(.2,.7,.3,1)}
+@keyframes cmdkFade{from{opacity:0}to{opacity:1}}
+@keyframes cmdkPop{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}
+.cmdk-in{display:flex;align-items:center;gap:.7rem;padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.cmdk-ic{font-family:'JetBrains Mono',monospace;color:var(--vx);font-size:1rem}
+#cmdkInput{flex:1;background:none;border:none;outline:none;color:var(--t1,#f0f4ff);font-size:1rem;font-family:'Inter',sans-serif}
+#cmdkList{list-style:none;margin:0;padding:.5rem;max-height:min(52vh,420px);overflow-y:auto}
+.cmdk-item{display:flex;align-items:center;gap:.8rem;padding:.7rem .8rem;border-radius:10px;cursor:pointer;color:var(--t2,#94a3b8)}
+.cmdk-item .ci-ico{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.05);font-size:.85rem}
+.cmdk-item .ci-l{flex:1;color:var(--t1,#f0f4ff);font-size:.9rem}
+.cmdk-item .ci-h{font-size:.68rem;font-family:'JetBrains Mono',monospace;color:var(--t3,#5b6b82)}
+.cmdk-item.on,.cmdk-item:hover{background:rgba(20,184,166,.12)}
+.cmdk-item.on .ci-ico{background:rgba(20,184,166,.25)}
+.cmdk-foot{display:flex;gap:1.1rem;padding:.6rem 1.1rem;border-top:1px solid rgba(255,255,255,.08);font-size:.66rem;color:var(--t3,#5b6b82);font-family:'JetBrains Mono',monospace}
+.cmdk-foot kbd{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:0 .35rem;margin-right:.15rem}
+/* voice dock */
+#voiceDock{position:fixed;right:20px;bottom:20px;z-index:1050;display:flex;flex-direction:column;align-items:flex-end;gap:.6rem}
+#voiceFab{width:54px;height:54px;border-radius:50%;border:1px solid rgba(20,184,166,.4);background:linear-gradient(145deg,#12324a,#0d1c2e);color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:transform .18s ease,box-shadow .18s}
+#voiceFab:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 14px 34px rgba(20,184,166,.35)}
+#voiceFab.listening{animation:vxPulse 1.2s infinite;border-color:var(--vx)}
+@keyframes vxPulse{0%,100%{box-shadow:0 0 0 0 rgba(20,184,166,.5)}50%{box-shadow:0 0 0 12px rgba(20,184,166,0)}}
+#voicePanel{width:250px;background:#0e1424;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:.9rem;box-shadow:0 20px 50px rgba(0,0,0,.5);animation:cmdkPop .2s cubic-bezier(.2,.7,.3,1)}
+#voicePanel[hidden]{display:none}
+.vx-h{display:flex;align-items:center;gap:.45rem;font-size:.78rem;font-weight:700;color:var(--t1,#f0f4ff);margin-bottom:.7rem}
+.vx-live{width:7px;height:7px;border-radius:50%;background:var(--vx);box-shadow:0 0 8px var(--vx)}
+.vx-btn{display:flex;align-items:center;gap:.6rem;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:.6rem .7rem;color:var(--t1,#f0f4ff);font-size:.82rem;cursor:pointer;margin-bottom:.5rem;transition:all .15s;font-family:inherit}
+.vx-btn:hover{border-color:var(--vx);background:rgba(20,184,166,.1)}
+.vx-btn.on{border-color:var(--vx);background:rgba(20,184,166,.16)}
+#vxStatus{font-size:.72rem;color:var(--t2,#94a3b8);margin:.3rem 0 .5rem;min-height:1.1rem;line-height:1.45}
+.vx-cmds{font-size:.64rem;color:var(--t3,#5b6b82);font-family:'JetBrains Mono',monospace;line-height:1.6;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem}
+/* accessibility: visible focus */
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--vx);outline-offset:2px;border-radius:4px}
+@media(max-width:600px){#voicePanel{width:210px}.cmdk-panel{margin-top:8vh}}
+@media(prefers-reduced-motion:reduce){#scrollProgress,.cmdk-panel,#voicePanel,#voiceFab{animation:none!important;transition:none!important}}
+</style>
+
+<script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $=function(s,r){return (r||document).querySelector(s);};
+
+  /* ---------- scroll progress ---------- */
+  var sp=$('#scrollProgress');
+  function onScroll(){var h=document.documentElement,max=h.scrollHeight-h.clientHeight;sp.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+  addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);onScroll();
+
+  /* ---------- section numbering (systematised look) ---------- */
+  document.querySelectorAll('.stag').forEach(function(el,i){
+    if(el.querySelector('.stag-num'))return;
+    var n=('0'+(i+1)).slice(-2);
+    el.insertAdjacentHTML('afterbegin','<span class="stag-num">'+n+'</span>');
+  });
+
+  /* ---------- ⌘K hint in nav ---------- */
+  var navUl=$('#nav .nav-links');
+  if(navUl){var li=document.createElement('li');var b=document.createElement('button');b.className='cmdk-hint';b.type='button';b.innerHTML='<kbd>⌘</kbd>K';b.setAttribute('aria-label','Open command palette');b.addEventListener('click',openCmdk);li.appendChild(b);navUl.insertBefore(li,navUl.firstChild);}
+
+  /* ---------- helpers ---------- */
+  function scrollToSel(sel,label){var t=$(sel);if(t){t.scrollIntoView({behavior:reduce?'auto':'smooth'});if(label)say('Going to '+label);}}
+  function openUrl(u,nt){if(nt)window.open(u,'_blank','noopener');else location.href=u;}
+
+  /* ---------- command palette ---------- */
+  var ACTIONS=[
+    {ico:'▲',l:'Go to Home',h:'home',run:function(){scrollToSel('#home');}},
+    {ico:'▤',l:'Go to Projects',h:'projects',run:function(){scrollToSel('#projects');}},
+    {ico:'✦',l:'Go to Skills',h:'skills',run:function(){scrollToSel('#skills');}},
+    {ico:'◐',l:'Go to About',h:'about',run:function(){scrollToSel('#about');}},
+    {ico:'✉',l:'Go to Contact',h:'contact',run:function(){scrollToSel('#contact');}},
+    {ico:'⚡',l:'Open Churn & Revenue-Risk dashboard',h:'dashboard',run:function(){openUrl('dashboards/churn.html',true);}},
+    {ico:'⚡',l:'Open Expense-Reconciliation dashboard',h:'dashboard',run:function(){openUrl('dashboards/reconciliation.html',true);}},
+    {ico:'⚡',l:'Open Demand & Supply-Risk dashboard',h:'dashboard',run:function(){openUrl('dashboards/demand.html',true);}},
+    {ico:'⚡',l:'Open Market-Performance dashboard',h:'dashboard',run:function(){openUrl('dashboards/market.html',true);}},
+    {ico:'🔊',l:'Narrate my introduction',h:'voice',run:function(){narrate();}},
+    {ico:'🎙',l:'Start a voice command',h:'voice',run:function(){setTimeout(startCommand,150);}},
+    {ico:'in',l:'Open LinkedIn',h:'link',run:function(){openUrl('https://www.linkedin.com/in/gaurav-warke-b5493b394',true);}},
+    {ico:'gh',l:'Open GitHub',h:'link',run:function(){openUrl('https://github.com/GauravWarke',true);}},
+    {ico:'✦',l:'Email / Hire Me',h:'contact',run:function(){openUrl('mailto:gauravwarke8@gmail.com');}}
+  ];
+  var modal=$('#cmdk'),input=$('#cmdkInput'),list=$('#cmdkList'),sel=0,shown=ACTIONS.slice();
+  function renderList(){
+    list.innerHTML=shown.map(function(a,i){return '<li class="cmdk-item'+(i===sel?' on':'')+'" role="option" data-i="'+i+'"><span class="ci-ico">'+a.ico+'</span><span class="ci-l">'+a.l+'</span><span class="ci-h">'+a.h+'</span></li>';}).join('')||'<li class="cmdk-item" style="cursor:default"><span class="ci-l" style="color:var(--t3,#5b6b82)">No matches</span></li>';
+    list.querySelectorAll('.cmdk-item[data-i]').forEach(function(n){n.addEventListener('click',function(){run(+n.dataset.i);});n.addEventListener('mousemove',function(){sel=+n.dataset.i;paint();});});
+  }
+  function paint(){list.querySelectorAll('.cmdk-item[data-i]').forEach(function(n){n.classList.toggle('on',+n.dataset.i===sel);});}
+  function filter(){var q=input.value.trim().toLowerCase();shown=q?ACTIONS.filter(function(a){return (a.l+' '+a.h).toLowerCase().indexOf(q)!==-1;}):ACTIONS.slice();sel=0;renderList();}
+  function run(i){var a=shown[i];if(a){closeCmdk();a.run();}}
+  function openCmdk(){modal.hidden=false;input.value='';shown=ACTIONS.slice();sel=0;renderList();setTimeout(function(){input.focus();},20);}
+  function closeCmdk(){modal.hidden=true;}
+  input.addEventListener('input',filter);
+  modal.addEventListener('click',function(e){if(e.target.hasAttribute('data-close'))closeCmdk();});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(sel+1,shown.length-1);paint();scrollSel();}
+    else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(sel-1,0);paint();scrollSel();}
+    else if(e.key==='Enter'){e.preventDefault();run(sel);}
+    else if(e.key==='Escape'){closeCmdk();}
+  });
+  function scrollSel(){var el=list.querySelector('.cmdk-item.on');if(el)el.scrollIntoView({block:'nearest'});}
+  addEventListener('keydown',function(e){
+    if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();modal.hidden?openCmdk():closeCmdk();}
+    else if(e.key==='Escape'&&!modal.hidden){closeCmdk();}
+  });
+  window.openCmdk=openCmdk;
+
+  /* ---------- voice assistant ---------- */
+  var fab=$('#voiceFab'),panel=$('#voicePanel'),micBtn=$('#vxMic'),narrateBtn=$('#vxNarrate'),status=$('#vxStatus');
+  var synth=window.speechSynthesis;
+  function setStatus(t){if(status)status.textContent=t;}
+  function say(t){ if(!synth)return; try{synth.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-AU';u.rate=1.02;synth.speak(u);}catch(e){} }
+  function narrate(){
+    if(!synth){setStatus('Narration not supported in this browser.');return;}
+    var role=(document.querySelector('.hero-role')||{}).textContent||'';
+    var about=(document.querySelector('.about-body')||{}).textContent||'';
+    var txt='Hi, I’m Gaurav Warke. '+role+'. '+about;
+    try{synth.cancel();var u=new SpeechSynthesisUtterance(txt);u.lang='en-AU';u.rate=1.02;u.onstart=function(){setStatus('Narrating… say or click Stop to end.');};u.onend=function(){setStatus('Done. Ask me to navigate anytime.');};synth.speak(u);}catch(e){setStatus('Could not start narration.');}
+  }
+  fab.addEventListener('click',function(){panel.hidden=!panel.hidden;if(!panel.hidden)setStatus(SR?'Ask me to navigate — hands-free.':'Tip: voice commands work best in Chrome or Edge.');});
+  narrateBtn.addEventListener('click',function(){ if(synth&&synth.speaking){synth.cancel();setStatus('Stopped.');return;} narrate(); });
+
+  /* speech recognition (commands) */
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition, rec=null, listening=false;
+  function setMic(on){listening=on;micBtn.classList.toggle('on',on);fab.classList.toggle('listening',on);}
+  if(SR){
+    rec=new SR();rec.lang='en-AU';rec.interimResults=false;rec.maxAlternatives=1;
+    rec.onresult=function(e){var tr=e.results[0][0].transcript;setStatus('Heard: “'+tr+'”');handle(tr);};
+    rec.onerror=function(e){setStatus('Mic: '+e.error+(e.error==='not-allowed'?' — allow microphone access.':''));setMic(false);};
+    rec.onend=function(){setMic(false);};
+  }
+  function startCommand(){
+    panel.hidden=false;
+    if(!SR){setStatus('Voice commands need Chrome or Edge. Narration still works.');return;}
+    if(listening){rec.stop();return;}
+    try{rec.start();setMic(true);setStatus('Listening… try “projects”, “open demand dashboard”, “read about you”.');}catch(e){setMic(false);}
+  }
+  micBtn.addEventListener('click',startCommand);
+  function handle(t){
+    t=t.toLowerCase();
+    if(/stop|quiet|silence|cancel|shut/.test(t)){synth&&synth.cancel();setStatus('Stopped.');return;}
+    if(/read|narrat|listen|introduc|about you/.test(t)){narrate();return;}
+    if(/command|palette|search|menu/.test(t)){openCmdk();say('Command palette');return;}
+    if(/churn|revenue|risk/.test(t)){setStatus('Opening Churn dashboard…');say('Opening the churn dashboard');openUrl('dashboards/churn.html',true);return;}
+    if(/reconcil|expense|receipt/.test(t)){setStatus('Opening Reconciliation dashboard…');say('Opening the reconciliation dashboard');openUrl('dashboards/reconciliation.html',true);return;}
+    if(/demand|supply|inventory|forecast/.test(t)){setStatus('Opening Demand dashboard…');say('Opening the demand dashboard');openUrl('dashboards/demand.html',true);return;}
+    if(/market|roas|marketing|channel/.test(t)){setStatus('Opening Market dashboard…');say('Opening the market dashboard');openUrl('dashboards/market.html',true);return;}
+    if(/project|work|case/.test(t)){scrollToSel('#projects','projects');return;}
+    if(/skill|tech|stack|tool/.test(t)){scrollToSel('#skills','skills');return;}
+    if(/about|who are|background/.test(t)){scrollToSel('#about','about');return;}
+    if(/contact|hire|email|reach|talk/.test(t)){scrollToSel('#contact','contact');return;}
+    if(/home|top|start|beginning/.test(t)){scrollToSel('#home','home');return;}
+    setStatus('Didn’t catch a command in: “'+t+'”');
+  }
+  window.startCommand=startCommand;window.narrate=narrate;window.say=say;
+})();
+</script>
 </body>
 </html>

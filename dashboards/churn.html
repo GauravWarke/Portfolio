@@ -377,28 +377,29 @@ function renderBars(){
 var sc=document.getElementById('scatter'), sctx=sc.getContext('2d');
 function sizeCanvas(cv,cx){var r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;cx.setTransform(dpr,0,0,dpr,0,0);return r;}
 function renderScatter(){
-  var r=sizeCanvas(sc,sctx),W=r.width,H=r.height,pad=36;
+  var r=sizeCanvas(sc,sctx),W=r.width,H=r.height,pad=42;
   sctx.clearRect(0,0,W,H);
-  // quadrant shading (top-right = priority)
-  var tx=pad+THRESH*(W-pad-14);
-  sctx.fillStyle='rgba(244,63,94,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
-  sctx.strokeStyle='rgba(255,255,255,.08)';sctx.lineWidth=1;
-  sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
-  // mid horizontal
-  sctx.strokeStyle='rgba(255,255,255,.05)';sctx.beginPath();sctx.moveTo(pad,(H-pad)/2+4);sctx.lineTo(W-6,(H-pad)/2+4);sctx.stroke();
-  sctx.fillStyle='#5B6B82';sctx.font='10px JetBrains Mono, monospace';
-  sctx.fillText('churn probability →',pad+4,H-6);
-  sctx.save();sctx.translate(12,H-pad-4);sctx.rotate(-Math.PI/2);sctx.fillText('MRR (AUD) →',0,0);sctx.restore();
   var maxM=Math.max.apply(null,BOOK.map(function(d){return d.mrr;}));
-  filtered().forEach(function(d){
-    var x=pad+d.prob*(W-pad-14), y=(H-pad)-(d.mrr/maxM)*(H-pad-14);
-    var rad=4+Math.sqrt(d.risk)/70;
-    sctx.beginPath();sctx.arc(x,y,rad,0,7);sctx.fillStyle=riskColor(d.prob)+'cc';sctx.fill();
-  });
-  sctx.strokeStyle='rgba(244,63,94,.5)';sctx.setLineDash([4,4]);
-  sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
-  sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);
-  sctx.fillStyle='rgba(251,113,133,.7)';sctx.fillText('◤ priority',W-64,20);
+  function X(p){return pad+p*(W-pad-14);}
+  function Y(m){return (H-pad)-(m/maxM)*(H-pad-16);}
+  sctx.font='9px JetBrains Mono, monospace';sctx.lineWidth=1;
+  // gridlines + numeric ticks
+  sctx.strokeStyle='rgba(255,255,255,.05)';sctx.fillStyle='#5B6B82';
+  [0,0.25,0.5,0.75,1].forEach(function(p){var x=X(p);sctx.beginPath();sctx.moveTo(x,8);sctx.lineTo(x,H-pad);sctx.stroke();sctx.fillText(p.toFixed(2),x-8,H-pad+15);});
+  [0,0.25,0.5,0.75,1].forEach(function(f){var y=Y(f*maxM);sctx.beginPath();sctx.moveTo(pad,y);sctx.lineTo(W-6,y);sctx.stroke();sctx.fillText('$'+Math.round(f*maxM/1000)+'k',3,y+3);});
+  // priority quadrant shading (high prob + high value)
+  var tx=X(THRESH);
+  sctx.fillStyle='rgba(244,63,94,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
+  // axes
+  sctx.strokeStyle='rgba(255,255,255,.14)';sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
+  // points
+  filtered().forEach(function(d){var rad=4+Math.sqrt(d.risk)/70;sctx.beginPath();sctx.arc(X(d.prob),Y(d.mrr),rad,0,7);sctx.fillStyle=riskColor(d.prob)+'cc';sctx.fill();});
+  // flag threshold
+  sctx.strokeStyle='rgba(244,63,94,.55)';sctx.setLineDash([4,4]);sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
+  sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);sctx.fillText('◤ priority',W-64,16);
+  // axis titles
+  sctx.fillStyle='#5B6B82';sctx.fillText('X: churn probability',W-128,H-4);
+  sctx.save();sctx.translate(11,H-pad-2);sctx.rotate(-Math.PI/2);sctx.fillText('Y: MRR (AUD)',0,0);sctx.restore();
 }
 
 /* ---------- gauge (ROI, driven by what-if) ---------- */
@@ -486,7 +487,7 @@ var buildCloud=function(){};
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
   var scene=new THREE.Scene();
-  var camera=new THREE.PerspectiveCamera(55,W/H,1,4000);camera.position.z=560;
+  var camera=new THREE.PerspectiveCamera(55,W/H,1,4000);camera.position.set(60,120,720);camera.lookAt(0,0,0);
   var group=new THREE.Group();scene.add(group);
   var pts=null,meta=[];
   function build(){
@@ -516,18 +517,32 @@ var buildCloud=function(){};
   }
   buildCloud=build;build();
 
-  // ---- labelled axes (added once; persist across rebuilds) ----
+  // ---- plot frame: floor grid + ticked, labelled axes (added once; persists across rebuilds) ----
   (function(){
-    var AX=-400,AY=-280,AZ=-240, EX=400,EY=280,EZ=240;
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(EX,AY,AZ),0xF43F5E));
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,EY,AZ),0x34D399));
-    group.add(axisLine(new THREE.Vector3(AX,AY,AZ),new THREE.Vector3(AX,AY,EZ),0x60A5FA));
-    var sx=makeTextSprite('X: CHURN PROB','#FB7185');sx.position.set(EX+30,AY,AZ);group.add(sx);
-    var sy=makeTextSprite('Y: MRR (AUD)','#34D399');sy.position.set(AX,EY+22,AZ);group.add(sy);
-    var sz=makeTextSprite('Z: TENURE (mo)','#60A5FA');sz.position.set(AX,AY,EZ+30);group.add(sz);
+    var HX=380,HY=260,HZ=220;                         // half-extents match the point mapping
+    var gm=new THREE.LineBasicMaterial({color:0x2a3450,transparent:true,opacity:.4});
+    var tk='#8794a8';
+    // floor grid on y = -HY
+    var k;
+    for(k=-1;k<=1;k+=0.5){ group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(k*HX,-HY,-HZ),new THREE.Vector3(k*HX,-HY,HZ)]),gm)); }
+    for(k=-1;k<=1;k+=0.5){ group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-HX,-HY,k*HZ),new THREE.Vector3(HX,-HY,k*HZ)]),gm)); }
+    // axis lines along the box edges
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(HX,-HY,-HZ),0xF43F5E,.7));  // X
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,HY,-HZ),0x34D399,.7));  // Y
+    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,-HY,HZ),0x60A5FA,.7));  // Z
+    // ticks — X: churn probability
+    [0,0.25,0.5,0.75,1].forEach(function(p){var s=makeTextSprite(p.toFixed(2),tk,24);s.position.set((p-0.5)*760,-HY-28,-HZ);group.add(s);});
+    // ticks — Y: MRR (matches sqrt mapping)
+    [1000,3000,6000].forEach(function(v){var s=makeTextSprite('$'+(v/1000)+'k',tk,24);s.position.set(-HX-46,(Math.sqrt(v/7000)-0.5)*520,-HZ);group.add(s);});
+    // ticks — Z: tenure (months)
+    [6,24,42].forEach(function(t){var s=makeTextSprite(t+'mo',tk,24);s.position.set(-HX-6,-HY-28,(t/48-0.5)*440);group.add(s);});
+    // axis titles
+    var sx=makeTextSprite('CHURN PROB','#FB7185',30);sx.position.set(HX+78,-HY,-HZ);group.add(sx);
+    var sy=makeTextSprite('MRR (AUD)','#34D399',30);sy.position.set(-HX,HY+34,-HZ);group.add(sy);
+    var sz=makeTextSprite('TENURE','#60A5FA',30);sz.position.set(-HX,-HY-28,HZ+70);group.add(sz);
   })();
 
-  var drag=false,px=0,py=0,ry=0,rx=0,vy=0.0016;
+  var drag=false,px=0,py=0,ry=-0.35,rx=0.22,vy=0.0016;
   wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
   wrap.addEventListener('pointermove',function(e){

@@ -381,9 +381,14 @@ function drawQuad(){
   var maxS=(allS.length?Math.max.apply(null,allS):1)*1.12, maxR=3.6, maxRev=(allRev.length?Math.max.apply(null,allRev):1);
   function X(v){return pad+v/maxS*(W-pad-10);}
   function Y(v){return (H-pad)-v/maxR*(H-pad-12);}
-  cx.strokeStyle='rgba(255,255,255,.08)';cx.lineWidth=1;cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
-  cx.fillStyle='#5B6B82';cx.font='9px JetBrains Mono, monospace';cx.fillText('X: weekly spend (AUD) →',pad+3,H-6);
-  cx.save();cx.translate(12,H-pad-4);cx.rotate(-Math.PI/2);cx.fillText('Y: ROAS →   ● size: revenue',0,0);cx.restore();
+  cx.font='9px JetBrains Mono, monospace';cx.lineWidth=1;
+  // gridlines + numeric ticks
+  cx.strokeStyle='rgba(255,255,255,.05)';cx.fillStyle='#5B6B82';
+  [0,0.25,0.5,0.75,1].forEach(function(fp){var x=X(fp*maxS);cx.beginPath();cx.moveTo(x,8);cx.lineTo(x,H-pad);cx.stroke();cx.fillText('$'+Math.round(fp*maxS/1000)+'k',x-8,H-pad+13);});
+  [0,1,2,3].forEach(function(rv){var y=Y(rv);cx.beginPath();cx.moveTo(pad,y);cx.lineTo(W-6,y);cx.stroke();cx.fillText(rv+'x',3,y+3);});
+  cx.strokeStyle='rgba(255,255,255,.14)';cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
+  cx.fillStyle='#5B6B82';cx.fillText('X: weekly spend (AUD) →',W-152,H-6);
+  cx.save();cx.translate(12,H-pad-4);cx.rotate(-Math.PI/2);cx.fillText('Y: ROAS →  ● size: revenue',0,0);cx.restore();
   cx.setLineDash([4,4]);
   if(refOn.scale){cx.strokeStyle='rgba(89,161,79,.4)';cx.beginPath();cx.moveTo(pad,Y(3));cx.lineTo(W-6,Y(3));cx.stroke();cx.fillStyle='#59A14F';cx.fillText('SCALE',W-46,Y(3)-3);}
   if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.beginPath();cx.moveTo(pad,Y(1.5));cx.lineTo(W-6,Y(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT',W-40,Y(1.5)-3);}
@@ -426,8 +431,13 @@ function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([
   var ly=makeTextSprite('Y: AUD $',Yc.y);ly.position.set(X0-14,Ymax+18,ZSPEND-30);group.add(ly);
   var lzs=makeTextSprite('SPEND',Yc.z);lzs.position.set(X0-70,6,ZSPEND);group.add(lzs);
   var lzr=makeTextSprite('REVENUE',Yc.z);lzr.position.set(X0-80,6,ZREV);group.add(lzr);
-  // Y tick labels
-  [0.25,0.5,0.75,1].forEach(function(t){var v=t*(Ymax-40)/SC;var s=makeTextSprite('$'+Math.round(v/1000)+'k','#68727E',30);s.position.set(X0-46,t*(Ymax-40),ZSPEND-30);group.add(s);});
+  // Y tick labels + horizontal reference gridlines (so bar heights read against the scale)
+  var EXBAR=X0+GAP*3+120, gmat=new THREE.LineBasicMaterial({color:0x2a3648,transparent:true,opacity:.35});
+  [0.25,0.5,0.75,1].forEach(function(t){
+    var yy=t*(Ymax-40), v=yy/SC;
+    var s=makeTextSprite('$'+Math.round(v/1000)+'k','#8794a8',28);s.position.set(X0-46,yy,ZSPEND-30);group.add(s);
+    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(X0,yy,ZSPEND-30),new THREE.Vector3(EXBAR,yy,ZSPEND-30)]),gmat));
+  });
   // ---- bars: per channel, a spend bar (back) + revenue bar (front) ----
   var bars=[];
   CHK.forEach(function(k,ci){
