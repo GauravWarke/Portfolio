@@ -5,71 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gaurav Warke | Data & Business Analytics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080C18;--bg1:#0C1120;--bg2:#101828;--card:rgba(15,22,36,.55);--card2:rgba(20,29,46,.6);
-  --teal:#0D9488;--teal2:#14B8A6;--blue:#3B82F6;--amber:#F59E0B;--rose:#F43F5E;--emerald:#10B981;
-  --t1:#F0F4FF;--t2:#94A3B8;--t3:#475569;
-  --b:rgba(13,148,136,.15);--bh:rgba(13,148,136,.4);
+  /* AgentAI-inspired red/black system. --teal/--blue/--amber/--emerald are kept as
+     token NAMES (referenced everywhere) but remapped to the warm red/orange palette. */
+  --bg:#0A0605;--bg1:#120B09;--bg2:#1B110E;--card:rgba(26,17,15,.6);--card2:rgba(40,25,22,.6);
+  --teal:#E8442B;--teal2:#FF6A4D;--blue:#FF7A4D;--amber:#FF9E5A;--rose:#FF3B30;--emerald:#FF6F59;
+  --red:#E8442B;--red2:#FF6A4D;--redglow:rgba(232,68,43,.5);
+  --t1:#F7F1EF;--t2:#B6A8A4;--t3:#7A6C68;
+  --b:rgba(232,68,43,.16);--bh:rgba(232,68,43,.45);
+  --serif:'Playfair Display',Georgia,serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 3rem;display:flex;justify-content:space-between;align-items:center;transition:all .3s}
-nav.scrolled{background:rgba(8,12,24,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b)}
-.logo{font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:800;color:var(--t1);letter-spacing:-.5px}
-.logo em{color:var(--teal);font-style:normal}
-.nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
-.nav-links a{color:var(--t3);text-decoration:none;font-size:.82rem;font-weight:500;transition:color .2s;letter-spacing:.02em}
-.nav-links a:hover{color:var(--t1)}
-.nav-cta{padding:.45rem 1.25rem;background:transparent;border:1px solid var(--teal);color:var(--teal)!important;border-radius:6px;font-size:.8rem!important;font-weight:600!important;transition:all .2s!important}
-.nav-cta:hover{background:var(--teal);color:#fff!important}
+/* NAV — floating glass pill (Building Beyond / AgentAI) */
+nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;width:min(1120px,calc(100% - 28px));padding:.5rem .55rem .5rem 1.3rem;display:flex;justify-content:space-between;align-items:center;transition:background .3s,border-color .3s;background:rgba(20,12,10,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.08);border-radius:100px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+nav.scrolled{background:rgba(14,8,7,.85);border-color:var(--b)}
+.logo{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:var(--t1);letter-spacing:-.5px}
+.logo em{color:var(--red);font-style:normal}
+.nav-links{display:flex;gap:.25rem;list-style:none;align-items:center}
+.nav-links>li>a:not(.nav-cta){color:var(--t2);text-decoration:none;font-size:.82rem;font-weight:500;transition:all .2s;letter-spacing:.01em;padding:.5rem .95rem;border-radius:100px;display:inline-block}
+.nav-links>li>a:not(.nav-cta):hover{color:var(--t1);background:rgba(255,255,255,.06)}
+.nav-cta{padding:.55rem 1.3rem;background:var(--red);border:1px solid var(--red);color:#fff!important;border-radius:100px;font-size:.8rem!important;font-weight:700!important;transition:all .2s!important}
+.nav-cta:hover{background:var(--red2);border-color:var(--red2);box-shadow:0 6px 20px var(--redglow)}
 
 /* HERO — CENTERED LAYOUT */
 #home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 2rem 4rem;position:relative;overflow:hidden;gap:2.5rem}
 .noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:128px}
-.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(13,148,136,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(13,148,136,.04) 1px,transparent 1px);background-size:48px 48px}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(232,68,43,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(232,68,43,.04) 1px,transparent 1px);background-size:48px 48px}
 /* Global 3D data-network — fixed behind the whole page */
 #bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none}
 #home .hero-left,#home .hero-right{position:relative;z-index:2}
 /* lift all content above the canvas; bands stay translucent so the network bleeds through */
-nav,section,footer,.divider{position:relative;z-index:1}
+section,footer,.divider{position:relative;z-index:1}
 /* glass surfaces — translucent so the fluid background shows through, blurred so text stays legible */
 .data-card,.sk,.pc,.info-item,.edu-card,.r-card,.avail,.c-link,.photo-box,.pc-prob,.dc-stat{backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
-.hero-left{position:relative;z-index:2;max-width:780px}
-.hero-tag{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .9rem;border:1px solid rgba(16,185,129,.3);border-radius:4px;font-size:.7rem;font-weight:600;color:var(--emerald);margin-bottom:1.75rem;background:rgba(16,185,129,.06);letter-spacing:.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
-.dot{width:5px;height:5px;background:var(--emerald);border-radius:50%;animation:pulse 2s infinite}
+/* warm red radial glow behind the hero, echoing the AgentAI jellyfish light */
+.hero-glow{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);width:min(900px,90vw);height:min(900px,90vw);border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(232,68,43,.22),rgba(232,68,43,.06) 40%,transparent 66%);filter:blur(10px)}
+.hero-left{position:relative;z-index:2;max-width:820px}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border:1px solid rgba(232,68,43,.35);border-radius:100px;font-size:.68rem;font-weight:600;color:var(--red2);margin-bottom:1.9rem;background:rgba(232,68,43,.08);letter-spacing:.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.dot{width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3;transform:scale(1.3)}}
-h1{font-family:'Sora',sans-serif;font-size:clamp(2.8rem,5.5vw,4.5rem);font-weight:800;line-height:1;letter-spacing:-2.5px;margin-bottom:1rem;color:var(--t1)}
-h1 span{display:block;color:var(--teal)}
-.hero-role{font-size:1rem;color:var(--t2);font-weight:400;margin-bottom:.6rem;line-height:1.5}
+h1{font-family:'Sora',sans-serif;font-size:clamp(3rem,6.5vw,5.4rem);font-weight:800;line-height:.98;letter-spacing:-3px;margin-bottom:1.1rem;color:var(--t1)}
+h1 em{display:block;font-family:var(--serif);font-style:italic;font-weight:600;color:var(--red);letter-spacing:-1.5px}
+.hero-role{font-size:1.02rem;color:var(--t2);font-weight:400;margin-bottom:.6rem;line-height:1.5}
 .tw-line{font-size:.9rem;color:var(--t3);margin-bottom:2.25rem;min-height:1.5rem;font-family:'JetBrains Mono',monospace}
-#tw{color:var(--teal2)}
-.cur{display:inline-block;width:2px;height:.9em;background:var(--teal);margin-left:1px;vertical-align:middle;animation:blink .7s infinite}
+#tw{color:var(--red2)}
+.cur{display:inline-block;width:2px;height:.9em;background:var(--red);margin-left:1px;vertical-align:middle;animation:blink .7s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .hero-actions{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:2.5rem;justify-content:center}
-.btn-fill{padding:.7rem 1.6rem;background:var(--teal);color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:.88rem;transition:all .2s;font-family:'Sora',sans-serif}
-.btn-fill:hover{background:var(--teal2);transform:translateY(-1px)}
-.btn-line{padding:.7rem 1.6rem;background:transparent;color:var(--t2);text-decoration:none;border-radius:6px;font-weight:500;font-size:.88rem;border:1px solid var(--b);transition:all .2s}
-.btn-line:hover{border-color:var(--teal);color:var(--t1)}
+.btn-fill{padding:.85rem 1.8rem;background:var(--red);color:#fff;text-decoration:none;border-radius:100px;font-weight:700;font-size:.88rem;transition:all .2s;font-family:'Sora',sans-serif;box-shadow:0 8px 26px rgba(232,68,43,.28)}
+.btn-fill:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 12px 32px var(--redglow)}
+.btn-line{padding:.85rem 1.8rem;background:rgba(255,255,255,.03);color:var(--t1);text-decoration:none;border-radius:100px;font-weight:500;font-size:.88rem;border:1px solid rgba(255,255,255,.14);transition:all .2s}
+.btn-line:hover{border-color:var(--red);color:#fff}
 .hero-socials{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
-.hsoc{display:flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border:1px solid var(--b);border-radius:4px;text-decoration:none;color:var(--t3);font-size:.75rem;transition:all .2s;font-family:'JetBrains Mono',monospace}
-.hsoc:hover{border-color:var(--teal);color:var(--teal)}
+.hsoc{display:flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border:1px solid rgba(255,255,255,.1);border-radius:100px;text-decoration:none;color:var(--t3);font-size:.75rem;transition:all .2s;font-family:'JetBrains Mono',monospace}
+.hsoc:hover{border-color:var(--red);color:var(--red2)}
 
 /* HERO RIGHT — DATA VISUAL */
 .hero-right{position:relative;z-index:2;display:flex;flex-direction:row;gap:1rem;width:100%;max-width:780px}
 .hero-right .data-card{flex:1;text-align:left}
-.data-card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;transition:all .25s}
-.data-card:hover{border-color:var(--bh)}
+.data-card{background:linear-gradient(160deg,rgba(40,25,22,.75),rgba(20,12,10,.7));border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:1.4rem;transition:all .25s}
+.data-card:hover{border-color:var(--bh);box-shadow:0 14px 40px rgba(0,0,0,.35)}
 .dc-label{font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);margin-bottom:.6rem;font-family:'JetBrains Mono',monospace}
 .dc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
 .dc-metric{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px}
 .dc-change{font-size:.72rem;font-weight:600;padding:.18rem .55rem;border-radius:4px}
-.pos{color:var(--emerald);background:rgba(16,185,129,.1)}
+.pos{color:var(--emerald);background:rgba(255,111,89,.1)}
 .bar-wrap{display:flex;flex-direction:column;gap:.45rem}
 .bar-item{display:flex;align-items:center;gap:.6rem}
 .bar-name{font-size:.68rem;color:var(--t3);width:80px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
@@ -77,8 +83,8 @@ h1 span{display:block;color:var(--teal)}
 .bar-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
 .bar-val{font-size:.65rem;color:var(--t2);font-weight:600;font-family:'JetBrains Mono',monospace;width:30px;text-align:right}
 .dc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-.dc-stat{text-align:center;padding:.75rem;background:rgba(13,148,136,.06);border-radius:8px;border:1px solid rgba(13,148,136,.1)}
-.dcs-val{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.8px}
+.dc-stat{text-align:center;padding:.85rem;background:rgba(232,68,43,.07);border-radius:14px;border:1px solid rgba(232,68,43,.12)}
+.dcs-val{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.8px}
 .dcs-lbl{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
 
 /* SHARED */
@@ -87,8 +93,9 @@ section{padding:7.5rem 0}
 .divider{height:1px;background:linear-gradient(90deg,transparent,var(--b),transparent)}
 .stag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--teal);margin-bottom:.5rem;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.5rem}
 .stag::before{content:'//';opacity:.5}
-.stitle{font-family:'Sora',sans-serif;font-size:clamp(1.8rem,4vw,2.4rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:.9rem}
-.ssub{color:var(--t3);font-size:.92rem;max-width:520px;line-height:1.8;margin-bottom:3.5rem}
+.stitle{font-family:'Sora',sans-serif;font-size:clamp(2rem,4.4vw,2.9rem);font-weight:800;letter-spacing:-1.8px;line-height:1.08;margin-bottom:.9rem}
+.stitle em{font-family:var(--serif);font-style:italic;font-weight:600;color:var(--red);letter-spacing:-1px}
+.ssub{color:var(--t2);font-size:.92rem;max-width:540px;line-height:1.8;margin-bottom:3.5rem}
 
 /* ABOUT */
 .about-wrap{display:grid;grid-template-columns:280px 1fr;gap:3.5rem;align-items:start}
@@ -96,7 +103,7 @@ section{padding:7.5rem 0}
 .photo-box{width:100%;aspect-ratio:3/4;border-radius:16px;background:var(--card2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
 .photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:16px;z-index:1}
 .initials{font-family:'Sora',sans-serif;font-size:4.5rem;font-weight:800;color:var(--teal);opacity:.4}
-.photo-status{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(8,12,24,.85);backdrop-filter:blur(8px);border:1px solid var(--b);border-radius:8px;padding:.6rem .85rem;display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--t2)}
+.photo-status{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(10,6,5,.85);backdrop-filter:blur(8px);border:1px solid var(--b);border-radius:8px;padding:.6rem .85rem;display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:var(--t2)}
 .status-dot{width:6px;height:6px;background:var(--emerald);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
 .about-content .stitle{margin-bottom:.5rem}
 .about-body{color:var(--t2);font-size:.9rem;line-height:1.8;margin-bottom:1.75rem}
@@ -107,7 +114,7 @@ section{padding:7.5rem 0}
 .info-val{font-size:.85rem;color:var(--t1);font-weight:600}
 .chips{display:flex;gap:.5rem;flex-wrap:wrap}
 .chip{padding:.3rem .8rem;border:1px solid var(--b);border-radius:100px;font-size:.72rem;color:var(--t3)}
-.chip.teal{border-color:rgba(13,148,136,.3);color:var(--teal);background:rgba(13,148,136,.06)}
+.chip.teal{border-color:rgba(232,68,43,.3);color:var(--teal);background:rgba(232,68,43,.06)}
 
 /* SKILLS */
 #skills{background:transparent}
@@ -120,45 +127,75 @@ section{padding:7.5rem 0}
 .t-wrap{display:flex;flex-wrap:wrap;gap:.3rem}
 .t{padding:.2rem .55rem;border:1px solid rgba(255,255,255,.07);border-radius:4px;font-size:.66rem;color:var(--t2);font-weight:500;transition:all .15s}
 .t:hover{border-color:var(--teal);color:var(--teal)}
-.t.hi{border-color:rgba(245,158,11,.25);color:var(--amber)}
-.t.em{border-color:rgba(13,148,136,.25);color:var(--teal2)}
+.t.hi{border-color:rgba(255,158,90,.25);color:var(--amber)}
+.t.em{border-color:rgba(232,68,43,.25);color:var(--teal2)}
 
-/* PROJECTS */
-.proj-filters{display:flex;gap:.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
-.pf{padding:.42rem 1.1rem;border:1px solid var(--b);border-radius:100px;font-size:.76rem;font-weight:500;color:var(--t3);background:transparent;cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace}
-.pf:hover{color:var(--t1);border-color:var(--teal)}
-.pf.on{background:var(--teal);color:#fff;border-color:var(--teal)}
-.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
-.pc{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden;transition:all .25s;display:flex;flex-direction:column}
-.pc:hover{border-color:var(--bh);transform:translateY(-3px);box-shadow:0 12px 35px rgba(0,0,0,.3)}
-.pc.wide{grid-column:span 2}
-.pc.hidden{display:none}
-.pc-head{padding:1.4rem 1.4rem .8rem;border-bottom:1px solid rgba(255,255,255,.04)}
-.pc-kpi{font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:.2rem}
-.pc-kpi-label{font-size:.65rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
-.pc-body{padding:1.1rem 1.4rem 1.4rem;flex:1;display:flex;flex-direction:column}
-.pc-cat{font-size:.6rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-family:'JetBrains Mono',monospace;margin-bottom:.35rem}
-.live-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;margin-bottom:.55rem;padding:.22rem .65rem;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.08);color:var(--emerald);border-radius:100px;font-size:.58rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;transition:all .2s}
-.live-badge:hover{background:var(--emerald);color:#04121a;border-color:var(--emerald);transform:translateY(-1px)}
-.live-badge .ld{width:5px;height:5px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite}
-.live-badge:hover .ld{background:#04121a}
-.pc-title{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;letter-spacing:-.3px;margin-bottom:.5rem;line-height:1.3}
-.pc-prob{font-size:.75rem;color:var(--t3);line-height:1.5;margin-bottom:.75rem;padding:.5rem .7rem;background:rgba(13,148,136,.05);border-left:2px solid var(--teal);border-radius:0 4px 4px 0}
-.pc-desc{font-size:.8rem;color:var(--t2);line-height:1.65;margin-bottom:.9rem;flex:1}
-.pc-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.9rem}
+/* PROJECTS — Iceland-style frosted-glass showcase carousel */
+.ice-wrap{position:relative;margin-top:.5rem;border-radius:26px;isolation:isolate}
+/* a scene behind the glass so the frost always has light to catch */
+.ice-wrap::before{content:'';position:absolute;inset:0;z-index:0;border-radius:26px;background:
+   radial-gradient(120% 100% at 80% 65%,rgba(232,68,43,.34),transparent 55%),
+   radial-gradient(90% 80% at 12% 15%,rgba(255,106,77,.18),transparent 60%),
+   linear-gradient(155deg,#1c0e0b,#0a0605 72%)}
+.ice-panel{position:relative;z-index:1;min-height:520px;display:flex;flex-direction:column;padding:2.1rem 2.4rem;
+   background:rgba(18,11,9,.24);backdrop-filter:blur(16px) saturate(1.1);-webkit-backdrop-filter:blur(16px) saturate(1.1);
+   border:1px solid rgba(255,255,255,.09);border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.ice-topbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);flex-wrap:wrap}
+.ice-count b{color:var(--red2);font-weight:700}
+.ice-cats{display:flex;gap:.4rem;flex-wrap:wrap}
+.ice-chip{padding:.34rem .85rem;border:1px solid rgba(255,255,255,.12);border-radius:100px;font-size:.6rem;color:var(--t3);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;letter-spacing:.06em}
+.ice-chip:hover{color:var(--t1);border-color:var(--red)}
+.ice-chip.on{background:var(--red);border-color:var(--red);color:#fff}
+/* huge overlapping outlined + solid type (ICE / LEND) */
+.ice-stage{flex:1;display:flex;flex-direction:column;justify-content:center;padding:1.6rem 0;position:relative}
+.ice-bigtype{line-height:.82;font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-4px}
+.ice-out{display:block;font-size:clamp(3rem,10.5vw,8rem);color:transparent;-webkit-text-stroke:1.5px rgba(247,241,239,.48)}
+.ice-sol{display:block;font-size:clamp(3.3rem,11.5vw,8.8rem);color:var(--t1);margin-top:-.05em;text-shadow:0 10px 44px rgba(0,0,0,.55)}
+.ice-sol .amp{color:var(--red)}
+.ice-kpi{position:absolute;top:.6rem;right:0;text-align:right;max-width:42%}
+.ice-kpi b{display:block;font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.4rem);letter-spacing:-1px;color:var(--red2);line-height:1}
+.ice-kpi span{font-size:.58rem;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--t3)}
+/* bottom row: dots + label + desc + actions */
+.ice-bottom{display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:end;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.1)}
+.ice-dots{display:flex;align-items:center;gap:.7rem}
+.ice-arrow{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(20,12,10,.4);color:var(--t1);cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.ice-arrow:hover{border-color:var(--red);background:var(--red);color:#fff}
+.ice-idx{font-family:'Sora',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-1px;color:var(--t1)}
+.ice-idx::before{content:'';display:inline-block;width:8px;height:8px;border:1.5px solid var(--red);border-radius:50%;margin-right:.5rem;vertical-align:middle}
+.ice-dotrow{display:flex;gap:.45rem}
+.ice-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:all .25s}
+.ice-dot.on{background:var(--red);width:22px;border-radius:100px}
+.ice-info{max-width:470px}
+.ice-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red2);font-weight:600;margin-bottom:.5rem}
+.ice-desc{font-size:.82rem;color:var(--t2);line-height:1.6}
+.ice-actions{display:flex;flex-direction:column;gap:.7rem;align-items:flex-end;white-space:nowrap}
+.ice-view{display:inline-flex;align-items:center;gap:.85rem;font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--t1);text-decoration:none;font-weight:600;cursor:pointer}
+.ice-view .arrow{display:inline-block;width:54px;height:1px;background:var(--t1);position:relative;transition:width .25s,background .25s}
+.ice-view .arrow::after{content:'';position:absolute;right:0;top:-3px;width:7px;height:7px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg);color:var(--t1)}
+.ice-view:hover{color:var(--red2)}
+.ice-view:hover .arrow{width:80px;background:var(--red)}
+.ice-view:hover .arrow::after{color:var(--red)}
+.ice-dashlink{font-family:'JetBrains Mono',monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);text-decoration:none;display:inline-flex;align-items:center;gap:.45rem;transition:color .2s}
+.ice-dashlink .ld{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+.ice-dashlink:hover{color:var(--red2)}
+.ice-fade{animation:iceFade .45s ease}
+@keyframes iceFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-width:820px){
+  .ice-panel{padding:1.5rem 1.4rem;min-height:0}
+  .ice-bottom{grid-template-columns:1fr;gap:1.2rem;align-items:start}
+  .ice-actions{align-items:flex-start}
+  .ice-kpi{position:static;text-align:left;max-width:none;margin-bottom:1rem}
+}
 .pc-tag{padding:.18rem .5rem;border:1px solid rgba(255,255,255,.06);border-radius:3px;font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.pc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.04)}
-.pc-link{font-size:.75rem;color:var(--teal);text-decoration:none;font-weight:500;transition:color .2s}
-.pc-link:hover{color:var(--teal2)}
-.view-gh{display:flex;align-items:center;gap:.6rem;margin-top:2.25rem;padding:.65rem 1.5rem;border:1px solid var(--b);border-radius:6px;color:var(--t2);text-decoration:none;font-size:.83rem;font-weight:500;width:fit-content;transition:all .2s}
-.view-gh:hover{border-color:var(--teal);color:var(--teal)}
+.view-gh{display:flex;align-items:center;gap:.6rem;margin-top:2rem;padding:.75rem 1.6rem;border:1px solid rgba(255,255,255,.12);border-radius:100px;color:var(--t2);text-decoration:none;font-size:.83rem;font-weight:500;width:fit-content;transition:all .2s}
+.view-gh:hover{border-color:var(--red);color:var(--red2)}
 
 /* EXPERIENCE */
 .exp-cols{display:grid;grid-template-columns:1fr 1fr;gap:4rem}
 .tl{position:relative;padding-left:1.75rem}
 .tl::before{content:'';position:absolute;left:0;top:10px;bottom:0;width:1px;background:linear-gradient(180deg,var(--teal),transparent)}
 .ti{position:relative;padding-bottom:2.25rem}
-.ti::before{content:'';position:absolute;left:-2.1rem;top:8px;width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);box-shadow:0 0 8px rgba(13,148,136,.5)}
+.ti::before{content:'';position:absolute;left:-2.1rem;top:8px;width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);box-shadow:0 0 8px rgba(232,68,43,.5)}
 .t-date{font-size:.62rem;color:var(--teal);font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
 .t-role{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:-.3px;margin-bottom:.1rem}
 .t-co{font-size:.78rem;color:var(--t3);margin-bottom:.6rem}
@@ -171,13 +208,13 @@ section{padding:7.5rem 0}
 .edu-year{font-size:.58rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.35rem;font-family:'JetBrains Mono',monospace}
 .edu-deg{font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;margin-bottom:.15rem}
 .edu-sch{font-size:.78rem;color:var(--t3);margin-bottom:.5rem}
-.gpa{display:inline-block;padding:.18rem .6rem;background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.2);border-radius:4px;font-size:.68rem;color:var(--teal);font-weight:700;font-family:'JetBrains Mono',monospace}
+.gpa{display:inline-block;padding:.18rem .6rem;background:rgba(232,68,43,.1);border:1px solid rgba(232,68,43,.2);border-radius:4px;font-size:.68rem;color:var(--teal);font-weight:700;font-family:'JetBrains Mono',monospace}
 
 /* RESEARCH */
-.r-card{background:var(--card);border:1px solid rgba(245,158,11,.18);border-radius:12px;padding:2.25rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;transition:all .25s;position:relative;overflow:hidden}
-.r-card::after{content:'PUBLISHED';position:absolute;top:16px;right:-28px;background:rgba(245,158,11,.12);color:var(--amber);font-size:.55rem;font-weight:800;letter-spacing:.2em;padding:.25rem 2.5rem;transform:rotate(45deg);border-top:1px solid rgba(245,158,11,.2);border-bottom:1px solid rgba(245,158,11,.2)}
-.r-card:hover{border-color:rgba(245,158,11,.35);box-shadow:0 0 25px rgba(245,158,11,.07)}
-.r-badge{display:inline-block;padding:.25rem .7rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.22);border-radius:4px;font-size:.6rem;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.7rem;font-family:'JetBrains Mono',monospace}
+.r-card{background:var(--card);border:1px solid rgba(255,158,90,.18);border-radius:12px;padding:2.25rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;transition:all .25s;position:relative;overflow:hidden}
+.r-card::after{content:'PUBLISHED';position:absolute;top:16px;right:-28px;background:rgba(255,158,90,.12);color:var(--amber);font-size:.55rem;font-weight:800;letter-spacing:.2em;padding:.25rem 2.5rem;transform:rotate(45deg);border-top:1px solid rgba(255,158,90,.2);border-bottom:1px solid rgba(255,158,90,.2)}
+.r-card:hover{border-color:rgba(255,158,90,.35);box-shadow:0 0 25px rgba(255,158,90,.07)}
+.r-badge{display:inline-block;padding:.25rem .7rem;background:rgba(255,158,90,.1);border:1px solid rgba(255,158,90,.22);border-radius:4px;font-size:.6rem;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.7rem;font-family:'JetBrains Mono',monospace}
 .r-title{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:-.4px;margin-bottom:.35rem}
 .r-venue{font-size:.75rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
 .r-stats{display:flex;flex-direction:column;gap:.9rem;align-items:center}
@@ -189,7 +226,7 @@ section{padding:7.5rem 0}
 #contact{background:transparent}
 .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
 .c-heading{font-family:'Sora',sans-serif;font-size:clamp(2rem,4vw,2.8rem);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:1rem}
-.c-heading em{color:var(--teal);font-style:normal}
+.c-heading em{font-family:var(--serif);color:var(--red);font-style:italic;font-weight:600;letter-spacing:-1px}
 .c-sub{color:var(--t3);font-size:.88rem;line-height:1.75;margin-bottom:1.75rem}
 .c-links{display:flex;flex-direction:column;gap:.6rem}
 .c-link{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.1rem;background:var(--card);border:1px solid var(--b);border-radius:8px;text-decoration:none;color:var(--t2);font-size:.84rem;transition:all .2s}
@@ -203,8 +240,8 @@ section{padding:7.5rem 0}
 .av-row:last-child{border-bottom:none}
 .av-lbl{color:var(--t3)}
 .badge{padding:.16rem .55rem;border-radius:3px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.badge.open{background:rgba(16,185,129,.1);color:var(--emerald);border:1px solid rgba(16,185,129,.18)}
-.badge.con{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.18)}
+.badge.open{background:rgba(255,111,89,.1);color:var(--emerald);border:1px solid rgba(255,111,89,.18)}
+.badge.con{background:rgba(255,158,90,.1);color:var(--amber);border:1px solid rgba(255,158,90,.18)}
 
 /* FOOTER */
 footer{padding:3.5rem 0 1.5rem;border-top:1px solid var(--b)}
@@ -306,12 +343,13 @@ body.insp-lock{overflow:hidden}
 
 <!-- HERO — SPLIT -->
 <section id="home">
+  <div class="hero-glow"></div>
   <div class="noise"></div>
   <div class="grid-lines"></div>
 
   <div class="hero-left">
-    <div class="hero-tag u"><div class="dot"></div>Open to Internships & Graduate Roles · Melbourne</div>
-    <h1 class="u u1">Gaurav<span>Warke.</span></h1>
+    <div class="hero-tag u"><div class="dot"></div>AI-Driven Analyst · Open to Graduate Roles · Melbourne</div>
+    <h1 class="u u1">Gaurav Warke<em>the analyst who codes.</em></h1>
     <p class="hero-role u u2">AI-Driven Data &amp; Business Analyst · BI · Supply Chain · FinTech &amp; Product</p>
     <p class="tw-line u u3"><span id="tw"></span><span class="cur"></span></p>
     <div class="hero-actions u u4">
@@ -370,7 +408,7 @@ body.insp-lock{overflow:hidden}
       </div>
       <div class="about-content">
         <div class="stag">About Me</div>
-        <h2 class="stitle">Analyst who codes.<br>Engineer who advises.</h2>
+        <h2 class="stitle">Analyst who <em>codes.</em><br>Engineer who <em>advises.</em></h2>
         <p class="about-body">I'm a Computer Engineering graduate completing my <strong>Master of Business Analytics at Monash University</strong> — built at the intersection of technical depth and commercial intelligence. I translate fragmented datasets into strategic decisions that drive real revenue and operational outcomes.</p>
         <p class="about-body" style="margin-top:-.75rem">At idigitalxp, I reduced reporting cycles by 30% and lifted lead conversion by 10% — not by working harder, but by building smarter analytical systems. My engineering background means I can build the pipelines I analyse, without waiting for a data engineer to do it.</p>
         <p class="about-body" style="margin-top:-.75rem"><strong>AI is core to how I work</strong> — as an analyst I ship machine-learning models (gradient boosting, NLP text classification, time-series forecasting) that turn raw data into decisions; as a coder I build with AI copilots to design, debug, and deliver those systems faster. Every project below runs on a model I built.</p>
@@ -399,7 +437,7 @@ body.insp-lock{overflow:hidden}
 <section id="skills">
   <div class="container">
     <div class="stag">Technical Stack</div>
-    <h2 class="stitle">Skills & Technologies</h2>
+    <h2 class="stitle">Skills & <em>Technologies</em></h2>
     <p class="ssub">The languages, tools, data stacks, and AI/ML models I actually build with — grouped by how I use them, not by buzzword.</p>
     <div class="skill-grid">
       <div class="sk span2">
@@ -442,86 +480,40 @@ body.insp-lock{overflow:hidden}
 <section id="projects">
   <div class="container">
     <div class="stag">Case Studies</div>
-    <h2 class="stitle">Featured Projects</h2>
-    <p class="ssub">Each project starts from a real Australian business question and solves it end-to-end — the problem, the technical architecture, and a measurable dollar outcome.</p>
-    <div class="proj-filters">
-      <button class="pf on" data-f="all">All</button>
-      <button class="pf" data-f="bi">Data & BI</button>
-      <button class="pf" data-f="sc">Supply Chain Management</button>
-      <button class="pf" data-f="ftpa">FinTech & Product Analytics</button>
-      <button class="pf" data-f="nlp">Automation with NLP</button>
-    </div>
-    <div class="proj-grid">
-
-      <div class="pc" data-c="nlp" data-id="reconciliation">
-        <div class="pc-head">
-          <div class="pc-kpi" style="color:var(--teal)">100%</div>
-          <div class="pc-kpi-label">Manual Entry Eliminated</div>
+    <h2 class="stitle">Featured <em>Projects</em></h2>
+    <p class="ssub">Each project starts from a real Australian business question and solves it end-to-end — the problem, the technical architecture, and a measurable dollar outcome. Browse the four below.</p>
+  </div>
+  <div class="container">
+    <div class="ice-wrap">
+      <div class="ice-panel">
+        <div class="ice-topbar">
+          <div class="ice-count">CASE STUDY <b id="iceCount">01</b> / 04</div>
+          <div class="ice-cats" id="iceCats"></div>
         </div>
-        <div class="pc-body">
-          <div class="pc-cat">// Automation with NLP · OCR · Finance</div>
-          <a class="live-badge" href="dashboards/reconciliation.html" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>⚡ Live Dashboard</a>
-          <h3 class="pc-title">How does an AU finance team close the books without keying every receipt by hand?</h3>
-          <p class="pc-prob">▸ Business: month-end close is bottlenecked by manual receipt entry and GST reconciliation for the BAS — slow, error-prone, and an audit liability. &nbsp;Tech: how do you auto-classify noisy OCR text to the right GL account and still catch the exceptions?</p>
-          <p class="pc-desc">Intelligent Expense-Reconciliation Engine: OCR text → TF-IDF + Logistic Regression classifies each receipt to a GL account, validates GST for the BAS, and routes low-confidence or non-compliant records to a review queue. 59% auto-posted, $91k GST surfaced, ~37.5 hrs saved per close.</p>
-          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">OCR</span><span class="pc-tag">TF-IDF NLP</span><span class="pc-tag">MongoDB</span><span class="pc-tag">GST / BAS</span><span class="pc-tag">Finance</span></div>
-          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Automation with NLP</span><span class="pc-link pc-open" style="color:var(--teal)">Open Inspector ↗</span></div>
-        </div>
-      </div>
-
-      <div class="pc" data-c="bi" data-id="mpi">
-        <div class="pc-head">
-          <div class="pc-kpi" style="color:var(--blue)">−30%</div>
-          <div class="pc-kpi-label">Reporting Cycle Time</div>
-        </div>
-        <div class="pc-body">
-          <div class="pc-cat">// Data & BI · Performance Reporting</div>
-          <a class="live-badge" href="dashboards/market.html" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>⚡ Live Dashboard</a>
-          <h3 class="pc-title">Which marketing channel do you scale, and which do you cut, before budget leaks?</h3>
-          <p class="pc-prob">▸ Business: a D2C brand's data is split across GA4, orders, and ad platforms, so spend decisions are gut-feel. &nbsp;Tech: how do you unify three fragmented sources into one weekly per-channel truth and turn it into a SCALE/CUT rule?</p>
-          <p class="pc-desc">Market-Performance Intelligence System: unifies GA4 + orders + ad spend on week × channel, computes ROAS / CAC / CVR in AUD, and recommends SCALE vs CUT with a reallocation estimate. Mirrors the reporting work I did at idigitalxp — −30% cycle time, +10% lead conversion, +20% efficiency.</p>
-          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">pandas</span><span class="pc-tag">ROAS / CAC</span><span class="pc-tag">KPI Dashboards</span></div>
-          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Data & BI</span><span class="pc-link pc-open" style="color:var(--blue)">Open Inspector ↗</span></div>
-        </div>
-      </div>
-
-      <div class="pc" data-c="sc" data-id="demand">
-        <div class="pc-head">
-          <div class="pc-kpi" style="color:var(--emerald)">Predictive</div>
-          <div class="pc-kpi-label">vs Reactive Operations</div>
-        </div>
-        <div class="pc-body">
-          <div class="pc-cat">// Supply Chain Management · Forecasting</div>
-          <a class="live-badge" href="dashboards/demand.html" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>⚡ Live Dashboard</a>
-          <h3 class="pc-title">How many units of each SKU do you order — and when — to dodge both stockouts and dead stock?</h3>
-          <p class="pc-prob">▸ Business: an AU distributor faces lost sales on stockouts and tied-up capital on overstock ahead of the summer peak. &nbsp;Tech: how do you forecast per-SKU demand with confidence and convert it into a reorder trigger that respects supplier lead time?</p>
-          <p class="pc-desc">Demand-Variability & Supply-Risk Forecasting: Holt-Winters (with EWMA fallback) forecasts each SKU, then safety stock = z·σ·√lead_time sets reorder points and a costed AUD purchase-order plan. Flagged 3 of 6 SKUs for reorder and sized a $63k PO plan.</p>
-          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">Holt-Winters</span><span class="pc-tag">Time Series</span><span class="pc-tag">Inventory Math</span></div>
-          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">Supply Chain Management</span><span class="pc-link pc-open" style="color:var(--emerald)">Open Inspector ↗</span></div>
-        </div>
-      </div>
-
-      <div class="pc wide" data-c="ftpa" data-id="churn">
-        <div class="pc-head" style="display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:center">
-          <div><div class="pc-kpi" style="color:var(--rose)">30d</div><div class="pc-kpi-label">Early Churn Warning</div></div>
-          <div style="height:1px;background:rgba(255,255,255,.06)"></div>
-          <div style="display:flex;gap:1.5rem;text-align:center">
-            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--amber)">RFM</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Feature Eng.</div></div>
-            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--blue)">XGB</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Model</div></div>
-            <div><div style="font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;color:var(--teal)">BI</div><div style="font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.08em">Dashboard</div></div>
+        <div class="ice-stage" id="iceStage">
+          <div class="ice-kpi"><b id="iceKpi"></b><span id="iceKpiLbl"></span></div>
+          <div class="ice-bigtype">
+            <span class="ice-out" id="iceWord1"></span>
+            <span class="ice-sol" id="iceWord2"></span>
           </div>
         </div>
-        <div class="pc-body">
-          <div class="pc-cat" style="color:var(--rose)">// FinTech · Product Analytics · Predictive ML</div>
-          <a class="live-badge" href="dashboards/churn.html" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>⚡ Live Dashboard</a>
-          <h3 class="pc-title">Which customers will churn, how much revenue (AUD) is at risk, and is it worth saving them?</h3>
-          <p class="pc-prob">▸ Business: an AU B2B payments SaaS loses revenue to preventable churn and finds out too late, burning CAC with no recovery. &nbsp;Tech: how do you rank accounts by dollar-weighted risk and tune the model to the false-positive cost the business actually pays?</p>
-          <p class="pc-desc">Customer Churn & Revenue-Risk Platform: XGBoost + Logistic Regression ensemble scores each merchant, ranks a revenue-at-risk register (ARR = MRR × 12 × churn probability), and PR-threshold tuning minimises wasted outreach. Verified: $3.37M ARR at risk, 14.8x retention ROI. Now a live interactive dashboard.</p>
-          <div class="pc-tags"><span class="pc-tag">Python</span><span class="pc-tag">XGBoost</span><span class="pc-tag">SQL</span><span class="pc-tag">Power BI</span><span class="pc-tag">Feature Engineering</span><span class="pc-tag">Churn Modelling</span><span class="pc-tag">FinTech</span></div>
-          <div class="pc-foot"><span style="font-size:.72rem;color:var(--t3)">FinTech · Product Analytics · Predictive ML</span><span class="pc-link pc-open" style="color:var(--rose)">Open Inspector ↗</span></div>
+        <div class="ice-bottom">
+          <div class="ice-dots">
+            <button class="ice-arrow" id="icePrev" aria-label="Previous project">←</button>
+            <span class="ice-idx" id="iceIdx">01</span>
+            <div class="ice-dotrow" id="iceDotRow"></div>
+            <button class="ice-arrow" id="iceNext" aria-label="Next project">→</button>
+          </div>
+          <div class="ice-info">
+            <div class="ice-label" id="iceLabel"></div>
+            <p class="ice-desc" id="iceDesc"></p>
+          </div>
+          <div class="ice-actions">
+            <span class="ice-view" id="iceInspect">View case study<span class="arrow"></span></span>
+            <a class="ice-dashlink" id="iceDash" href="#" target="_blank"><span class="ld"></span>Live dashboard ↗</a>
+          </div>
         </div>
       </div>
-
     </div>
     <a href="https://github.com/GauravWarke" target="_blank" class="view-gh">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -541,9 +533,9 @@ body.insp-lock{overflow:hidden}
         <h2 class="c-heading">Let's build<br>something <em>together.</em></h2>
         <p class="c-sub">Open to internships, part-time, and graduate roles across AI/ML Analytics, Data & BI, Supply Chain Management, FinTech & Product Analytics, and Automation with NLP in Melbourne.</p>
         <div class="c-links">
-          <a href="mailto:gauravwarke8@gmail.com" class="c-link"><div class="c-ico" style="background:rgba(13,148,136,.1)">📧</div>gauravwarke8@gmail.com</a>
-          <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="c-link"><div class="c-ico" style="background:rgba(59,130,246,.1)">💼</div>linkedin.com/in/gaurav-warke</a>
-          <a href="tel:0420908450" class="c-link"><div class="c-ico" style="background:rgba(16,185,129,.1)">📱</div>0420 908 450</a>
+          <a href="mailto:gauravwarke8@gmail.com" class="c-link"><div class="c-ico" style="background:rgba(232,68,43,.1)">📧</div>gauravwarke8@gmail.com</a>
+          <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="c-link"><div class="c-ico" style="background:rgba(255,122,77,.1)">💼</div>linkedin.com/in/gaurav-warke</a>
+          <a href="tel:0420908450" class="c-link"><div class="c-ico" style="background:rgba(255,111,89,.1)">📱</div>0420 908 450</a>
           <a href="https://github.com/GauravWarke" target="_blank" class="c-link"><div class="c-ico" style="background:rgba(255,255,255,.05)">⌨</div>github.com/GauravWarke</a>
         </div>
       </div>
@@ -652,7 +644,7 @@ body.insp-lock{overflow:hidden}
 <script>
 // SECTION ORDER — lead with Projects (Hero → Projects → About → Skills → Experience → Research → Contact)
 (function(){
-  var order=['home','projects','about','skills','contact'];
+  var order=['home','about','projects','skills','contact'];
   var footer=document.querySelector('footer'); if(!footer) return;
   var parent=footer.parentNode;
   document.querySelectorAll('.divider').forEach(function(d){d.remove();});
@@ -679,17 +671,54 @@ function tw(){
 }
 tw();
 
-// FILTERS
-document.querySelectorAll('.pf').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.pf').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');
-    const f=b.dataset.f;
-    document.querySelectorAll('.pc').forEach(c=>{
-      c.classList.toggle('hidden',f!=='all'&&c.dataset.c.split(' ').indexOf(f)===-1);
-    });
+// PROJECTS — Iceland-style glass carousel
+const PROJECTS=[
+  {id:'churn',w1:'CHURN',w2:'RISK',chip:'FinTech',label:'FinTech · Product Analytics · Predictive ML',kpi:'$3.37M',kpiLbl:'ARR at risk · 14.8× ROI',
+   desc:'XGBoost + Logistic-Regression ensemble scores each merchant and ranks a revenue-at-risk register; PR-threshold tuning minimises wasted outreach.',dash:'dashboards/churn.html'},
+  {id:'mpi',w1:'MARKET',w2:'INTEL',chip:'Data & BI',label:'Data & BI · Performance Reporting',kpi:'−30%',kpiLbl:'Reporting cycle time',
+   desc:'Unifies GA4 + orders + ad spend on week × channel, computes ROAS / CAC / CVR in AUD, and recommends SCALE vs CUT with a reallocation estimate.',dash:'dashboards/market.html'},
+  {id:'demand',w1:'DEMAND',w2:'FORECAST',chip:'Supply Chain',label:'Supply Chain Management · Forecasting',kpi:'$63k',kpiLbl:'PO plan · 3 / 6 reorder',
+   desc:'Holt-Winters (with EWMA fallback) forecasts each SKU, then safety stock = z·σ·√lead-time sets reorder points and a costed AUD purchase-order plan.',dash:'dashboards/demand.html'},
+  {id:'reconciliation',w1:'EXPENSE',w2:'ENGINE',chip:'NLP',label:'Automation with NLP · OCR · Finance',kpi:'$91k',kpiLbl:'GST surfaced · 59% auto-posted',
+   desc:'OCR text → TF-IDF + Logistic Regression classifies each receipt to a GL account, validates GST for the BAS, and routes exceptions to a review queue.',dash:'dashboards/reconciliation.html'}
+];
+(function(){
+  var stage=document.getElementById('iceStage'), cur=0, N=PROJECTS.length;
+  var $=function(id){return document.getElementById(id);};
+  // build category chips + dots once
+  $('iceCats').innerHTML=PROJECTS.map((p,i)=>'<span class="ice-chip" data-i="'+i+'">'+p.chip+'</span>').join('');
+  $('iceDotRow').innerHTML=PROJECTS.map((p,i)=>'<span class="ice-dot" data-i="'+i+'"></span>').join('');
+  function pad(n){return ('0'+n).slice(-2);}
+  function render(animate){
+    var p=PROJECTS[cur];
+    $('iceCount').textContent=pad(cur+1);
+    $('iceIdx').textContent=pad(cur+1);
+    $('iceWord1').textContent=p.w1;
+    $('iceWord2').innerHTML=p.w2+'<span class="amp">.</span>';
+    $('iceKpi').textContent=p.kpi;
+    $('iceKpiLbl').textContent=p.kpiLbl;
+    $('iceLabel').textContent=p.label;
+    $('iceDesc').textContent=p.desc;
+    $('iceDash').href=p.dash;
+    document.querySelectorAll('.ice-chip').forEach(function(c){c.classList.toggle('on',+c.dataset.i===cur);});
+    document.querySelectorAll('.ice-dot').forEach(function(d){d.classList.toggle('on',+d.dataset.i===cur);});
+    if(animate!==false){stage.classList.remove('ice-fade');void stage.offsetWidth;stage.classList.add('ice-fade');}
+  }
+  function go(i){cur=(i+N)%N;render();}
+  $('icePrev').addEventListener('click',function(){go(cur-1);});
+  $('iceNext').addEventListener('click',function(){go(cur+1);});
+  document.querySelectorAll('.ice-chip,.ice-dot').forEach(function(el){el.addEventListener('click',function(){go(+el.dataset.i);});});
+  $('iceInspect').addEventListener('click',function(){openCase(PROJECTS[cur].id);});
+  // keyboard arrows when the showcase is in view
+  document.addEventListener('keydown',function(e){
+    if(document.getElementById('insp').classList.contains('show'))return;
+    var r=document.getElementById('projects').getBoundingClientRect();
+    if(r.top<window.innerHeight*0.6&&r.bottom>window.innerHeight*0.4){
+      if(e.key==='ArrowLeft')go(cur-1); else if(e.key==='ArrowRight')go(cur+1);
+    }
   });
-});
+  render(false);
+})();
 
 // CASE STUDY INSPECTOR — Triple-M data
 const CASES={
@@ -899,7 +928,7 @@ bars.forEach(b=>bio.observe(b));
   // points (nodes)
   var pGeo=new THREE.BufferGeometry();
   pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  var points=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x14B8A6,size:3.0,transparent:true,opacity:0.8,sizeAttenuation:true}));
+  var points=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0xE8442B,size:3.0,transparent:true,opacity:0.8,sizeAttenuation:true}));
   group.add(points);
 
   // connecting lines (rebuilt each frame for nearby nodes)
@@ -907,7 +936,7 @@ bars.forEach(b=>bio.observe(b));
   var linePos=new Float32Array(MAXSEG*2*3);
   var lGeo=new THREE.BufferGeometry();
   lGeo.setAttribute('position',new THREE.BufferAttribute(linePos,3));
-  var lines=new THREE.LineSegments(lGeo,new THREE.LineBasicMaterial({color:0x0D9488,transparent:true,opacity:0.20}));
+  var lines=new THREE.LineSegments(lGeo,new THREE.LineBasicMaterial({color:0x9E2A18,transparent:true,opacity:0.22}));
   group.add(lines);
 
   // ---- fluid morphing blob: an organic liquid shape behind the network ----
@@ -922,7 +951,7 @@ bars.forEach(b=>bio.observe(b));
     var l0=Math.sqrt(bx0*bx0+by0*by0+bz0*bz0)||1;
     blobLen[bi]=l0; blobN[o3]=bx0/l0; blobN[o3+1]=by0/l0; blobN[o3+2]=bz0/l0;
   }
-  var blob=new THREE.Mesh(blobGeo,new THREE.MeshBasicMaterial({color:0x0D9488,wireframe:true,transparent:true,opacity:0.13}));
+  var blob=new THREE.Mesh(blobGeo,new THREE.MeshBasicMaterial({color:0x9E2A18,wireframe:true,transparent:true,opacity:0.14}));
   blobGroup.add(blob);
   var tBlob=0;
   function morphBlob(t){                                           // displace each vertex along its (precomputed) normal by layered sine "noise"
@@ -938,13 +967,13 @@ bars.forEach(b=>bio.observe(b));
 
   // ---- per-section domain themes: the network recolours + changes energy as you scroll ----
   var THEMES={
-    home:      {c:0x14B8A6,l:0x0D9488,spin:0.0012,shape:'cloud'},   // teal  · free data-network
-    projects:  {c:0x14B8A6,l:0x0D9488,spin:0.0013,shape:'sphere'},  // teal  · orbital case studies
-    about:     {c:0x3B82F6,l:0x2563EB,spin:0.0009,shape:'cloud'},   // blue  · identity / calm
-    skills:    {c:0xF59E0B,l:0xB45309,spin:0.0017,shape:'grid'},    // amber · BI lattice
-    experience:{c:0x10B981,l:0x059669,spin:0.0010,shape:'helix'},   // green · growth / timeline
-    research:  {c:0xF59E0B,l:0xB45309,spin:0.0011,shape:'sphere'},  // amber · publications
-    contact:   {c:0x2DD4BF,l:0x0D9488,spin:0.0012,shape:'cloud'}    // teal  · invite
+    home:      {c:0xE8442B,l:0x9E2A18,spin:0.0012,shape:'cloud'},   // red    · free data-network
+    projects:  {c:0xFF5A3C,l:0xB0301C,spin:0.0013,shape:'sphere'},  // red-orange · orbital case studies
+    about:     {c:0xFF7A4D,l:0xC24A28,spin:0.0009,shape:'cloud'},   // warm orange · identity
+    skills:    {c:0xFF9E5A,l:0xC26A28,spin:0.0017,shape:'grid'},    // amber-orange · BI lattice
+    experience:{c:0xFF6F59,l:0xB0301C,spin:0.0010,shape:'helix'},   // coral · timeline
+    research:  {c:0xFF9E5A,l:0xC26A28,spin:0.0011,shape:'sphere'},  // amber-orange · publications
+    contact:   {c:0xFF5A3C,l:0x9E2A18,spin:0.0012,shape:'cloud'}    // red-orange · invite
   };
 
   // ---- domain shape generators: node target positions per motif ----
@@ -978,8 +1007,8 @@ bars.forEach(b=>bio.observe(b));
   }
   var SHAPES={cloud:null,sphere:shapeTargets('sphere'),grid:shapeTargets('grid'),helix:shapeTargets('helix')};
   var targetShape=null;
-  var curC=new THREE.Color(0x14B8A6), tgtC=new THREE.Color(0x14B8A6);
-  var curL=new THREE.Color(0x0D9488), tgtL=new THREE.Color(0x0D9488);
+  var curC=new THREE.Color(0xE8442B), tgtC=new THREE.Color(0xE8442B);
+  var curL=new THREE.Color(0x9E2A18), tgtL=new THREE.Color(0x9E2A18);
   var spin=0.0012, tgtSpin=0.0012;
   if('IntersectionObserver' in window){
     var so=new IntersectionObserver(function(es){
@@ -1103,7 +1132,7 @@ bars.forEach(b=>bio.observe(b));
 /* command palette */
 #cmdk{position:fixed;inset:0;z-index:1100;display:flex;align-items:flex-start;justify-content:center}
 #cmdk[hidden]{display:none}
-.cmdk-backdrop{position:absolute;inset:0;background:rgba(4,8,16,.6);backdrop-filter:blur(6px);animation:cmdkFade .18s ease}
+.cmdk-backdrop{position:absolute;inset:0;background:rgba(10,6,5,.6);backdrop-filter:blur(6px);animation:cmdkFade .18s ease}
 .cmdk-panel{position:relative;margin-top:12vh;width:min(600px,92vw);background:#0e1424;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;animation:cmdkPop .2s cubic-bezier(.2,.7,.3,1)}
 @keyframes cmdkFade{from{opacity:0}to{opacity:1}}
 @keyframes cmdkPop{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}
