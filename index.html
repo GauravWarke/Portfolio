@@ -24,16 +24,33 @@ html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--bg);color:var(--t1);line-height:1.6;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--teal);border-radius:2px}
 
-/* NAV — floating pill row (Hotle reference) */
-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;width:min(1180px,calc(100% - 28px));padding:.4rem;display:flex;justify-content:space-between;align-items:center;transition:background .3s,border-color .3s;background:transparent}
-nav.scrolled{background:rgba(247,246,242,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:100px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
-.logo{font-family:var(--sans);font-size:1.1rem;font-weight:800;color:var(--t1);letter-spacing:-.5px;padding-left:.6rem}
+/* NAV — logo + left dropdown menu button; CTA on the right */
+nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;width:min(1180px,calc(100% - 28px));padding:.4rem .5rem;display:flex;justify-content:space-between;align-items:center;transition:background .3s,border-color .3s;background:transparent}
+nav.scrolled,nav.menu-open{background:rgba(247,246,242,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.nav-left{display:flex;align-items:center;gap:.9rem}
+.logo{font-family:var(--sans);font-size:1.1rem;font-weight:800;color:var(--t1);letter-spacing:-.5px}
 .logo em{color:var(--t1);font-style:normal}
-.nav-links{display:flex;gap:.35rem;list-style:none;align-items:center}
-.nav-links>li>a:not(.nav-cta){color:var(--t1);text-decoration:none;font-size:.82rem;font-weight:500;transition:all .2s;letter-spacing:.01em;padding:.5rem 1.05rem;border:1px solid var(--b);border-radius:100px;display:inline-block;background:rgba(251,250,247,.6)}
-.nav-links>li>a:not(.nav-cta):hover{background:var(--t1);color:var(--bg2);border-color:var(--t1)}
-.nav-cta{padding:.55rem 1.3rem;background:transparent;border:1px solid var(--t1);color:var(--t1)!important;border-radius:100px;font-size:.8rem!important;font-weight:600!important;transition:all .2s!important}
+/* hamburger */
+.menu-btn{width:46px;height:46px;border:1px solid var(--b);border-radius:50%;background:rgba(251,250,247,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.menu-btn span{width:17px;height:1.6px;background:var(--t1);border-radius:2px;transition:transform .28s,opacity .2s}
+.menu-btn:hover{background:var(--t1)}
+.menu-btn:hover span{background:var(--bg2)}
+.menu-btn.open span:nth-child(1){transform:translateY(5.6px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-5.6px) rotate(-45deg)}
+/* vertical dropdown panel, anchored left */
+.menu-panel{position:absolute;top:calc(100% + 10px);left:.5rem;min-width:270px;background:#FBFAF7;border:1px solid var(--b);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.14);padding:.6rem;display:flex;flex-direction:column;gap:.1rem;animation:menuPop .18s ease}
+.menu-panel[hidden]{display:none}
+@keyframes menuPop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.menu-panel a,.menu-search{display:flex;justify-content:space-between;align-items:center;font-family:var(--sans);font-size:1.35rem;font-weight:700;letter-spacing:-.5px;color:var(--t1);text-decoration:none;padding:.7rem .95rem;border-radius:12px;transition:background .18s,padding .18s;background:none;border:none;cursor:pointer;text-align:left;width:100%}
+.menu-panel a:hover{background:var(--bg1);padding-left:1.3rem}
+.menu-panel a .mi-n{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:500;color:var(--t3)}
+.menu-search{font-size:.86rem;font-weight:600;color:var(--t2);border-top:1px solid var(--b);margin-top:.35rem;border-radius:0;padding-top:1rem}
+.menu-search:hover{color:var(--t1)}
+.menu-search kbd{font-family:'JetBrains Mono',monospace;font-size:.7rem;border:1px solid var(--b);border-radius:6px;padding:.15rem .45rem;color:var(--t2)}
+.nav-cta{padding:.6rem 1.4rem;background:transparent;border:1px solid var(--t1);color:var(--t1)!important;border-radius:100px;font-size:.82rem!important;font-weight:600!important;transition:all .2s!important}
 .nav-cta:hover{background:var(--t1);color:var(--bg2)!important}
+@media(max-width:440px){.nav-cta{display:none}}
 
 /* HERO — CENTERED LAYOUT */
 #home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 2rem 4rem;position:relative;overflow:hidden;gap:2.5rem}
@@ -56,19 +73,32 @@ section,footer,.divider{position:relative;z-index:1}
 .hl.right{text-align:right}
 .hero-big{font-family:var(--sans);font-weight:800;font-size:clamp(3.2rem,13vw,11rem);line-height:.86;letter-spacing:-.055em;color:var(--t1);position:relative;z-index:2;white-space:nowrap;margin:.1rem 0 -.05em}
 .hero-big .serif{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:-.02em}
-.hero-visual{position:relative;z-index:1;border-radius:16px;overflow:hidden;background:#16150F;aspect-ratio:16/7.2;min-height:330px;box-shadow:0 30px 80px rgba(0,0,0,.16)}
-.hero-visual svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-.hv-tag{position:absolute;left:1.5rem;top:1.4rem;color:rgba(255,255,255,.55);font-size:.72rem;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;z-index:2}
-.hv-pills{position:absolute;left:1.5rem;bottom:1.4rem;display:flex;gap:.5rem;flex-wrap:wrap;z-index:2}
+.hero-visual{position:relative;z-index:1;border-radius:16px;overflow:hidden;background:#16150F;min-height:370px;box-shadow:0 30px 80px rgba(0,0,0,.16);display:flex;flex-direction:column;padding:1.5rem 1.7rem}
+.hv-tag{color:rgba(255,255,255,.5);font-size:.72rem;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+.hv-body{flex:1;display:flex;align-items:center;justify-content:space-between;gap:2.5rem;padding:1.4rem 0}
+.hv-text{max-width:56%}
+.hv-headline{font-family:var(--sans);font-weight:700;font-size:clamp(1.15rem,2.3vw,1.95rem);line-height:1.22;letter-spacing:-.6px;color:#F7F1EF;margin-bottom:1.3rem;transition:opacity .25s}
+.hv-metric{display:flex;align-items:baseline;gap:.7rem;margin-bottom:1.4rem}
+.hv-metric b{font-family:var(--sans);font-weight:800;font-size:clamp(2.1rem,4vw,3.3rem);letter-spacing:-1.5px;color:#fff;line-height:1}
+.hv-metric span{font-size:.8rem;color:rgba(255,255,255,.6);max-width:15ch;line-height:1.35}
+.hv-more{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.2rem;transition:border-color .2s}
+.hv-more:hover{border-color:#fff}
+.hv-viz{flex-shrink:0;width:clamp(120px,17vw,180px)}
+.hv-viz svg{width:100%;height:auto;display:block}
+.hv-foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.hv-pills{display:flex;gap:.5rem;flex-wrap:wrap}
 .hv-pill{padding:.42rem 1rem;border:1px solid rgba(255,255,255,.28);border-radius:100px;background:transparent;color:rgba(255,255,255,.85);font-size:.74rem;font-family:var(--sans);font-weight:500;cursor:pointer;transition:all .2s}
 .hv-pill:hover{border-color:#fff;color:#fff}
 .hv-pill.on{background:#FBFAF7;color:#16150F;border-color:#FBFAF7;font-weight:600}
-.hv-loc{position:absolute;right:1.5rem;bottom:1.6rem;color:rgba(255,255,255,.7);font-size:.8rem;font-family:var(--sans);z-index:2}
+.hv-loc{color:rgba(255,255,255,.7);font-size:.8rem;font-family:var(--sans)}
 @media(max-width:820px){
   .hero-big{font-size:clamp(2.6rem,13vw,6rem);white-space:normal;line-height:.92}
   .hero-labels{grid-template-columns:1fr;gap:.25rem;margin-bottom:.8rem}
   .hl.mid,.hl.right{text-align:left}
-  .hero-visual{aspect-ratio:auto;min-height:280px}
+  .hero-visual{min-height:0}
+  .hv-body{flex-direction:column;align-items:flex-start;gap:1.4rem}
+  .hv-text{max-width:100%}
+  .hv-viz{width:130px}
   .hv-pill{padding:.36rem .8rem;font-size:.68rem}
 }
 
@@ -133,11 +163,12 @@ section{padding:7.5rem 0}
 .af-body strong{color:var(--t1);font-weight:700}
 .af-btn{display:inline-block;padding:.72rem 1.5rem;border:1px solid var(--t1);border-radius:100px;color:var(--t1);text-decoration:none;font-size:.82rem;font-weight:600;transition:all .2s}
 .af-btn:hover{background:var(--t1);color:var(--bg2)}
-.af-right .photo-box{aspect-ratio:4/3;max-width:none}
+.af-right .photo-box{aspect-ratio:4/5;max-width:none}
+.af-right .photo-box img{object-position:50% 22%}
 .af-right .initials{font-size:3.2rem}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;padding:2.5rem 0;border-top:1px solid var(--b);border-bottom:1px solid var(--b);margin-bottom:5rem}
-.stat b{display:block;font-family:var(--sans);font-weight:800;font-size:clamp(2.2rem,4.2vw,3.4rem);letter-spacing:-2px;line-height:1;color:var(--t1)}
-.stat span{font-size:.8rem;color:var(--t3);margin-top:.4rem;display:block;max-width:20ch}
+.stat b{display:block;font-family:var(--sans);font-weight:800;font-size:clamp(1.5rem,2.6vw,2.05rem);letter-spacing:-1px;line-height:1.05;color:var(--t1)}
+.stat span{font-size:.82rem;color:var(--t3);margin-top:.55rem;display:block;max-width:24ch;line-height:1.45}
 .x-band{margin-top:1rem}
 .x-title{font-family:var(--sans);font-weight:800;font-size:clamp(2.6rem,7.5vw,5.8rem);letter-spacing:-3px;line-height:1;margin-bottom:1.6rem}
 .x-title em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0}
@@ -371,19 +402,23 @@ body.insp-lock{overflow:hidden}
 </head>
 <body>
 
-<!-- NAV -->
+<!-- NAV — left dropdown menu -->
 <nav id="nav">
-  <div class="logo">Gaurav<em>.</em></div>
-  <ul class="nav-links">
-    <li><a href="#projects">Works</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="mailto:gauravwarke8@gmail.com" class="nav-cta">Let's work together</a></li>
-  </ul>
+  <div class="nav-left">
+    <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div class="logo">Gaurav<em>.</em></div>
+  </div>
+  <a href="mailto:gauravwarke8@gmail.com" class="nav-cta">Let's work together</a>
+  <div id="menuPanel" class="menu-panel" hidden>
+    <a href="#projects"><span class="mi-label">Works</span><span class="mi-n">01</span></a>
+    <a href="#skills"><span class="mi-label">Skills</span><span class="mi-n">02</span></a>
+    <a href="#about"><span class="mi-label">About</span><span class="mi-n">03</span></a>
+    <a href="#contact"><span class="mi-label">Contact</span><span class="mi-n">04</span></a>
+    <button type="button" class="menu-search" id="menuSearch">Search everything <kbd>⌘K</kbd></button>
+  </div>
 </nav>
 
-<!-- HERO — editorial giant display over a data-viz band -->
+<!-- HERO — editorial giant display + interactive plain-English project summary -->
 <section id="home">
   <div class="hero-inner">
     <div class="hero-labels">
@@ -393,36 +428,24 @@ body.insp-lock{overflow:hidden}
     </div>
     <h1 class="hero-big">Gaurav <span class="serif">Warke</span></h1>
     <div class="hero-visual">
-      <svg viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs>
-          <linearGradient id="hvFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
-            <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <g stroke="#ffffff" stroke-opacity="0.07">
-          <line x1="0" y1="150" x2="1200" y2="150"/><line x1="0" y1="230" x2="1200" y2="230"/>
-          <line x1="0" y1="310" x2="1200" y2="310"/><line x1="0" y1="390" x2="1200" y2="390"/>
-        </g>
-        <path d="M0 360 L140 322 L260 342 L380 282 L520 300 L640 232 L780 252 L920 182 L1060 208 L1200 150 L1200 430 L0 430 Z" fill="url(#hvFill)"/>
-        <path d="M0 360 L140 322 L260 342 L380 282 L520 300 L640 232 L780 252 L920 182 L1060 208 L1200 150" fill="none" stroke="#F7F1EF" stroke-width="2.5"/>
-        <path d="M920 182 L1010 168 L1120 132 L1200 108" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2.5" stroke-dasharray="6 5"/>
-        <g fill="#F7F1EF">
-          <circle cx="380" cy="282" r="4.5"/><circle cx="640" cy="232" r="4.5"/><circle cx="920" cy="182" r="6"/><circle cx="1200" cy="150" r="4.5"/>
-        </g>
-        <g font-family="'JetBrains Mono',monospace" fill="#ffffff" fill-opacity="0.75" font-size="15">
-          <text x="655" y="220">$3.37M at&#8209;risk</text>
-          <text x="150" y="312">&#8722;30% cycle time</text>
-        </g>
-      </svg>
-      <div class="hv-tag">// what i build · click a domain</div>
-      <div class="hv-pills">
-        <button class="hv-pill" data-id="mpi" type="button">Data &amp; BI</button>
-        <button class="hv-pill" data-id="demand" type="button">Supply Chain</button>
-        <button class="hv-pill on" data-id="churn" type="button">FinTech &amp; Product</button>
-        <button class="hv-pill" data-id="reconciliation" type="button">Automation · NLP</button>
+      <div class="hv-tag">// what i build · pick a domain</div>
+      <div class="hv-body">
+        <div class="hv-text">
+          <p class="hv-headline" id="hvHeadline"></p>
+          <div class="hv-metric"><b id="hvNum"></b><span id="hvNumLbl"></span></div>
+          <a class="hv-more" id="hvMore" href="#" onclick="event.preventDefault()">See the full story →</a>
+        </div>
+        <div class="hv-viz" id="hvViz"></div>
       </div>
-      <div class="hv-loc">Melbourne, AU</div>
+      <div class="hv-foot">
+        <div class="hv-pills">
+          <button class="hv-pill" data-id="mpi" type="button">Data &amp; BI</button>
+          <button class="hv-pill" data-id="demand" type="button">Supply Chain</button>
+          <button class="hv-pill on" data-id="churn" type="button">FinTech &amp; Product</button>
+          <button class="hv-pill" data-id="reconciliation" type="button">Automation · NLP</button>
+        </div>
+        <div class="hv-loc">Melbourne, AU</div>
+      </div>
     </div>
   </div>
 </section>
@@ -455,9 +478,9 @@ body.insp-lock{overflow:hidden}
     </div>
 
     <div class="stats-row">
-      <div class="stat"><b>30%</b><span>Faster reporting cycles — idigitalxp</span></div>
-      <div class="stat"><b>$3.37M</b><span>Revenue-at-risk modelled</span></div>
-      <div class="stat"><b>4</b><span>Analytics domains shipped end-to-end</span></div>
+      <div class="stat"><b>Python + SQL</b><span>The pipeline behind every number — built myself</span></div>
+      <div class="stat"><b>Power BI · Tableau</b><span>Dashboards non-analysts can actually read</span></div>
+      <div class="stat"><b>ML &amp; Forecasting</b><span>Models tuned to the business call, not a leaderboard</span></div>
     </div>
 
     <div class="x-band">
@@ -702,15 +725,50 @@ body.insp-lock{overflow:hidden}
   });
 })();
 
-// HERO domain pills — open the matching case study, keep one active
+// LEFT DROPDOWN MENU
 (function(){
-  var pills=document.querySelectorAll('.hv-pill');
-  pills.forEach(function(b){
-    b.addEventListener('click',function(){
-      pills.forEach(function(x){x.classList.toggle('on',x===b);});
-      if(typeof openCase==='function')openCase(b.dataset.id);
-    });
-  });
+  var btn=document.getElementById('menuBtn'),panel=document.getElementById('menuPanel'),nav=document.getElementById('nav');
+  if(!btn||!panel)return;
+  function setOpen(o){panel.hidden=!o;btn.classList.toggle('open',o);btn.setAttribute('aria-expanded',o);nav.classList.toggle('menu-open',o);}
+  btn.addEventListener('click',function(e){e.stopPropagation();setOpen(panel.hidden);});
+  panel.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){setOpen(false);});});
+  var srch=document.getElementById('menuSearch');
+  if(srch)srch.addEventListener('click',function(){setOpen(false);if(window.openCmdk)window.openCmdk();});
+  document.addEventListener('click',function(e){if(!panel.hidden&&!panel.contains(e.target)&&e.target!==btn&&!btn.contains(e.target))setOpen(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setOpen(false);});
+})();
+
+// HERO — interactive plain-English project summary (for non-technical stakeholders)
+const HERO_SUM={
+  churn:{headline:'Flags customers about to leave — 30 days early, while there’s still time to save them.',num:'$3.37M',numLbl:'revenue we can protect',pct:85,center:'14.8×',sub:'RETURN'},
+  mpi:{headline:'Shows which marketing to scale and which to cut — in plain dollars, every week.',num:'−30%',numLbl:'faster to the answer',pct:78,center:'3.1×',sub:'TOP ROAS'},
+  demand:{headline:'Says exactly what to reorder and when — no stockouts, no money stuck on shelves.',num:'$63k',numLbl:'smarter purchase plan',pct:50,center:'3/6',sub:'REORDER'},
+  reconciliation:{headline:'Reads every receipt and files it automatically — the books close in minutes, not days.',num:'$91k',numLbl:'GST found for the BAS',pct:59,center:'59%',sub:'AUTO-FILED'}
+};
+(function(){
+  var pills=document.querySelectorAll('.hv-pill'), cur='churn';
+  var $=function(id){return document.getElementById(id);};
+  function donut(pct,center,sub){
+    var R=52,C=(2*Math.PI*R).toFixed(1),off=(C*(1-pct/100)).toFixed(1);
+    return '<svg viewBox="0 0 130 130" role="img">'
+      +'<circle cx="65" cy="65" r="52" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="10"/>'
+      +'<circle cx="65" cy="65" r="52" fill="none" stroke="#F7F1EF" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'" transform="rotate(-90 65 65)"/>'
+      +'<text x="65" y="62" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="25" fill="#fff">'+center+'</text>'
+      +'<text x="65" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" letter-spacing="1.2" fill="rgba(255,255,255,.62)">'+sub+'</text>'
+      +'</svg>';
+  }
+  function render(id){
+    var d=HERO_SUM[id];if(!d)return;cur=id;
+    $('hvHeadline').textContent=d.headline;
+    $('hvNum').textContent=d.num;
+    $('hvNumLbl').textContent=d.numLbl;
+    $('hvViz').innerHTML=donut(d.pct,d.center,d.sub);
+    pills.forEach(function(x){x.classList.toggle('on',x.dataset.id===id);});
+  }
+  pills.forEach(function(b){b.addEventListener('click',function(){render(b.dataset.id);});});
+  var more=$('hvMore');
+  if(more)more.addEventListener('click',function(){if(typeof openCase==='function')openCase(cur);});
+  render('churn');
 })();
 
 // PROJECTS — Relief-Decor bento gallery (hand-built mini-visuals per case study)
