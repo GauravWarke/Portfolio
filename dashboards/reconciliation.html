@@ -476,16 +476,16 @@ function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([
   var maxGross=Math.max.apply(null,RECS.map(function(r){return r.gross;}));
   var n=RECS.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
   for(var i=0;i<n;i++){var r=RECS[i];
-    pos[i*3]  =(r.gross/maxGross-0.5)*720;                      // X = gross amount (AUD)
+    pos[i*3]  =(Math.sqrt(r.gross/maxGross)-0.5)*720;           // X = gross amount (sqrt-scaled so small receipts spread out)
     pos[i*3+1]=(r.conf-0.7)*640;                               // Y = OCR/classification confidence
     pos[i*3+2]=(r.gl/(GL.length-1)-0.5)*470+(rnd()-0.5)*32;    // Z = GL account (grouped in depth)
-    siz[i]=5+Math.sqrt(r.gross)/9;
+    siz[i]=8+Math.sqrt(r.gross)/9;
   }
   var g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
   var mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,vertexColors:true,
-    vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
-    fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.12,d);gl_FragColor=vec4(vC,a*0.95);}'});
+    vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=max(3.5,asize*(330.0/-mv.z));gl_Position=projectionMatrix*mv;}',
+    fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.16,d);gl_FragColor=vec4(vC,a);}'});
   var pts=new THREE.Points(g,mat);group.add(pts);
   // ---- plot frame: floor grid + ticked, labelled axes ----
   (function(){
@@ -496,14 +496,14 @@ function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([
     group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(HX,-HY,-HZ),0x4E79A7,.7));   // X
     group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,HY,-HZ),0x59A14F,.7));   // Y
     group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,-HY,HZ),0xB07AA1,.7));   // Z
-    [0,0.25,0.5,0.75,1].forEach(function(fp){var s=makeTextSprite('$'+Math.round(fp*maxGross),tk,24);s.position.set((fp-0.5)*720,-HY-26,-HZ);group.add(s);});
+    [0,0.25,0.5,0.75,1].forEach(function(fp){var s=makeTextSprite('$'+Math.round(fp*fp*maxGross),tk,24);s.position.set((fp-0.5)*720,-HY-26,-HZ);group.add(s);});
     [0.5,0.7,0.9].forEach(function(cf){var s=makeTextSprite(cf.toFixed(2),tk,24);s.position.set(-HX-42,(cf-0.7)*640,-HZ);group.add(s);});
     [0,3,7].forEach(function(gi){var s=makeTextSprite(GL[gi].split(' ')[0],tk,22);s.position.set(-HX-6,-HY-26,(gi/(GL.length-1)-0.5)*470);group.add(s);});
     var sx=makeTextSprite('AMOUNT (AUD)','#8FB0D4',30);sx.position.set(HX+96,-HY,-HZ);group.add(sx);
     var sy=makeTextSprite('CONFIDENCE','#7DC178',30);sy.position.set(-HX,HY+30,-HZ);group.add(sy);
     var sz=makeTextSprite('GL ACCOUNT','#C58ABF',30);sz.position.set(-HX,-HY-26,HZ+86);group.add(sz);
   })();
-  var C={ok:new THREE.Color('#59A14F'),rev:new THREE.Color('#F28E2B'),exc:new THREE.Color('#E15759')},dim=new THREE.Color('#C9D0DA');
+  var C={ok:new THREE.Color('#59A14F'),rev:new THREE.Color('#F28E2B'),exc:new THREE.Color('#E15759')},dim=new THREE.Color('#3d4757');
   var baseSiz=siz.slice();
   function recolor(){var a=g.attributes.color.array,sz=g.attributes.asize.array;for(var i=0;i<n;i++){var r=RECS[i];if(glOn[r.gl]){var c=C[route(r,curTh)];a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;sz[i]=baseSiz[i];}else{a[i*3]=dim.r;a[i*3+1]=dim.g;a[i*3+2]=dim.b;sz[i]=baseSiz[i]*0.4;}}g.attributes.color.needsUpdate=true;g.attributes.asize.needsUpdate=true;}
   window.recolorCloud=recolor;recolor();

@@ -392,8 +392,9 @@ function renderScatter(){
   sctx.fillStyle='rgba(244,63,94,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
   // axes
   sctx.strokeStyle='rgba(255,255,255,.14)';sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
-  // points
-  filtered().forEach(function(d){var rad=4+Math.sqrt(d.risk)/70;sctx.beginPath();sctx.arc(X(d.prob),Y(d.mrr),rad,0,7);sctx.fillStyle=riskColor(d.prob)+'cc';sctx.fill();});
+  // points — translucent fill + crisp ring so overlapping bubbles stay separable
+  sctx.lineWidth=1;
+  filtered().forEach(function(d){var rad=3+Math.sqrt(d.risk)/95,cc=riskColor(d.prob);sctx.beginPath();sctx.arc(X(d.prob),Y(d.mrr),rad,0,7);sctx.fillStyle=cc+'55';sctx.fill();sctx.strokeStyle=cc+'dd';sctx.stroke();});
   // flag threshold
   sctx.strokeStyle='rgba(244,63,94,.55)';sctx.setLineDash([4,4]);sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
   sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);sctx.fillText('◤ priority',W-64,16);
@@ -501,7 +502,7 @@ var buildCloud=function(){};
       pos[i*3+1]=(Math.sqrt(d.mrr/7000)-0.5)*520;     // Y = MRR (value)
       pos[i*3+2]=(d.tenure/48-0.5)*440;               // Z = account tenure (months)
       c.set(riskColor(d.prob));col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
-      siz[i]=6+Math.sqrt(d.risk)/34;
+      siz[i]=10+Math.sqrt(d.risk)/26;
     }
     var g=new THREE.BufferGeometry();
     g.setAttribute('position',new THREE.BufferAttribute(pos,3));
@@ -509,8 +510,8 @@ var buildCloud=function(){};
     g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
     var mat=new THREE.ShaderMaterial({
       transparent:true,depthWrite:false,
-      vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=asize*(300.0/-mv.z);gl_Position=projectionMatrix*mv;}',
-      fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.1,d);gl_FragColor=vec4(vC,a*0.92);}',
+      vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=max(4.0,asize*(330.0/-mv.z));gl_Position=projectionMatrix*mv;}',
+      fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.14,d);gl_FragColor=vec4(vC,a);}',
       vertexColors:true
     });
     pts=new THREE.Points(g,mat);group.add(pts);

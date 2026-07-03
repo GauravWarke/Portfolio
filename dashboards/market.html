@@ -394,7 +394,8 @@ function drawQuad(){
   if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.beginPath();cx.moveTo(pad,Y(1.5));cx.lineTo(W-6,Y(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT',W-40,Y(1.5)-3);}
   cx.setLineDash([]);
   function hexA(hex,a){var n=parseInt(hex.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
-  vis.forEach(function(k){var dat=WKD[k],col=hexA(CH[k].color,0.55);for(var i=0;i<WK;i++){var rad=4+Math.sqrt(dat.rev[i]/maxRev)*11;cx.beginPath();cx.arc(X(dat.spend[i]),Y(dat.roas[i]),rad,0,7);cx.fillStyle=col;cx.fill();}});
+  cx.lineWidth=1.1;
+  vis.forEach(function(k){var dat=WKD[k],fill=hexA(CH[k].color,0.32),edge=hexA(CH[k].color,0.95);for(var i=0;i<WK;i++){var rad=3+Math.sqrt(dat.rev[i]/maxRev)*8;cx.beginPath();cx.arc(X(dat.spend[i]),Y(dat.roas[i]),rad,0,7);cx.fillStyle=fill;cx.fill();cx.strokeStyle=edge;cx.stroke();}});
 }
 
 /* ================= 3D CHANNEL BARS (X=channel · Y=AUD · Z=spend/revenue) ================= */
