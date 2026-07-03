@@ -6,26 +6,28 @@
 <title>Churn & Revenue-Risk · Power BI-style Report | Gaurav Warke</title>
 <meta name="description" content="Power BI-style executive report — per-merchant churn risk ranked by ARR at risk (AUD), slicer pane, KPI ribbon, gauge, and a conditional-format risk matrix.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Power BI dark ("Innovate" style) chrome + rose data theme */
-  --canvas:#0B0F1A;--pane:#11162340;--card:#131826;--card2:#171D2E;--edge:#242B3D;--edgeH:#33405C;
-  --rose:#F43F5E;--rose2:#FB7185;--amber:#F59E0B;--emerald:#10B981;--blue:#3B82F6;--violet:#8B5CF6;--pbi:#F2C811;
-  --t1:#EAF0FB;--t2:#9AA6BC;--t3:#616E86;
-  --good:#22C55E;--bad:#F43F5E;
+  /* Light editorial theme (matches portfolio): warm cream + ink, muted earthy
+     semantic accents (brick=risk, ochre=watch, sage=healthy) for non-technical clarity. */
+  --canvas:#EFEDE7;--pane:#EAE7E0;--card:#FBFAF7;--card2:#F3F1EB;--edge:#E1DDD4;--edgeH:#CBC6BB;
+  --rose:#BE4A31;--rose2:#9A3A26;--amber:#B0853C;--emerald:#4E7C5A;--blue:#456187;--violet:#6E5A86;--pbi:#9A8836;
+  --t1:#141311;--t2:#57544E;--t3:#8B877F;
+  --good:#4E7C5A;--bad:#BE4A31;
+  --sans:'Archivo','Helvetica Neue',Arial,sans-serif;--serif:'Playfair Display',Georgia,serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Segoe UI','Inter',sans-serif;background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a3346;border-radius:8px}
+body{font-family:var(--sans);background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cfcabf;border-radius:8px}
 a{color:inherit}
-#bg3d{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.35}
+#bg3d{display:none}
 
 /* ---- Report chrome ---- */
-.appbar{position:sticky;top:0;z-index:60;background:linear-gradient(90deg,#0d1220,#131a2e);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:1rem;padding:.6rem 1.1rem}
+.appbar{position:sticky;top:0;z-index:60;background:linear-gradient(90deg,#f4f2ec,#eae7e0);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:1rem;padding:.6rem 1.1rem}
 .appbar .brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:.92rem;letter-spacing:-.2px}
-.pbi-badge{display:inline-flex;align-items:center;gap:.45rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--pbi);border:1px solid #4a4322;background:rgba(242,200,17,.07);border-radius:5px;padding:.28rem .6rem;text-transform:uppercase;letter-spacing:.08em}
+.pbi-badge{display:inline-flex;align-items:center;gap:.45rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--pbi);border:1px solid #d8cfa8;background:rgba(154,136,54,.07);border-radius:5px;padding:.28rem .6rem;text-transform:uppercase;letter-spacing:.08em}
 .pbi-badge svg{width:13px;height:13px}
 .appbar .sp{flex:1}
 .back{display:inline-flex;align-items:center;gap:.45rem;font-size:.78rem;color:var(--t2);text-decoration:none;transition:color .18s}
@@ -37,17 +39,17 @@ a{color:inherit}
 
 /* ---- Report shell: left slicer rail + canvas ---- */
 .report{position:relative;z-index:1;display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - 49px)}
-.rail{background:linear-gradient(180deg,#0e1322,#0c1120);border-right:1px solid var(--edge);padding:1.15rem .95rem;position:sticky;top:49px;align-self:start;height:calc(100vh - 49px);overflow-y:auto}
+.rail{background:linear-gradient(180deg,#f4f2ec,#edeae3);border-right:1px solid var(--edge);padding:1.15rem .95rem;position:sticky;top:49px;align-self:start;height:calc(100vh - 49px);overflow-y:auto}
 .rail h2{font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);font-family:'JetBrains Mono',monospace;margin:1.3rem 0 .55rem}
 .rail h2:first-child{margin-top:0}
-.report-title{font-family:'Sora',sans-serif;font-weight:800;font-size:1.02rem;letter-spacing:-.4px;line-height:1.25}
+.report-title{font-family:var(--sans);font-weight:800;font-size:1.02rem;letter-spacing:-.4px;line-height:1.25}
 .report-title span{color:var(--rose)}
 .rail-sub{font-size:.72rem;color:var(--t2);margin-top:.45rem;line-height:1.5}
 /* slicer */
 .slicer{display:flex;flex-direction:column;gap:.3rem}
 .slchk{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.42rem .6rem;border-radius:6px;font-size:.8rem;color:var(--t2);cursor:pointer;border:1px solid transparent;transition:all .15s;user-select:none}
-.slchk:hover{background:#161d2e;color:var(--t1)}
-.slchk.on{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.35);color:var(--t1)}
+.slchk:hover{background:#efede7;color:var(--t1)}
+.slchk.on{background:rgba(190,74,49,.12);border-color:rgba(190,74,49,.35);color:var(--t1)}
 .slchk .cnt{font-size:.66rem;font-family:'JetBrains Mono',monospace;color:var(--t3)}
 .slchk.on .cnt{color:var(--rose2)}
 .slbox{display:flex;align-items:center;gap:.5rem}
@@ -60,6 +62,13 @@ a{color:inherit}
 .canvas{padding:1.1rem 1.25rem 2.5rem}
 .crumb{font-size:.7rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
 .crumb b{color:var(--rose2)}
+/* plain-English takeaway banner (for non-technical stakeholders) */
+.tldr{background:var(--card);border:1px solid var(--edge);border-left:3px solid var(--rose);border-radius:9px;padding:1.1rem 1.3rem;margin-bottom:.85rem}
+.tldr-tag{font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);margin-bottom:.5rem}
+.tldr-h{font-family:var(--sans);font-size:clamp(1.05rem,1.9vw,1.45rem);font-weight:800;letter-spacing:-.5px;line-height:1.25;margin-bottom:.5rem;max-width:62ch}
+.tldr-h em{font-family:var(--serif);font-style:italic;font-weight:600}
+.tldr-p{font-size:.82rem;color:var(--t2);line-height:1.6;max-width:80ch}
+.tldr-p b{color:var(--t1);font-weight:700}
 
 /* KPI ribbon */
 .ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin-bottom:.85rem}
@@ -68,7 +77,7 @@ a{color:inherit}
 .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rose)}
 .kpi.c2::before{background:var(--amber)}.kpi.c3::before{background:var(--emerald)}.kpi.c4::before{background:var(--blue)}.kpi.c5::before{background:var(--violet)}
 .kpi-l{font-size:.62rem;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;font-weight:600;display:flex;align-items:center;gap:.35rem}
-.kpi-v{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px;line-height:1;margin:.4rem 0 .3rem}
+.kpi-v{font-family:var(--sans);font-size:1.6rem;font-weight:800;letter-spacing:-1px;line-height:1;margin:.4rem 0 .3rem}
 .kpi-d{font-size:.66rem;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.3rem}
 .kpi-d.up{color:var(--good)}.kpi-d.dn{color:var(--bad)}
 .spark{position:absolute;right:8px;bottom:8px;opacity:.5}
@@ -84,65 +93,66 @@ a{color:inherit}
 .vmore{font-size:.9rem;color:var(--t3);letter-spacing:1px}
 
 /* 3D cloud */
-#cloudWrap{position:relative;height:340px;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(244,63,94,.07),transparent 70%);cursor:grab}
+#cloudWrap{position:relative;height:340px;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(190,74,49,.20),transparent 70%),#16150F;cursor:grab}
 #cloudWrap.drag{cursor:grabbing}
 #cloud{width:100%;height:100%;display:block}
-.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
+#cloudWrap .axes-key{color:rgba(255,255,255,.72)!important;background:rgba(0,0,0,.4)!important}
+.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;pointer-events:none}
 .cloud-legend{position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:.28rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
-.lg{display:flex;align-items:center;gap:.38rem;color:var(--t2)}
+.lg{display:flex;align-items:center;gap:.38rem;color:rgba(255,255,255,.75)}
 .lg i{width:8px;height:8px;border-radius:50%;display:inline-block}
 .tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.96);border:1px solid var(--edgeH);border-radius:7px;padding:.5rem .65rem;font-size:.68rem;opacity:0;transition:opacity .12s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .tip b{color:var(--rose2)}
 
-/* scatter */
-#scatter{width:100%;height:300px;display:block}
+/* scatter — kept on a dark panel so its light-on-dark rendering stays crisp */
+#scatter{width:100%;height:300px;display:block;background:#16150F;border-radius:6px}
 .note{font-size:.68rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.55rem}
 
 /* clustered bars */
 .bars{display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem}
 .brow{display:grid;grid-template-columns:92px 1fr auto;gap:.6rem;align-items:center}
 .bname{font-size:.72rem;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.btrack{height:20px;background:rgba(255,255,255,.035);border-radius:4px;overflow:hidden;position:relative}
+.btrack{height:20px;background:rgba(20,19,17,.035);border-radius:4px;overflow:hidden;position:relative}
 .bfill{height:100%;border-radius:4px;width:0;transition:width .9s cubic-bezier(.2,.7,.3,1);background:linear-gradient(90deg,var(--rose),var(--rose2))}
 .bval{font-size:.7rem;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap}
 
 /* gauge */
 .gaugeWrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem 0 .1rem}
 #gauge{width:210px;height:130px}
-.gauge-c{font-family:'Sora',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-1px;margin-top:-.2rem}
+.gauge-c{font-family:var(--sans);font-size:1.9rem;font-weight:800;letter-spacing:-1px;margin-top:-.2rem}
 .gauge-l{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
 /* what-if params */
 .param{margin-top:.9rem}
 .param-row{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.75rem}
 .param-top{display:flex;justify-content:space-between;align-items:baseline}
 .param-lbl{font-size:.72rem;color:var(--t2)}
-.param-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--rose2);font-size:.85rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.12);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #0b0f1a;box-shadow:0 0 0 1px var(--rose)}
-input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #0b0f1a}
+.param-num{font-family:var(--sans);font-weight:700;color:var(--rose2);font-size:.85rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:rgba(20,19,17,.12);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fbfaf7;box-shadow:0 0 0 1px var(--rose)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fbfaf7}
 .param-out{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-top:.3rem}
-.po{background:rgba(244,63,94,.06);border:1px solid var(--edge);border-radius:7px;padding:.7rem;text-align:center}
-.po-v{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:800;letter-spacing:-.6px}
+.po{background:rgba(190,74,49,.06);border:1px solid var(--edge);border-radius:7px;padding:.7rem;text-align:center}
+.po-v{font-family:var(--sans);font-size:1.3rem;font-weight:800;letter-spacing:-.6px}
 .po-l{font-size:.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem;font-family:'JetBrains Mono',monospace}
 
 /* matrix */
 .mtx-scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.76rem}
-th{text-align:left;font-family:'Segoe UI',sans-serif;font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);font-weight:700;padding:.5rem .7rem;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap;background:#0f1524}
+th{text-align:left;font-family:var(--sans);font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);font-weight:700;padding:.5rem .7rem;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap;background:#f3f1eb}
 th:hover{color:var(--rose2)}
 th.num,td.num{text-align:right}
 th.sorted::after{content:' ▾';color:var(--rose2)}
 th.sorted.asc::after{content:' ▴'}
-td{padding:.44rem .7rem;border-bottom:1px solid rgba(255,255,255,.035);color:var(--t2);white-space:nowrap}
-tr:hover td{background:rgba(244,63,94,.045)}
+td{padding:.44rem .7rem;border-bottom:1px solid rgba(20,19,17,.035);color:var(--t2);white-space:nowrap}
+tr:hover td{background:rgba(190,74,49,.045)}
 .mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
 .pill{padding:.12rem .5rem;border-radius:4px;font-size:.62rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.pill.hi{background:rgba(244,63,94,.14);color:var(--rose2)}
-.pill.md{background:rgba(245,158,11,.14);color:var(--amber)}
-.pill.lo{background:rgba(16,185,129,.14);color:var(--emerald)}
+.pill.hi{background:rgba(190,74,49,.14);color:var(--rose2)}
+.pill.md{background:rgba(176,133,60,.14);color:var(--amber)}
+.pill.lo{background:rgba(78,124,90,.14);color:var(--emerald)}
 /* data-bar cell (Power BI conditional formatting) */
 .dbar{position:relative;min-width:120px}
-.dbar .df{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);height:14px;border-radius:3px;background:linear-gradient(90deg,rgba(244,63,94,.5),rgba(251,113,133,.32));z-index:0}
+.dbar .df{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);height:14px;border-radius:3px;background:linear-gradient(90deg,rgba(190,74,49,.5),rgba(154,58,38,.32));z-index:0}
 .dbar .dv{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;color:var(--t1)}
 
 footer{padding:1.6rem 1.25rem;text-align:center;color:var(--t3);font-size:.72rem;border-top:1px solid var(--edge)}
@@ -195,6 +205,13 @@ footer a{color:var(--rose2);text-decoration:none}
   <main class="canvas">
     <div class="crumb">Retention &nbsp;›&nbsp; <b id="crumb">All states · all risk bands</b></div>
 
+    <!-- PLAIN-ENGLISH TAKEAWAY -->
+    <div class="tldr">
+      <div class="tldr-tag">What this means — in plain english</div>
+      <h2 class="tldr-h">About <em>$3.4M</em> of yearly revenue is at risk from customers who look likely to leave.</h2>
+      <p class="tldr-p">Every customer is scored on how likely they are to leave, then ranked by <b>how much money we'd lose</b> if they did — not just the raw percentage. The names at the top are where saving effort pays back the most: around <b>$14.80 back for every $1</b> spent keeping them. <b>The call:</b> put the retention team on the high-risk, high-value accounts shown in red, and don't waste outreach on the low-value long tail.</p>
+    </div>
+
     <!-- KPI RIBBON -->
     <div class="ribbon">
       <div class="card kpi"><div class="kpi-l">ARR at Risk</div><div class="kpi-v" style="color:var(--rose)" id="k_arr">$0</div><div class="kpi-d dn" id="k_arr_d">▲ book exposure</div></div>
@@ -207,7 +224,7 @@ footer a{color:var(--rose2);text-decoration:none}
     <!-- ROW 1: 3D cloud + scatter -->
     <div class="vgrid r1" style="margin-bottom:.85rem">
       <div class="card vis">
-        <div class="vh"><div><div class="vt">Account Risk Cloud <span style="color:var(--pbi);font-size:.6rem;font-family:'JetBrains Mono',monospace;border:1px solid #4a4322;border-radius:4px;padding:.05rem .35rem;vertical-align:middle">custom visual</span></div></div><div class="vs">size = ARR · colour = risk band</div></div>
+        <div class="vh"><div><div class="vt">Account Risk Cloud <span style="color:var(--pbi);font-size:.6rem;font-family:'JetBrains Mono',monospace;border:1px solid #d8cfa8;border-radius:4px;padding:.05rem .35rem;vertical-align:middle">custom visual</span></div></div><div class="vs">size = ARR · colour = risk band</div></div>
         <div id="cloudWrap">
           <canvas id="cloud"></canvas>
           <div class="cloud-legend">
@@ -384,19 +401,19 @@ function renderScatter(){
   function Y(m){return (H-pad)-(m/maxM)*(H-pad-16);}
   sctx.font='9px JetBrains Mono, monospace';sctx.lineWidth=1;
   // gridlines + numeric ticks
-  sctx.strokeStyle='rgba(255,255,255,.05)';sctx.fillStyle='#5B6B82';
+  sctx.strokeStyle='rgba(255,255,255,.08)';sctx.fillStyle='#9AA3B0';
   [0,0.25,0.5,0.75,1].forEach(function(p){var x=X(p);sctx.beginPath();sctx.moveTo(x,8);sctx.lineTo(x,H-pad);sctx.stroke();sctx.fillText(p.toFixed(2),x-8,H-pad+15);});
   [0,0.25,0.5,0.75,1].forEach(function(f){var y=Y(f*maxM);sctx.beginPath();sctx.moveTo(pad,y);sctx.lineTo(W-6,y);sctx.stroke();sctx.fillText('$'+Math.round(f*maxM/1000)+'k',3,y+3);});
   // priority quadrant shading (high prob + high value)
   var tx=X(THRESH);
-  sctx.fillStyle='rgba(244,63,94,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
+  sctx.fillStyle='rgba(190,74,49,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
   // axes
-  sctx.strokeStyle='rgba(255,255,255,.14)';sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
+  sctx.strokeStyle='rgba(255,255,255,.18)';sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
   // points — translucent fill + crisp ring so overlapping bubbles stay separable
   sctx.lineWidth=1;
   filtered().forEach(function(d){var rad=3+Math.sqrt(d.risk)/95,cc=riskColor(d.prob);sctx.beginPath();sctx.arc(X(d.prob),Y(d.mrr),rad,0,7);sctx.fillStyle=cc+'55';sctx.fill();sctx.strokeStyle=cc+'dd';sctx.stroke();});
   // flag threshold
-  sctx.strokeStyle='rgba(244,63,94,.55)';sctx.setLineDash([4,4]);sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
+  sctx.strokeStyle='rgba(190,74,49,.55)';sctx.setLineDash([4,4]);sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
   sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);sctx.fillText('◤ priority',W-64,16);
   // axis titles
   sctx.fillStyle='#5B6B82';sctx.fillText('X: churn probability',W-128,H-4);
@@ -416,15 +433,15 @@ function renderGauge(roi){
   var needleA=a0+(a1-a0)*frac; // note a1<a0 so sweeps clockwise across top
   // background segments (red→amber→green zones)
   var svgc='';
-  svgc+=arc(a0, a0+(-Math.PI)*0.33, '#F43F5E', 12);
-  svgc+=arc(a0+(-Math.PI)*0.33, a0+(-Math.PI)*0.66, '#F59E0B', 12);
-  svgc+=arc(a0+(-Math.PI)*0.66, a1, '#10B981', 12);
+  svgc+=arc(a0, a0+(-Math.PI)*0.33, '#BE4A31', 12);
+  svgc+=arc(a0+(-Math.PI)*0.33, a0+(-Math.PI)*0.66, '#B0853C', 12);
+  svgc+=arc(a0+(-Math.PI)*0.66, a1, '#4E7C5A', 12);
   // value overlay arc
-  svgc+=arc(a0, a0+(-Math.PI)*frac, 'rgba(255,255,255,.9)', 4);
+  svgc+=arc(a0, a0+(-Math.PI)*frac, 'rgba(20,19,17,.35)', 4);
   // needle
   var np=pt(needleA);
-  svgc+='<line x1="'+cx+'" y1="'+cy+'" x2="'+np[0]+'" y2="'+np[1]+'" stroke="#EAF0FB" stroke-width="2.5" stroke-linecap="round"/>';
-  svgc+='<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="#EAF0FB"/>';
+  svgc+='<line x1="'+cx+'" y1="'+cy+'" x2="'+np[0]+'" y2="'+np[1]+'" stroke="#141311" stroke-width="2.5" stroke-linecap="round"/>';
+  svgc+='<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="#141311"/>';
   svgc+='<text x="15" y="128" fill="#616E86" font-size="9" font-family="JetBrains Mono">0x</text>';
   svgc+='<text x="180" y="128" fill="#616E86" font-size="9" font-family="JetBrains Mono">'+max+'x</text>';
   svg.innerHTML=svgc;
