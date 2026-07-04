@@ -71,7 +71,7 @@ section,footer,.divider{position:relative;z-index:1}
 .hl{font-size:.84rem;color:var(--t2);line-height:1.35;font-weight:500}
 .hl.mid{text-align:center}
 .hl.right{text-align:right}
-.hero-big{font-family:var(--sans);font-weight:800;font-size:clamp(3.2rem,13vw,11rem);line-height:.86;letter-spacing:-.055em;color:var(--t1);position:relative;z-index:2;white-space:nowrap;margin:.1rem 0 -.05em}
+.hero-big{font-family:var(--sans);font-weight:800;font-size:clamp(3.2rem,13vw,11rem);line-height:.9;letter-spacing:-.055em;color:var(--t1);position:relative;z-index:2;white-space:nowrap;margin:.1rem 0 1.1rem;padding-bottom:.12em}
 .hero-big .serif{font-family:var(--serif);font-style:italic;font-weight:500;letter-spacing:-.02em}
 .hero-visual{position:relative;z-index:1;border-radius:16px;overflow:hidden;background:#16150F;min-height:370px;box-shadow:0 30px 80px rgba(0,0,0,.16);display:flex;flex-direction:column;padding:1.5rem 1.7rem}
 .hv-tag{color:rgba(255,255,255,.5);font-size:.72rem;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
@@ -438,12 +438,12 @@ body.insp-lock{overflow:hidden}
       </div>
       <div class="hv-foot">
         <div class="hv-pills">
+          <button class="hv-pill on" data-id="churn" type="button">FinTech &amp; Retention</button>
           <button class="hv-pill" data-id="mpi" type="button">Data &amp; BI</button>
           <button class="hv-pill" data-id="demand" type="button">Supply Chain</button>
-          <button class="hv-pill on" data-id="churn" type="button">FinTech &amp; Product</button>
-          <button class="hv-pill" data-id="reconciliation" type="button">Automation · NLP</button>
+          <button class="hv-pill" data-id="reconciliation" type="button">Public Finance</button>
         </div>
-        <div class="hv-loc">Melbourne, AU</div>
+        <div class="hv-loc">Real Australian open data</div>
       </div>
     </div>
   </div>
@@ -462,7 +462,7 @@ body.insp-lock{overflow:hidden}
     <div class="about-feature">
       <div class="af-left">
         <div class="af-tag"><span class="ab-dot"></span>HOW I WORK</div>
-        <p class="af-body">I'm a Computer Engineering graduate finishing a <strong>Master of Business Analytics at Monash</strong>. I translate fragmented data into decisions — and because I code the pipeline, train the model, and build the dashboard myself, there's no hand-off between "the analyst" and "the engineer." That's the point: one person, end to end.</p>
+        <p class="af-body">I'm a Computer Engineering graduate finishing a <strong>Master of Business Analytics at Monash</strong>. I translate fragmented data into decisions, and because I code the pipeline, train the model, and build the dashboard myself, there's no hand-off between "the analyst" and "the engineer." That's the point: one person, end to end.</p>
         <a class="af-btn" href="#projects">See my work →</a>
       </div>
       <div class="af-right">
@@ -477,7 +477,7 @@ body.insp-lock{overflow:hidden}
     </div>
 
     <div class="stats-row">
-      <div class="stat"><b>Python + SQL</b><span>The pipeline behind every number — built myself</span></div>
+      <div class="stat"><b>Python + SQL</b><span>The pipeline behind every number, built myself</span></div>
       <div class="stat"><b>Power BI · Tableau</b><span>Dashboards non-analysts can actually read</span></div>
       <div class="stat"><b>ML &amp; Forecasting</b><span>Models tuned to the business call, not a leaderboard</span></div>
     </div>
@@ -486,7 +486,7 @@ body.insp-lock{overflow:hidden}
       <h2 class="x-title">Analyst <em>x</em> Engineer</h2>
       <div class="x-foot">
         <div class="x-label">Where I sit</div>
-        <p class="x-body">Every good decision rests on two things: a sharp commercial question and a system that can answer it repeatedly. I do both halves — the read and the build — so the insight actually ships instead of dying in a slide. AI is woven through it: I ship ML models as an analyst and build with copilots as a coder.</p>
+        <p class="x-body">Every good decision rests on two things: a sharp commercial question and a system that can answer it repeatedly. I do both halves, the read and the build, so the insight actually ships instead of dying in a slide. AI is woven through it: I ship ML models as an analyst and build with copilots as a coder.</p>
       </div>
     </div>
   </div>
@@ -499,7 +499,7 @@ body.insp-lock{overflow:hidden}
   <div class="container">
     <div class="stag">Technical Stack</div>
     <h2 class="stitle">Skills & <em>Technologies</em></h2>
-    <p class="ssub">The languages, tools, data stacks, and AI/ML models I actually build with — grouped by how I use them, not by buzzword.</p>
+    <p class="ssub">The languages, tools, data stacks, and AI/ML models I actually build with, grouped by how I use them, not by buzzword.</p>
     <div class="skill-grid">
       <div class="sk span2">
         <div class="sk-icon">🤖</div>
@@ -542,20 +542,20 @@ body.insp-lock{overflow:hidden}
   <div class="container">
     <div class="stag">Case Studies</div>
     <h2 class="stitle">Featured <em>Projects</em></h2>
-    <p class="ssub">Four real Australian business questions — each solved end-to-end: the problem, the model I built, and a measurable dollar outcome.</p>
+    <p class="ssub">Four real Australian questions, answered with real public data: the source, what it shows, and the decision it points to. No synthetic numbers.</p>
     <!-- numbered capability strip -->
     <div class="cap-strip" id="capStrip">
-      <div class="cap on" data-id="churn"><span class="cap-n">01</span><h4>FinTech &amp; Product</h4><p>Churn &amp; revenue-risk scoring, retention economics.</p></div>
-      <div class="cap" data-id="mpi"><span class="cap-n">02</span><h4>Data &amp; BI</h4><p>Unified reporting, ROAS / CAC, SCALE-vs-CUT calls.</p></div>
-      <div class="cap" data-id="demand"><span class="cap-n">03</span><h4>Supply Chain</h4><p>Demand forecasting, safety stock, reorder plans.</p></div>
-      <div class="cap" data-id="reconciliation"><span class="cap-n">04</span><h4>Automation · NLP</h4><p>OCR + text classification, GST / BAS reconciliation.</p></div>
+      <div class="cap on" data-id="churn"><span class="cap-n">01</span><h4>FinTech &amp; Retention</h4><p>Business churn: entries, exits and survival, ABS data.</p></div>
+      <div class="cap" data-id="mpi"><span class="cap-n">02</span><h4>Data &amp; BI</h4><p>Government advertising spend: channels, trends, states.</p></div>
+      <div class="cap" data-id="demand"><span class="cap-n">03</span><h4>Supply Chain</h4><p>Retail demand by category and state, ABS turnover.</p></div>
+      <div class="cap" data-id="reconciliation"><span class="cap-n">04</span><h4>Public Finance</h4><p>How the national GST pool is reconciled to the states.</p></div>
     </div>
     <p class="cap-hint">↑ click a domain to jump to its case study</p>
   </div>
 
   <!-- centered statement band -->
   <div class="proj-statement">
-    <h3>I build the model, the pipeline, and the dashboard myself <em>— no hand-offs, no black boxes.</em></h3>
+    <h3>I build the model, the pipeline, and the dashboard myself. <em>No hand-offs, no black boxes.</em></h3>
     <a class="stmt-link" href="#bento">See how each one works ↓</a>
   </div>
 
@@ -565,18 +565,18 @@ body.insp-lock{overflow:hidden}
 
     <div class="engine">
       <h3 class="engine-h">The <em>engine</em> behind every project</h3>
-      <p class="engine-sub">One person, the whole stack — from raw data to a trained model to a dashboard a stakeholder can actually use.</p>
+      <p class="engine-sub">One person, the whole stack, from raw data to a trained model to a dashboard a stakeholder can actually use.</p>
       <div class="engine-grid">
         <div class="eng-col left">
           <div class="eng-item"><h5>Python · SQL</h5><p>Pipelines, feature engineering, and the queries behind every number.</p></div>
-          <div class="eng-item"><h5>ML models</h5><p>XGBoost, Logistic Regression, Holt-Winters — tuned to the cost the business actually pays.</p></div>
-          <div class="eng-item"><h5>NLP + OCR</h5><p>TF-IDF text classification that reads noisy receipts and routes the exceptions.</p></div>
+          <div class="eng-item"><h5>ML models</h5><p>XGBoost, Logistic Regression, Holt-Winters, tuned to the cost the business actually pays.</p></div>
+          <div class="eng-item"><h5>NLP + OCR</h5><p>TF-IDF text classification and OCR, turning messy documents into structured, categorised data.</p></div>
         </div>
         <div class="eng-core"><b>AI +<br>Analytics</b></div>
         <div class="eng-col right">
-          <div class="eng-item"><h5>Power BI · Tableau</h5><p>Decision-ready reports, not just charts — the last mile that gets used.</p></div>
+          <div class="eng-item"><h5>Power BI · Tableau</h5><p>Decision-ready reports, not just charts: the last mile that gets used.</p></div>
           <div class="eng-item"><h5>Forecasting &amp; stats</h5><p>Confidence intervals, safety-stock math, precision-recall tuning.</p></div>
-          <div class="eng-item"><h5>AI-assisted build</h5><p>Copilot &amp; Claude to design, debug, and ship faster — the coder half of me.</p></div>
+          <div class="eng-item"><h5>AI-assisted build</h5><p>Copilot &amp; Claude to design, debug, and ship faster: the coder half of me.</p></div>
         </div>
       </div>
     </div>
@@ -629,7 +629,7 @@ body.insp-lock{overflow:hidden}
     <div class="footer-inner">
       <div>
         <span class="f-brand">Gaurav<em>.</em></span>
-        <p class="f-desc">Data & Business Analytics professional — turning raw data into decisions that move revenue.</p>
+        <p class="f-desc">Data & Business Analytics professional, turning raw data into decisions that move revenue.</p>
         <div class="f-socials">
           <a href="https://www.linkedin.com/in/gaurav-warke-b5493b394" target="_blank" class="f-soc">in</a>
           <a href="https://github.com/GauravWarke" target="_blank" class="f-soc">
@@ -703,7 +703,7 @@ body.insp-lock{overflow:hidden}
     <div class="insp-tags" id="insp-tags"></div>
     <a class="insp-cta" id="insp-dash" href="#" target="_blank" style="display:none;background:linear-gradient(90deg,var(--teal),var(--teal2));margin-bottom:.6rem">⚡ Launch Live Dashboard ↗</a>
     <a class="insp-cta" id="insp-cta" href="https://github.com/GauravWarke" target="_blank" style="background:transparent;border:1px solid var(--b);color:var(--t2)">View Source on GitHub ↗</a>
-    <p class="insp-note">// Public repo — clone &amp; run it independently</p>
+    <p class="insp-note">// Public repo · clone &amp; run it independently</p>
   </aside>
 </div>
 
@@ -739,10 +739,10 @@ body.insp-lock{overflow:hidden}
 
 // HERO — interactive plain-English project summary (for non-technical stakeholders)
 const HERO_SUM={
-  churn:{headline:'Flags customers about to leave — 30 days early, while there’s still time to save them.',num:'$3.37M',numLbl:'revenue we can protect',pct:85,center:'14.8×',sub:'RETURN'},
-  mpi:{headline:'Shows which marketing to scale and which to cut — in plain dollars, every week.',num:'−30%',numLbl:'faster to the answer',pct:78,center:'3.1×',sub:'TOP ROAS'},
-  demand:{headline:'Says exactly what to reorder and when — no stockouts, no money stuck on shelves.',num:'$63k',numLbl:'smarter purchase plan',pct:50,center:'3/6',sub:'REORDER'},
-  reconciliation:{headline:'Reads every receipt and files it automatically — the books close in minutes, not days.',num:'$91k',numLbl:'GST found for the BAS',pct:59,center:'59%',sub:'AUTO-FILED'}
+  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.9%',numLbl:'annual exit (churn) rate',pct:48,center:'48%',sub:'SURVIVE 3Y'},
+  mpi:{headline:'Tracks where government advertising money actually goes, and how fast it is shifting to digital.',num:'$250.6M',numLbl:'gov ad spend, 2023-24',pct:44,center:'44%',sub:'DIGITAL'},
+  demand:{headline:'Reads national retail demand: what Australians are buying, by category and by state, each month.',num:'$37.9bn',numLbl:'monthly retail turnover',pct:80,center:'+4.9%',sub:'YEAR ON YEAR'},
+  reconciliation:{headline:'Shows how the national GST pool is reconciled out to the states by need, not by where it was raised.',num:'$102bn',numLbl:'GST pool reconciled',pct:100,center:'8',sub:'STATES'}
 };
 (function(){
   var pills=document.querySelectorAll('.hv-pill'), cur='churn';
@@ -772,10 +772,10 @@ const HERO_SUM={
 
 // PROJECTS — Relief-Decor bento gallery (hand-built mini-visuals per case study)
 const PROJECTS=[
-  {id:'churn',span:'s4',cat:'FinTech · Predictive ML',title:'Churn & Revenue-Risk Platform',csub:'XGBoost merchant scoring',kpi:'$3.37M',kpiSub:'ARR at risk',chart:'scatter',dash:'dashboards/churn.html'},
-  {id:'mpi',span:'s2',cat:'Data & BI · Reporting',title:'Market-Performance Intel',csub:'ROAS / CAC · SCALE vs CUT',kpi:'−30%',kpiSub:'cycle time',chart:'bars',dash:'dashboards/market.html'},
-  {id:'demand',span:'s3',cat:'Supply Chain · Forecasting',title:'Demand & Supply-Risk',csub:'Holt-Winters + safety stock',kpi:'$63k',kpiSub:'PO plan',chart:'line',dash:'dashboards/demand.html'},
-  {id:'reconciliation',span:'s3',cat:'Automation · NLP · OCR',title:'Expense Reconciliation',csub:'TF-IDF receipt classifier',kpi:'$91k',kpiSub:'GST surfaced',chart:'treemap',dash:'dashboards/reconciliation.html'}
+  {id:'churn',span:'s4',cat:'FinTech · Retention · Open Data',title:'Australian Business Churn',csub:'ABS entries, exits & survival',kpi:'13.9%',kpiSub:'annual exit rate',chart:'scatter',dash:'dashboards/churn.html'},
+  {id:'mpi',span:'s2',cat:'Data & BI · Media',title:'Government Ad Spend',csub:'Commonwealth + state open data',kpi:'$250.6M',kpiSub:'ad spend analysed',chart:'bars',dash:'dashboards/market.html'},
+  {id:'demand',span:'s3',cat:'Supply Chain · Demand',title:'Australian Retail Demand',csub:'ABS retail turnover',kpi:'$37.9bn',kpiSub:'monthly demand',chart:'line',dash:'dashboards/demand.html'},
+  {id:'reconciliation',span:'s3',cat:'Public Finance · FinTech',title:'GST Reconciliation',csub:'CGC state distribution',kpi:'$102bn',kpiSub:'GST pool',chart:'treemap',dash:'dashboards/reconciliation.html'}
 ];
 (function(){
   // ---- hand-drawn SVG mini-visuals, one per project, echoing the real dashboard chart ----
@@ -833,46 +833,46 @@ const PROJECTS=[
 // CASE STUDY INSPECTOR — Triple-M data
 const CASES={
   reconciliation:{
-    cat:'// NLP · OCR · Finance Automation',catColor:'var(--teal)',
-    title:'Intelligent Expense-Reconciliation Engine',
-    kpi:'100%',kpiColor:'var(--teal)',kpiLabel:'Manual Entry Eliminated',
-    market:'Manual reconciliation is slow, error-prone, and an audit liability. Finance teams burn 40%+ of processing time re-keying receipts, and every hand-typed line item is a control gap that delays month-end close.',
-    arch:['OCR ingestion layer normalises heterogeneous receipt images into structured text.','NLP classifier maps line items to expense categories with confidence scoring.','Low-confidence records route to a human review queue — no silent failures.','Persists an audit-ready, append-only dataset in MongoDB — reproducible and traceable end to end.'],
-    metric:'100% of manual data entry eliminated; reconciliation lag reduced from days to minutes.',
-    tags:['Python','OCR','NLP','MongoDB','Data Pipeline','Finance'],
+    cat:'// Public Finance · FinTech · Open Data',catColor:'var(--teal)',
+    title:'GST Reconciliation: Carving the National Pool to the States',
+    kpi:'≈$102bn',kpiColor:'var(--teal)',kpiLabel:'GST Pool Reconciled 2026-27',
+    market:'GST is one national pool, reconciled out to eight states and territories by need, not by where it was raised. It is the fairness mechanism sitting under the federation, and it is rarely shown clearly.',
+    arch:['Uses the Commonwealth Grants Commission distribution figures for all eight states and territories.','Reconciles each jurisdiction’s share against the total pool so the split is legible on one scale.','Tracks the pool’s growth over time and flags the legislated WA 0.75 relativity floor.','Explains horizontal fiscal equalisation in plain English before the interactive detail.'],
+    metric:'≈$102bn reconciled in 2026-27: Victoria $27.9bn and NSW $26.1bn lead, while the NT receives $5.1bn for under a million people.',
+    tags:['Open Data','Public Finance','FinTech','Data Storytelling'],
     repo:'https://github.com/GauravWarke/expense-reconciliation-engine',
     dash:'dashboards/reconciliation.html'
   },
   mpi:{
-    cat:'// BI · Analytics · Performance Reporting',catColor:'var(--blue)',
-    title:'Market-Performance Intelligence System',
-    kpi:'−30%',kpiColor:'var(--blue)',kpiLabel:'Reporting Cycle Time',
-    market:'A reporting cycle measured in days means decisions are always made on stale data. Marketing orgs without a single source of truth make slow, gut-feel calls and lose conversion opportunities daily.',
-    arch:['Unified fragmented customer/market sources into one weekly reporting schema.','Automated the ETL + refresh path that was previously manual and brittle.','Engineered KPI definitions with stakeholders so numbers meant the same thing to every team.','Surfaced leading conversion signals, not just lagging totals.'],
-    metric:'−30% reporting cycle time, +10% lead-conversion lift, +20% process-efficiency gain (idigitalxp, verified).',
-    tags:['Excel','Analytics','KPI Dashboards','Market Data'],
+    cat:'// Media Analytics · Public Sector · Open Data',catColor:'var(--blue)',
+    title:'Government Advertising Spend: Where the Public Dollar Goes',
+    kpi:'$250.6M',kpiColor:'var(--blue)',kpiLabel:'Commonwealth Ad Spend 2023-24',
+    market:'Public advertising money is scrutinised but rarely made legible. This unifies the Commonwealth and state advertising reports to show how much governments spend reaching citizens, on which media, and how fast the mix is shifting to digital.',
+    arch:['Ingests the Dept of Finance campaign-advertising reports plus NSW and QLD open data.','Splits placement vs development and breaks media down by real channel: digital, TV, radio, out-of-home, cinema, press.','Adds a cross-jurisdiction comparison so Commonwealth and state spend read on one scale.','Leads with a plain-English takeaway for non-technical readers.'],
+    metric:'$250.6M total in 2023-24 ($173.8M placed in media); digital is now 44% of the media budget, ahead of television.',
+    tags:['Open Data','Data & BI','Media Analytics','Data Storytelling'],
     repo:'https://github.com/GauravWarke/market-performance-intelligence',
     dash:'dashboards/market.html'
   },
   demand:{
-    cat:'// Supply Chain · Forecasting · Risk',catColor:'var(--emerald)',
-    title:'Demand-Variability & Supply-Risk Forecasting',
-    kpi:'Predictive',kpiColor:'var(--emerald)',kpiLabel:'vs Reactive Operations',
-    market:'Without early-warning systems, operations teams stay reactive — driving up holding costs, stockout risk, and SLA breaches. Every day of forecast lead time is inventory you don’t over-order and a stockout you pre-empt.',
-    arch:['Time-series decomposition isolates trend, seasonality, and irregular variance.','Statistical forecasting with confidence intervals quantifies uncertainty rather than hiding it.','Risk-indicator flags surface supply exposure before it becomes a stockout.','Delivered via Agile iterations with stakeholder feedback loops; outputs dashboard-ready.'],
-    metric:'Shifts operations from reactive to predictive — reducing holding-cost and stockout/SLA-breach exposure.',
-    tags:['Python','R','Time Series','Statistical Modelling'],
+    cat:'// Supply Chain · Demand · Open Data',catColor:'var(--emerald)',
+    title:'Australian Retail Demand: What the Country is Buying',
+    kpi:'$37.9bn',kpiColor:'var(--emerald)',kpiLabel:'Monthly Retail Turnover',
+    market:'Demand is the signal under every inventory and staffing call. This reads the ABS retail turnover series to show what Australians are actually spending, by category and by state, and where the mix is rotating.',
+    arch:['Pulls the ABS Retail Trade release: seasonally adjusted turnover, real monthly readings.','Reconciles the category split (food, household goods, cafés and the rest) exactly to the national total.','Tracks a rolling trend and month-on-month growth by state.','Surfaces the takeaway in plain language ahead of the interactive detail.'],
+    metric:'$37.9bn in June 2025, +4.9% year on year; household goods rising (+2.3%) while cafés & takeaway slipped (-0.4%).',
+    tags:['ABS Open Data','Forecasting','Supply Chain','Data Storytelling'],
     repo:'https://github.com/GauravWarke/demand-supply-risk-forecasting',
     dash:'dashboards/demand.html'
   },
   churn:{
-    cat:'// FinTech · Product Analytics · Predictive ML',catColor:'var(--rose)',
-    title:'Customer Churn & Revenue-Risk Intelligence Platform',
-    kpi:'30d',kpiColor:'var(--rose)',kpiLabel:'Early Churn Warning',
-    market:'Banks and SaaS businesses lose 20–30% of revenue to preventable churn, and a 5% retention lift can raise profit 25%+. The pain is timing: teams find out a customer left after they leave.',
-    arch:['RFM (Recency/Frequency/Monetary) feature engineering with leakage-safe temporal splits.','XGBoost + logistic-regression ensemble; class imbalance handled via stratified sampling.','Precision-recall threshold tuned to minimise false-positive outreach cost — the metric the business pays for.','Ranked revenue-at-risk register piped into an interactive Power BI dashboard.'],
-    metric:'Flags at-risk accounts 30 days before predicted churn; PR-optimised threshold cuts wasted outreach.',
-    tags:['Python','XGBoost','SQL','Power BI','Feature Engineering','Churn Modelling'],
+    cat:'// FinTech · Retention & Attrition · Open Data',catColor:'var(--rose)',
+    title:'Australian Business Churn: Who Survives and Who Exits',
+    kpi:'13.9%',kpiColor:'var(--rose)',kpiLabel:'Annual Exit (Churn) Rate',
+    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and under half survive to year three.',
+    arch:['Pulls the ABS Counts of Australian Businesses release: real entries, exits and survival by state.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments three-year survival (employing vs non-employing, best and worst industry) to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
+    metric:'370,500 exits (13.9%) against 437,150 entries in 2024-25, a net +66,650; only 48% of businesses reach year three.',
+    tags:['ABS Open Data','Python','SQL','Retention Analytics','Data Storytelling'],
     repo:'https://github.com/GauravWarke/churn-revenue-risk-platform',
     dash:'dashboards/churn.html'
   }
@@ -1297,10 +1297,10 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
     {ico:'✦',l:'Go to Skills',h:'skills',run:function(){scrollToSel('#skills');}},
     {ico:'◐',l:'Go to About',h:'about',run:function(){scrollToSel('#about');}},
     {ico:'✉',l:'Go to Contact',h:'contact',run:function(){scrollToSel('#contact');}},
-    {ico:'⚡',l:'Open Churn & Revenue-Risk dashboard',h:'dashboard',run:function(){openUrl('dashboards/churn.html',true);}},
-    {ico:'⚡',l:'Open Expense-Reconciliation dashboard',h:'dashboard',run:function(){openUrl('dashboards/reconciliation.html',true);}},
-    {ico:'⚡',l:'Open Demand & Supply-Risk dashboard',h:'dashboard',run:function(){openUrl('dashboards/demand.html',true);}},
-    {ico:'⚡',l:'Open Market-Performance dashboard',h:'dashboard',run:function(){openUrl('dashboards/market.html',true);}},
+    {ico:'⚡',l:'Open Business Churn dashboard',h:'dashboard',run:function(){openUrl('dashboards/churn.html',true);}},
+    {ico:'⚡',l:'Open GST Reconciliation dashboard',h:'dashboard',run:function(){openUrl('dashboards/reconciliation.html',true);}},
+    {ico:'⚡',l:'Open Retail Demand dashboard',h:'dashboard',run:function(){openUrl('dashboards/demand.html',true);}},
+    {ico:'⚡',l:'Open Government Ad Spend dashboard',h:'dashboard',run:function(){openUrl('dashboards/market.html',true);}},
     {ico:'in',l:'Open LinkedIn',h:'link',run:function(){openUrl('https://www.linkedin.com/in/gaurav-warke-b5493b394',true);}},
     {ico:'gh',l:'Open GitHub',h:'link',run:function(){openUrl('https://github.com/GauravWarke',true);}},
     {ico:'✦',l:'Email / Hire Me',h:'contact',run:function(){openUrl('mailto:gauravwarke8@gmail.com');}}
