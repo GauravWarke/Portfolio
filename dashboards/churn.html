@@ -3,490 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Churn & Revenue-Risk · Power BI-style Report | Gaurav Warke</title>
-<meta name="description" content="Power BI-style executive report — per-merchant churn risk ranked by ARR at risk (AUD), slicer pane, KPI ribbon, gauge, and a conditional-format risk matrix.">
+<title>Australian Business Churn · Real ABS open-data report | Gaurav Warke</title>
+<meta name="description" content="Who survives and who exits — a real open-data report on Australian business churn from the ABS: entries vs exits, survival rates, and the business base by state. No synthetic or modelled numbers.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Playfair+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Light editorial theme (matches portfolio): warm cream + ink, muted earthy
-     semantic accents (brick=risk, ochre=watch, sage=healthy) for non-technical clarity. */
   --canvas:#EFEDE7;--pane:#EAE7E0;--card:#FBFAF7;--card2:#F3F1EB;--edge:#E1DDD4;--edgeH:#CBC6BB;
-  --rose:#BE4A31;--rose2:#9A3A26;--amber:#B0853C;--emerald:#4E7C5A;--blue:#456187;--violet:#6E5A86;--pbi:#9A8836;
-  --t1:#141311;--t2:#57544E;--t3:#8B877F;
-  --good:#4E7C5A;--bad:#BE4A31;
-  --sans:'Archivo','Helvetica Neue',Arial,sans-serif;--serif:'Playfair Display',Georgia,serif;
+  --ink:#141311;--ink2:#3A3833;
+  --blue:#456187;--blue2:#5B7BA6;--amber:#B0853C;--rose:#BE4A31;--emerald:#4E7C5A;--violet:#6E5A86;
+  --t1:#141311;--t2:#57544E;--t3:#8B877F;--good:#4E7C5A;--bad:#BE4A31;
+  --sans:'Archivo','Helvetica Neue',Arial,sans-serif;--serif:'Playfair Display',Georgia,serif;--mono:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cfcabf;border-radius:8px}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cfc9bd;border-radius:8px}
 a{color:inherit}
-#bg3d{display:none}
 
-/* ---- Report chrome ---- */
-.appbar{position:sticky;top:0;z-index:60;background:linear-gradient(90deg,#f4f2ec,#eae7e0);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:1rem;padding:.6rem 1.1rem}
-.appbar .brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:.92rem;letter-spacing:-.2px}
-.pbi-badge{display:inline-flex;align-items:center;gap:.45rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--pbi);border:1px solid #d8cfa8;background:rgba(154,136,54,.07);border-radius:5px;padding:.28rem .6rem;text-transform:uppercase;letter-spacing:.08em}
-.pbi-badge svg{width:13px;height:13px}
+.appbar{position:sticky;top:0;z-index:60;background:rgba(239,237,231,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.85rem;padding:.55rem 1rem}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--t2);text-decoration:none;font-weight:600}
+.back:hover{color:var(--ink)}
+.appbar .wb{display:flex;flex-direction:column;line-height:1.18}
+.appbar .wb b{font-size:.9rem;font-weight:800;letter-spacing:-.3px}
+.appbar .wb span{font-size:.6rem;color:var(--t3);font-family:var(--mono)}
 .appbar .sp{flex:1}
-.back{display:inline-flex;align-items:center;gap:.45rem;font-size:.78rem;color:var(--t2);text-decoration:none;transition:color .18s}
-.back:hover{color:var(--rose2)}
-.appbar a.src{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--edge);border-radius:5px;padding:.34rem .7rem}
-.appbar a.src:hover{border-color:var(--rose);color:var(--rose2)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:pulse 2s infinite;display:inline-block}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.src-chip{display:inline-flex;align-items:center;gap:.45rem;font-size:.62rem;font-family:var(--mono);color:var(--t2);border:1px solid var(--edge);background:var(--card);border-radius:100px;padding:.28rem .7rem;font-weight:600}
+.src-chip i{width:6px;height:6px;border-radius:50%;background:var(--emerald);display:inline-block}
+.src{font-size:.72rem;font-family:var(--mono);color:var(--t2);text-decoration:none;border:1px solid var(--edge);border-radius:6px;padding:.34rem .64rem;font-weight:600}
+.src:hover{border-color:var(--ink);color:var(--ink)}
 
-/* ---- Report shell: left slicer rail + canvas ---- */
-.report{position:relative;z-index:1;display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - 49px)}
-.rail{background:linear-gradient(180deg,#f4f2ec,#edeae3);border-right:1px solid var(--edge);padding:1.15rem .95rem;position:sticky;top:49px;align-self:start;height:calc(100vh - 49px);overflow-y:auto}
-.rail h2{font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);font-family:'JetBrains Mono',monospace;margin:1.3rem 0 .55rem}
-.rail h2:first-child{margin-top:0}
-.report-title{font-family:var(--sans);font-weight:800;font-size:1.02rem;letter-spacing:-.4px;line-height:1.25}
-.report-title span{color:var(--rose)}
-.rail-sub{font-size:.72rem;color:var(--t2);margin-top:.45rem;line-height:1.5}
-/* slicer */
-.slicer{display:flex;flex-direction:column;gap:.3rem}
-.slchk{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.42rem .6rem;border-radius:6px;font-size:.8rem;color:var(--t2);cursor:pointer;border:1px solid transparent;transition:all .15s;user-select:none}
-.slchk:hover{background:#efede7;color:var(--t1)}
-.slchk.on{background:rgba(190,74,49,.12);border-color:rgba(190,74,49,.35);color:var(--t1)}
-.slchk .cnt{font-size:.66rem;font-family:'JetBrains Mono',monospace;color:var(--t3)}
-.slchk.on .cnt{color:var(--rose2)}
-.slbox{display:flex;align-items:center;gap:.5rem}
-.tick{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none}
-.slchk.on .tick{background:var(--rose);border-color:var(--rose)}
-.slchk.on .tick::after{content:'';width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
-.railnote{font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:1.4rem;border-top:1px solid var(--edge);padding-top:.9rem}
+.band{border-bottom:1px solid var(--edge);padding:1.25rem 1.3rem .55rem}
+.eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);font-weight:600}
+.band h1{font-family:var(--sans);font-size:clamp(1.5rem,3.4vw,2.35rem);font-weight:900;letter-spacing:-1px;line-height:1.04;margin-top:.35rem}
+.band h1 em{font-family:var(--serif);font-style:italic;font-weight:400}
+.band p{color:var(--t2);font-size:.86rem;max-width:900px;margin-top:.55rem}
 
-/* ---- Canvas ---- */
-.canvas{padding:1.1rem 1.25rem 2.5rem}
-.crumb{font-size:.7rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:.7rem}
-.crumb b{color:var(--rose2)}
-/* plain-English takeaway banner (for non-technical stakeholders) */
-.tldr{background:var(--card);border:1px solid var(--edge);border-left:3px solid var(--rose);border-radius:9px;padding:1.1rem 1.3rem;margin-bottom:.85rem}
-.tldr-tag{font-family:'JetBrains Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);margin-bottom:.5rem}
-.tldr-h{font-family:var(--sans);font-size:clamp(1.05rem,1.9vw,1.45rem);font-weight:800;letter-spacing:-.5px;line-height:1.25;margin-bottom:.5rem;max-width:62ch}
-.tldr-h em{font-family:var(--serif);font-style:italic;font-weight:600}
-.tldr-p{font-size:.82rem;color:var(--t2);line-height:1.6;max-width:80ch}
-.tldr-p b{color:var(--t1);font-weight:700}
+.tldr{margin:1rem 1.3rem 0;background:var(--card);border:1px solid var(--edge);border-left:3px solid var(--rose);border-radius:11px;padding:1.15rem 1.35rem}
+.tldr-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--rose);font-weight:700}
+.tldr-h{font-size:clamp(1.15rem,2.3vw,1.5rem);font-weight:800;letter-spacing:-.5px;line-height:1.22;margin:.5rem 0 .55rem}
+.tldr-h em{font-family:var(--serif);font-style:italic;font-weight:400}
+.tldr-p{font-size:.86rem;color:var(--t2);max-width:940px;line-height:1.68}
+.tldr-p b{color:var(--ink);font-weight:700}
 
-/* KPI ribbon */
-.ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin-bottom:.85rem}
-.card{background:var(--card);border:1px solid var(--edge);border-radius:7px;position:relative;overflow:hidden}
-.kpi{padding:.85rem .9rem .8rem}
+.report{padding:1.1rem 1.3rem 1.4rem;display:grid;gap:1rem}
+.ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem}
+.kpi{background:var(--card);border:1px solid var(--edge);border-radius:9px;padding:.85rem .95rem;position:relative;overflow:hidden}
 .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--rose)}
-.kpi.c2::before{background:var(--amber)}.kpi.c3::before{background:var(--emerald)}.kpi.c4::before{background:var(--blue)}.kpi.c5::before{background:var(--violet)}
-.kpi-l{font-size:.62rem;color:var(--t2);text-transform:uppercase;letter-spacing:.07em;font-weight:600;display:flex;align-items:center;gap:.35rem}
-.kpi-v{font-family:var(--sans);font-size:1.6rem;font-weight:800;letter-spacing:-1px;line-height:1;margin:.4rem 0 .3rem}
-.kpi-d{font-size:.66rem;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:.3rem}
-.kpi-d.up{color:var(--good)}.kpi-d.dn{color:var(--bad)}
-.spark{position:absolute;right:8px;bottom:8px;opacity:.5}
+.kpi.c1::before{background:var(--ink)}.kpi.c2::before{background:var(--rose)}.kpi.c3::before{background:var(--emerald)}.kpi.c4::before{background:var(--blue)}.kpi.c5::before{background:var(--amber)}
+.kpi-l{font-size:.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-weight:700;font-family:var(--mono)}
+.kpi-v{font-family:var(--sans);font-size:1.65rem;font-weight:900;letter-spacing:-1px;line-height:1;margin:.4rem 0 .25rem}
+.kpi-d{font-size:.62rem;font-family:var(--mono);color:var(--t3)}
 
-/* visual grid */
-.vgrid{display:grid;gap:.85rem}
-.r1{grid-template-columns:1.35fr 1fr}
-.r2{grid-template-columns:1fr 1fr 1fr}
-.vis{padding:.9rem 1rem 1rem}
-.vh{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.7rem}
-.vt{font-size:.86rem;font-weight:700;letter-spacing:-.2px}
-.vs{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.vmore{font-size:.9rem;color:var(--t3);letter-spacing:1px}
+.vgrid{display:grid;gap:1rem}
+.g2{grid-template-columns:1fr 1fr}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:9px}
+.vh{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.65rem .9rem;border-bottom:1px solid var(--edge)}
+.vt{font-size:.85rem;font-weight:800;letter-spacing:-.2px}
+.vs{font-size:.62rem;color:var(--t3);font-family:var(--mono)}
+.vb{padding:.9rem}
+.note{font-size:.64rem;color:var(--t3);font-family:var(--mono);line-height:1.6;margin-top:.55rem}
 
-/* 3D cloud */
-#cloudWrap{position:relative;height:340px;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,rgba(190,74,49,.20),transparent 70%),#16150F;cursor:grab}
-#cloudWrap.drag{cursor:grabbing}
-#cloud{width:100%;height:100%;display:block}
-#cloudWrap .axes-key{color:rgba(255,255,255,.72)!important;background:rgba(0,0,0,.4)!important}
-.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.62rem;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace;pointer-events:none}
-.cloud-legend{position:absolute;top:8px;right:10px;display:flex;flex-direction:column;gap:.28rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
-.lg{display:flex;align-items:center;gap:.38rem;color:rgba(255,255,255,.75)}
-.lg i{width:8px;height:8px;border-radius:50%;display:inline-block}
-.tip{position:absolute;pointer-events:none;background:rgba(8,12,24,.96);border:1px solid var(--edgeH);border-radius:7px;padding:.5rem .65rem;font-size:.68rem;opacity:0;transition:opacity .12s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.tip b{color:var(--rose2)}
+#flow,#states,#survive{width:100%;display:block}
+#flow{height:250px}#states{height:250px}#survive{height:230px}
 
-/* scatter — kept on a dark panel so its light-on-dark rendering stays crisp */
-#scatter{width:100%;height:300px;display:block;background:#16150F;border-radius:6px}
-.note{font-size:.68rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.6;margin-top:.55rem}
+#sceneWrap{position:relative;height:360px;border-radius:7px;overflow:hidden;background:radial-gradient(ellipse at 50% 62%,rgba(190,74,49,.15),transparent 70%),#16150F;cursor:grab}
+#sceneWrap.drag{cursor:grabbing}
+#scene{width:100%;height:100%;display:block}
+.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:rgba(255,255,255,.5);font-family:var(--mono);pointer-events:none}
+.axes-key{position:absolute;top:10px;left:10px;font-size:.58rem;font-family:var(--mono);color:rgba(255,255,255,.8);line-height:1.55;pointer-events:none;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.42rem .58rem}
+.tip{position:absolute;pointer-events:none;background:#0f0e0b;border:1px solid rgba(255,255,255,.18);color:#F4F1EA;border-radius:8px;padding:.5rem .65rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:170px;font-family:var(--mono);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tip b{color:#D8A08C}
 
-/* clustered bars */
-.bars{display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem}
-.brow{display:grid;grid-template-columns:92px 1fr auto;gap:.6rem;align-items:center}
-.bname{font-size:.72rem;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.btrack{height:20px;background:rgba(20,19,17,.035);border-radius:4px;overflow:hidden;position:relative}
-.bfill{height:100%;border-radius:4px;width:0;transition:width .9s cubic-bezier(.2,.7,.3,1);background:linear-gradient(90deg,var(--rose),var(--rose2))}
-.bval{font-size:.7rem;font-weight:600;color:var(--t1);font-family:'JetBrains Mono',monospace;white-space:nowrap}
-
-/* gauge */
-.gaugeWrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem 0 .1rem}
-#gauge{width:210px;height:130px}
-.gauge-c{font-family:var(--sans);font-size:1.9rem;font-weight:800;letter-spacing:-1px;margin-top:-.2rem}
-.gauge-l{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
-/* what-if params */
-.param{margin-top:.9rem}
-.param-row{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.75rem}
-.param-top{display:flex;justify-content:space-between;align-items:baseline}
-.param-lbl{font-size:.72rem;color:var(--t2)}
-.param-num{font-family:var(--sans);font-weight:700;color:var(--rose2);font-size:.85rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:rgba(20,19,17,.12);outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fbfaf7;box-shadow:0 0 0 1px var(--rose)}
-input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--rose);cursor:pointer;border:2px solid #fbfaf7}
-.param-out{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-top:.3rem}
-.po{background:rgba(190,74,49,.06);border:1px solid var(--edge);border-radius:7px;padding:.7rem;text-align:center}
-.po-v{font-family:var(--sans);font-size:1.3rem;font-weight:800;letter-spacing:-.6px}
-.po-l{font-size:.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:.15rem;font-family:'JetBrains Mono',monospace}
-
-/* matrix */
-.mtx-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.76rem}
-th{text-align:left;font-family:var(--sans);font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);font-weight:700;padding:.5rem .7rem;border-bottom:1px solid var(--edge);cursor:pointer;user-select:none;white-space:nowrap;background:#f3f1eb}
-th:hover{color:var(--rose2)}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{text-align:left;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:.55rem .65rem;border-bottom:1px solid var(--edge);white-space:nowrap}
 th.num,td.num{text-align:right}
-th.sorted::after{content:' ▾';color:var(--rose2)}
-th.sorted.asc::after{content:' ▴'}
-td{padding:.44rem .7rem;border-bottom:1px solid rgba(20,19,17,.035);color:var(--t2);white-space:nowrap}
-tr:hover td{background:rgba(190,74,49,.045)}
-.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
-.pill{padding:.12rem .5rem;border-radius:4px;font-size:.62rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.pill.hi{background:rgba(190,74,49,.14);color:var(--rose2)}
-.pill.md{background:rgba(176,133,60,.14);color:var(--amber)}
-.pill.lo{background:rgba(78,124,90,.14);color:var(--emerald)}
-/* data-bar cell (Power BI conditional formatting) */
-.dbar{position:relative;min-width:120px}
-.dbar .df{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);height:14px;border-radius:3px;background:linear-gradient(90deg,rgba(190,74,49,.5),rgba(154,58,38,.32));z-index:0}
-.dbar .dv{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;color:var(--t1)}
+td{padding:.6rem .65rem;border-bottom:1px solid var(--edge);color:var(--t2);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--card2)}
+.mono{font-family:var(--mono);color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:.45rem}.chip i{width:10px;height:10px;border-radius:3px}
+.up{color:var(--good);font-weight:700}
+.bar-cell{position:relative;min-width:120px}
+.bar-cell .bar{position:absolute;left:0;top:50%;transform:translateY(-50%);height:16px;border-radius:3px;opacity:.9}
 
-footer{padding:1.6rem 1.25rem;text-align:center;color:var(--t3);font-size:.72rem;border-top:1px solid var(--edge)}
-footer a{color:var(--rose2);text-decoration:none}
+footer{padding:1.4rem;text-align:center;color:var(--t3);font-size:.72rem;background:var(--pane);border-top:1px solid var(--edge)}
+footer a{color:var(--rose);text-decoration:none;font-weight:600}
 
-@media(max-width:960px){
-  .report{grid-template-columns:1fr}
-  .rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--edge)}
-  .ribbon{grid-template-columns:repeat(2,1fr)}
-  .r1,.r2{grid-template-columns:1fr}
-}
+@media(max-width:900px){.ribbon{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<canvas id="bg3d"></canvas>
 
-<!-- APP BAR -->
+<!-- APP BAR (no tool-mimicry badge) -->
 <div class="appbar">
   <a class="back" href="../index.html#projects">← Portfolio</a>
-  <span class="pbi-badge">
-    <svg viewBox="0 0 24 24" fill="var(--pbi)"><rect x="3" y="10" width="4" height="11" rx="1"/><rect x="10" y="5" width="4" height="16" rx="1"/><rect x="17" y="13" width="4" height="8" rx="1"/></svg>
-    Power BI-style report
-  </span>
-  <span style="font-size:.68rem;color:var(--t3);font-family:'JetBrains Mono',monospace"><span class="live-dot"></span> refreshed live</span>
+  <div class="wb"><b>Australian Business Churn</b><span>ABS Counts of Australian Businesses · real published records</span></div>
   <div class="sp"></div>
-  <a class="src" href="https://github.com/GauravWarke/churn-revenue-risk-platform" target="_blank" rel="noopener">Source ↗</a>
+  <span class="src-chip"><i></i>live from ABS</span>
+  <a class="src" href="https://www.abs.gov.au/statistics/economy/business-indicators/counts-australian-businesses-including-entries-and-exits/latest-release" target="_blank" rel="noopener">Data source ↗</a>
+</div>
+
+<!-- TITLE -->
+<div class="band">
+  <div class="eyebrow">FinTech · retention &amp; attrition analytics</div>
+  <h1>Who <em>survives</em> and who exits</h1>
+  <p>Real business churn from the Australian Bureau of Statistics — how many businesses open, how many close, and how many make it past their first years, across every state. This is attrition at the scale of a whole economy: the same retention question a bank or SaaS firm asks of its customers. No synthetic or modelled numbers.</p>
+</div>
+
+<!-- PLAIN ENGLISH -->
+<div class="tldr">
+  <div class="tldr-tag">What this means — in plain English</div>
+  <h2 class="tldr-h">About <em>370,500</em> Australian businesses closed in 2024-25 — a 13.9% churn rate — yet even more opened, so the country still added 66,650 net.</h2>
+  <p class="tldr-p">Roughly <b>1 in 7 businesses exits every year</b>, but <b>437,150 new ones entered</b> — so the base grew 2.5% to <b>2.73 million</b>. Survival is the hard part: only <b>75% make it past year one</b> and <b>under half (48%) reach year three</b> — though employing businesses (61%) and Health Care (82.7%) hold on far better than solo operators (43.3%). Growth is fastest in <b>WA (+4.3%)</b> and Queensland (+3.1%). <b>The call:</b> entries still outpace exits, but the thin survival curve is exactly where retention effort pays — most of all for the 64% of businesses that run with no employees.</p>
 </div>
 
 <div class="report">
-  <!-- SLICER RAIL -->
-  <aside class="rail">
-    <div class="report-title">Customer Churn &<br><span>Revenue-Risk</span> Report</div>
-    <div class="rail-sub">Every account scored, then ranked by <b>ARR at risk (AUD)</b> — not just churn probability. Slice the book below; every visual cross-filters.</div>
 
-    <h2>State (slicer)</h2>
-    <div class="slicer" id="stateSlicer"></div>
+  <div class="ribbon">
+    <div class="kpi c1"><div class="kpi-l">Active businesses</div><div class="kpi-v">2.73M</div><div class="kpi-d">at 30 Jun 2025</div></div>
+    <div class="kpi c2"><div class="kpi-l">Exit (churn) rate</div><div class="kpi-v" style="color:var(--bad)">13.9%</div><div class="kpi-d">370,500 exits</div></div>
+    <div class="kpi c3"><div class="kpi-l">Entry rate</div><div class="kpi-v" style="color:var(--good)">16.4%</div><div class="kpi-d">437,150 entries</div></div>
+    <div class="kpi c4"><div class="kpi-l">Net change</div><div class="kpi-v" style="color:var(--blue)">+2.5%</div><div class="kpi-d">+66,650 businesses</div></div>
+    <div class="kpi c5"><div class="kpi-l">Survive to year 3</div><div class="kpi-v" style="color:var(--amber)">48%</div><div class="kpi-d">75% survive year 1</div></div>
+  </div>
 
-    <h2>Risk band (slicer)</h2>
-    <div class="slicer" id="bandSlicer"></div>
+  <!-- churn flow -->
+  <div class="card">
+    <div class="vh"><span class="vt">The churn of the economy</span><span class="vs">2024-25 · entries vs exits</span></div>
+    <div class="vb"><canvas id="flow"></canvas><div class="note">437,150 businesses opened; 370,500 closed. Entries outnumber exits by 66,650 — the net growth in the business base.</div></div>
+  </div>
 
-    <div class="railnote">
-      Model: gradient-boosted churn classifier<br>
-      ROC-AUC 0.748 · flag ≥ 0.50<br>
-      2,000 accounts scored<br>
-      Synthetic AU book; headline<br>figures from the verified run.
+  <!-- state base + survival -->
+  <div class="vgrid g2">
+    <div class="card">
+      <div class="vh"><span class="vt">Business base by state</span><span class="vs">Jun 2025 · count</span></div>
+      <div class="vb"><canvas id="states"></canvas><div class="note">NSW and Victoria hold over 1.6m of the 2.73m businesses; WA and Queensland are growing fastest.</div></div>
     </div>
-  </aside>
-
-  <!-- CANVAS -->
-  <main class="canvas">
-    <div class="crumb">Retention &nbsp;›&nbsp; <b id="crumb">All states · all risk bands</b></div>
-
-    <!-- PLAIN-ENGLISH TAKEAWAY -->
-    <div class="tldr">
-      <div class="tldr-tag">What this means — in plain english</div>
-      <h2 class="tldr-h">About <em>$3.4M</em> of yearly revenue is at risk from customers who look likely to leave.</h2>
-      <p class="tldr-p">Every customer is scored on how likely they are to leave, then ranked by <b>how much money we'd lose</b> if they did — not just the raw percentage. The names at the top are where saving effort pays back the most: around <b>$14.80 back for every $1</b> spent keeping them. <b>The call:</b> put the retention team on the high-risk, high-value accounts shown in red, and don't waste outreach on the low-value long tail.</p>
+    <div class="card">
+      <div class="vh"><span class="vt">Who survives three years</span><span class="vs">3-year survival rate</span></div>
+      <div class="vb"><canvas id="survive"></canvas><div class="note">Having employees roughly doubles the odds of lasting; Health Care is the most durable industry.</div></div>
     </div>
+  </div>
 
-    <!-- KPI RIBBON -->
-    <div class="ribbon">
-      <div class="card kpi"><div class="kpi-l">ARR at Risk</div><div class="kpi-v" style="color:var(--rose)" id="k_arr">$0</div><div class="kpi-d dn" id="k_arr_d">▲ book exposure</div></div>
-      <div class="card kpi c2"><div class="kpi-l">Merchants Flagged</div><div class="kpi-v" style="color:var(--amber)" id="k_flag">0</div><div class="kpi-d" style="color:var(--t2)" id="k_flag_d">of 2,000 scored</div></div>
-      <div class="card kpi c3"><div class="kpi-l">Retention ROI</div><div class="kpi-v" style="color:var(--emerald)" id="k_roi">0x</div><div class="kpi-d up">▲ every $1 → $14.8</div></div>
-      <div class="card kpi c4"><div class="kpi-l">ROC-AUC</div><div class="kpi-v" style="color:var(--blue)" id="k_auc">0.000</div><div class="kpi-d up">▲ vs 0.5 baseline</div></div>
-      <div class="card kpi c5"><div class="kpi-l">Avg Churn Prob</div><div class="kpi-v" style="color:var(--violet)" id="k_prob">0%</div><div class="kpi-d" style="color:var(--t2)" id="k_prob_d">in current slice</div></div>
-    </div>
-
-    <!-- ROW 1: 3D cloud + scatter -->
-    <div class="vgrid r1" style="margin-bottom:.85rem">
-      <div class="card vis">
-        <div class="vh"><div><div class="vt">Account Risk Cloud <span style="color:var(--pbi);font-size:.6rem;font-family:'JetBrains Mono',monospace;border:1px solid #d8cfa8;border-radius:4px;padding:.05rem .35rem;vertical-align:middle">custom visual</span></div></div><div class="vs">size = ARR · colour = risk band</div></div>
-        <div id="cloudWrap">
-          <canvas id="cloud"></canvas>
-          <div class="cloud-legend">
-            <span class="lg"><i style="background:#F43F5E"></i>High risk</span>
-            <span class="lg"><i style="background:#F59E0B"></i>Watch</span>
-            <span class="lg"><i style="background:#10B981"></i>Healthy</span>
-          </div>
-          <div class="axes-key" style="position:absolute;bottom:8px;right:12px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--t2);line-height:1.55;pointer-events:none;background:rgba(11,15,26,.6);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
-            <div><b style="color:#FB7185">X</b> = churn probability</div>
-            <div><b style="color:#34D399">Y</b> = MRR (AUD)</div>
-            <div><b style="color:#60A5FA">Z</b> = tenure (months)</div>
-          </div>
-          <div class="cloud-hint">◐ drag to rotate · hover a point</div>
-          <div class="tip" id="tip"></div>
+  <!-- 3D state towers -->
+  <div class="card">
+    <div class="vh"><span class="vt">Business base in 3D</span><span class="vs">Jun 2025 · height = businesses · drag to rotate</span></div>
+    <div class="vb">
+      <div id="sceneWrap">
+        <canvas id="scene"></canvas>
+        <div class="axes-key">
+          <div><b style="color:#8FA6C6">ring</b> = state / territory</div>
+          <div><b style="color:#9FC3AC">height</b> = active businesses</div>
+          <div><b style="color:#D8A08C">click</b> = focus a state</div>
         </div>
-      </div>
-      <div class="card vis">
-        <div class="vh"><div><div class="vt">Risk vs Value Quadrant</div></div><div class="vs">churn prob → x · MRR → y</div></div>
-        <canvas id="scatter"></canvas>
-        <div class="note">Top-right quadrant = high probability + high value. That's where Customer Success outreach earns its keep.</div>
+        <div class="cloud-hint">◐ drag to rotate · click a state to focus</div>
+        <div class="tip" id="tip"></div>
       </div>
     </div>
+  </div>
 
-    <!-- ROW 2: bars + gauge + what-if -->
-    <div class="vgrid r2" style="margin-bottom:.85rem">
-      <div class="card vis">
-        <div class="vh"><div><div class="vt">ARR at Risk by Industry</div></div><div class="vmore">⋯</div></div>
-        <div class="bars" id="bars"></div>
-      </div>
-      <div class="card vis">
-        <div class="vh"><div><div class="vt">Retention ROI</div></div><div class="vs">gauge · net-benefit multiple</div></div>
-        <div class="gaugeWrap">
-          <svg id="gauge" viewBox="0 0 210 130"></svg>
-          <div class="gauge-c" id="gaugeC" style="color:var(--emerald)">0x</div>
-          <div class="gauge-l">return per $1 spent</div>
-        </div>
-      </div>
-      <div class="card vis">
-        <div class="vh"><div><div class="vt">Retention What-If</div></div><div class="vs">parameters</div></div>
-        <div class="param">
-          <div class="param-row">
-            <div class="param-top"><span class="param-lbl">Save rate</span><span class="param-num" id="upV">35%</span></div>
-            <input type="range" id="up" min="10" max="70" value="35" autocomplete="off">
-          </div>
-          <div class="param-row">
-            <div class="param-top"><span class="param-lbl">Outreach cost / account</span><span class="param-num" id="cpV">$50</span></div>
-            <input type="range" id="cp" min="10" max="200" value="50" autocomplete="off">
-          </div>
-          <div class="param-out">
-            <div class="po"><div class="po-v" style="color:var(--emerald)" id="netV">$0</div><div class="po-l">Net Benefit</div></div>
-            <div class="po"><div class="po-v" style="color:var(--rose2)" id="roiV">0x</div><div class="po-l">ROI</div></div>
-          </div>
-          <div class="note" id="calcNote"></div>
-        </div>
-      </div>
+  <!-- table -->
+  <div class="card">
+    <div class="vh"><span class="vt">State detail</span><span class="vs">2024-25 · the source of truth</span></div>
+    <div class="vb tbl-scroll">
+      <table><thead><tr><th>State / territory</th><th class="num">Businesses</th><th class="num">Share</th><th class="num">Net added</th></tr></thead><tbody id="tbody"></tbody></table>
     </div>
+  </div>
 
-    <!-- ROW 3: matrix -->
-    <div class="card vis">
-      <div class="vh"><div><div class="vt">Top ARR-at-Risk Register</div></div><div class="vs" id="mtxSub">// click a header to sort · data bars scaled to slice max</div></div>
-      <div class="mtx-scroll">
-        <table id="tbl">
-          <thead><tr>
-            <th data-k="id">Merchant</th>
-            <th data-k="state">State</th>
-            <th data-k="ind">Industry</th>
-            <th class="num" data-k="mrr">MRR</th>
-            <th class="num" data-k="prob">Churn P</th>
-            <th class="num sorted" data-k="risk">ARR @ Risk</th>
-          </tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <footer>
-      Built by <a href="../index.html">Gaurav Warke</a> · Power BI-style report on synthetic AU data · headline figures from the verified model run ·
-      <a href="https://github.com/GauravWarke/churn-revenue-risk-platform" target="_blank" rel="noopener">source ↗</a>
-    </footer>
-  </main>
 </div>
+
+<footer>Built by <a href="../index.html">Gaurav Warke</a> · real open-data report · source: <a href="https://www.abs.gov.au/statistics/economy/business-indicators/counts-australian-businesses-including-entries-and-exits/latest-release" target="_blank" rel="noopener">ABS Counts of Australian Businesses (Jul 2024 – Jun 2025)</a></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ---------- deterministic synthetic book ---------- */
-var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-var rnd=mulberry32(20260629);
-var STATES=['VIC','NSW','QLD','WA','SA'], SW=[.30,.28,.18,.14,.10];
-var INDS=['Retail','Hospitality','Health','Trades','Professional','Logistics'];
-function pick(arr,w){var r=rnd(),a=0;for(var i=0;i<arr.length;i++){a+=w?w[i]:1/arr.length;if(r<=a)return arr[i];}return arr[arr.length-1];}
-var BOOK=[];
-for(var i=0;i<180;i++){
-  var st=pick(STATES,SW), ind=INDS[(rnd()*INDS.length)|0];
-  var mrr=Math.round((300+rnd()*rnd()*6200));
-  var tenure=1+rnd()*46;
-  var fails=(rnd()*rnd()*9)|0, tickets=(rnd()*rnd()*11)|0, idle=(rnd()*rnd()*80)|0;
-  var z=-0.4 + fails*0.22 + tickets*0.09 + idle*0.012 - tenure*0.015 - (mrr>3000?0.35:0);
-  var prob=1/(1+Math.exp(-z)); prob=Math.max(.02,Math.min(.97,prob+(rnd()-.5)*0.12));
-  var arr=mrr*12, risk=arr*prob;
-  BOOK.push({id:'CP-'+(4100+i),state:st,ind:ind,mrr:mrr,prob:prob,arr:arr,risk:risk,tenure:tenure,band:prob>=.6?'High':(prob>=.35?'Watch':'Healthy')});
-}
-var ARR_AT_RISK_TOTAL=3369026, FLAGGED=1494, THRESH=0.5, ROC=0.748;
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmt(n){return n.toLocaleString('en-AU');}
 
-/* ---------- helpers ---------- */
-function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
-function fmtK(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':(n>=1e3?'$'+(n/1e3).toFixed(0)+'k':'$'+Math.round(n));}
-function riskColor(p){ if(p>=.6)return '#F43F5E'; if(p>=.35)return '#F59E0B'; return '#10B981'; }
-function riskClass(p){ return p>=.6?'hi':(p>=.35?'md':'lo'); }
+/* ---------- REAL DATA — ABS Counts of Australian Businesses (Jul 2024 – Jun 2025) ---------- */
+var NAT={total:2729648,entries:437150,exits:370500,entryRate:16.4,exitRate:13.9,net:66650,netPct:2.5};
+var STATES=[
+  {name:'New South Wales',   short:'NSW',        v:891123,add:20040,color:'#2f3b4d'},
+  {name:'Victoria',          short:'VIC',        v:735805,add:16486,color:'#456187'},
+  {name:'Queensland',        short:'QLD',        v:511835,add:14769,color:'#5B7BA6'},
+  {name:'Other states & territories',short:'SA·TAS·NT·ACT',v:330155,add:4478,color:'#6E7C63'},
+  {name:'Western Australia', short:'WA',         v:260730,add:10877,color:'#B0853C'}
+];
+/* 3-year business survival by segment (%) — ABS */
+var SURV=[
+  {name:'Health Care (best industry)',v:82.7,color:'#4E7C5A'},
+  {name:'Employing businesses',       v:61.0,color:'#456187'},
+  {name:'All businesses',             v:48.0,color:'#B0853C'},
+  {name:'Non-employing',              v:43.3,color:'#9A5B3B'}
+];
 
-/* ---------- slicer state ---------- */
-var curState='all', curBand='all';
-function filtered(){ return BOOK.filter(function(d){
-  return (curState==='all'||d.state===curState) && (curBand==='all'||d.band===curBand);
-}); }
+function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
 
-/* ---------- build slicers ---------- */
-function stCount(st){return BOOK.filter(function(d){return st==='all'||d.state===st;}).length;}
-function bandCount(b){return BOOK.filter(function(d){return b==='all'||d.band===b;}).length;}
-function buildSlicer(el,items,cur,onPick){
-  el.innerHTML=items.map(function(it){
-    return '<div class="slchk'+(it.v===cur?' on':'')+'" data-v="'+it.v+'"><span class="slbox"><span class="tick"></span>'+it.l+'</span><span class="cnt">'+it.c+'</span></div>';
-  }).join('');
-  el.querySelectorAll('.slchk').forEach(function(n){n.addEventListener('click',function(){onPick(n.dataset.v);});});
-}
-function renderSlicers(){
-  buildSlicer(document.getElementById('stateSlicer'),
-    [{v:'all',l:'All states',c:stCount('all')}].concat(STATES.map(function(s){return {v:s,l:s,c:stCount(s)};})),
-    curState, function(v){curState=v;refreshAll();});
-  buildSlicer(document.getElementById('bandSlicer'),
-    [{v:'all',l:'All bands',c:bandCount('all')},{v:'High',l:'High risk',c:bandCount('High')},{v:'Watch',l:'Watch',c:bandCount('Watch')},{v:'Healthy',l:'Healthy',c:bandCount('Healthy')}],
-    curBand, function(v){curBand=v;refreshAll();});
+/* ---------- entries vs exits flow ---------- */
+var flow=document.getElementById('flow');
+function drawFlow(){
+  var f=fitCanvas(flow);if(!f)return;var cx=f.cx,W=f.W,H=f.H,padB=40,padT=24;cx.clearRect(0,0,W,H);
+  var bars=[{l:'Entries',v:NAT.entries,c:'#4E7C5A'},{l:'Exits',v:NAT.exits,c:'#BE4A31'}];
+  var maxV=NAT.entries*1.18;
+  function Y(v){return (H-padB)-v/maxV*(H-padB-padT);}
+  cx.font='10px "JetBrains Mono", monospace';
+  cx.strokeStyle='rgba(20,19,17,.07)';cx.fillStyle='#8B877F';cx.lineWidth=1;
+  [0,100000,200000,300000,400000].forEach(function(v){var y=Y(v);cx.beginPath();cx.moveTo(70,y);cx.lineTo(W-8,y);cx.stroke();cx.fillText((v/1000)+'k',36,y+3);});
+  var slot=(W-78)/bars.length,bw=Math.min(120,slot*0.5);
+  bars.forEach(function(b,i){
+    var cxp=70+slot*(i+0.5),x=cxp-bw/2,y=Y(b.v);
+    cx.fillStyle=b.c;cx.fillRect(x,y,bw,(H-padB)-y);
+    cx.fillStyle='#141311';cx.font='bold 15px Archivo, sans-serif';cx.textAlign='center';cx.fillText(fmt(b.v),cxp,y-8);
+    cx.fillStyle='#57544E';cx.font='11px "JetBrains Mono", monospace';cx.fillText(b.l,cxp,H-22);
+    cx.fillStyle='#8B877F';cx.font='10px "JetBrains Mono", monospace';cx.fillText(i===0?NAT.entryRate+'% rate':NAT.exitRate+'% rate',cxp,H-8);
+  });
+  // net badge
+  cx.textAlign='center';cx.fillStyle='#4E7C5A';cx.font='bold 12px "JetBrains Mono", monospace';
+  cx.fillText('net +'+fmt(NAT.net)+' businesses',W/2,padT-8);
+  cx.textAlign='left';
 }
 
-/* ---------- KPI ribbon (scales headline to the current slice) ---------- */
-function renderKPIs(){
-  var d=filtered();
-  var sliceRisk=d.reduce(function(a,x){return a+x.risk;},0);
-  var fullRisk=BOOK.reduce(function(a,x){return a+x.risk;},0);
-  var share=fullRisk?sliceRisk/fullRisk:0;
-  var arr=Math.round(ARR_AT_RISK_TOTAL*share);
-  var flag=Math.round(FLAGGED*share);
-  var avgP=d.length?d.reduce(function(a,x){return a+x.prob;},0)/d.length:0;
-  document.getElementById('k_arr').textContent=fmtMoney(arr);
-  document.getElementById('k_flag').textContent=flag.toLocaleString('en-AU');
-  document.getElementById('k_flag_d').textContent=(curState==='all'&&curBand==='all')?'of 2,000 scored':(d.length+' accounts in slice');
-  document.getElementById('k_roi').textContent='14.8x';
-  document.getElementById('k_auc').textContent=ROC.toFixed(3);
-  document.getElementById('k_prob').textContent=(avgP*100).toFixed(0)+'%';
-  document.getElementById('crumb').textContent=(curState==='all'?'All states':curState)+' · '+(curBand==='all'?'all risk bands':curBand+' risk');
+/* ---------- business base by state (horizontal) ---------- */
+var statesC=document.getElementById('states');
+function drawStates(){
+  var f=fitCanvas(statesC);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
+  var rows=STATES.slice().sort(function(a,b){return b.v-a.v;});
+  var niceMax=1000000, padL=112, padR=124, top=12, botAxis=20;
+  var plotW=Math.max(60,W-padL-padR), areaH=H-top-botAxis;
+  var rh=areaH/rows.length, bh=Math.min(30,rh*0.62);
+  // scale gridlines + axis labels — gives the eye a fixed scale to read against
+  cx.textAlign='center';cx.font='9px "JetBrains Mono", monospace';
+  [0,250000,500000,750000,1000000].forEach(function(v){
+    var gx=padL+v/niceMax*plotW;
+    cx.strokeStyle='rgba(20,19,17,.07)';cx.lineWidth=1;cx.beginPath();cx.moveTo(gx,top-4);cx.lineTo(gx,H-botAxis+2);cx.stroke();
+    cx.fillStyle='#9b968d';cx.fillText(v?(v/1000000)+'M':'0',gx,H-5);
+  });
+  rows.forEach(function(d,i){
+    var y=top+rh*i+rh/2, w=(d.v/niceMax)*plotW, pct=(d.v/NAT.total*100);
+    cx.fillStyle='#3a3833';cx.textAlign='right';cx.font='bold 10px "JetBrains Mono", monospace';cx.fillText(d.short,padL-8,y+3);
+    cx.fillStyle=d.color;cx.textAlign='left';
+    var x=padL,h=bh,rr=3;cx.beginPath();cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
+    cx.fillStyle='#141311';cx.font='bold 12px "JetBrains Mono", monospace';cx.fillText(fmt(d.v),padL+w+8,y-1);
+    cx.fillStyle='#8B877F';cx.font='9px "JetBrains Mono", monospace';cx.fillText(pct.toFixed(1)+'% of AU',padL+w+8,y+11);
+  });
+  cx.textAlign='left';
 }
 
-/* ---------- clustered bars ---------- */
-function renderBars(){
-  var data=filtered(), agg={};
-  INDS.forEach(function(k){agg[k]=0;});
-  data.forEach(function(d){agg[d.ind]+=d.risk;});
-  var rows=INDS.map(function(k){return [k,agg[k]];}).sort(function(a,b){return b[1]-a[1];});
-  var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
-  document.getElementById('bars').innerHTML=rows.map(function(r){
-    return '<div class="brow"><span class="bname">'+r[0]+'</span><div class="btrack"><div class="bfill" data-w="'+(r[1]/max*100)+'"></div></div><span class="bval">'+fmtK(r[1])+'</span></div>';
-  }).join('');
-  requestAnimationFrame(function(){document.querySelectorAll('#bars .bfill').forEach(function(f){f.style.width=f.dataset.w+'%';});});
+/* ---------- survival by segment ---------- */
+var survC=document.getElementById('survive');
+function drawSurv(){
+  var f=fitCanvas(survC);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
+  var padL=150,padR=46,top=8,rh=(H-top-6)/SURV.length,bh=Math.min(24,rh*0.6);
+  cx.font='11px "JetBrains Mono", monospace';
+  SURV.forEach(function(d,i){
+    var y=top+rh*i+rh/2,w=(d.v/100)*(W-padL-padR);
+    cx.fillStyle='#57544E';cx.textAlign='right';cx.fillText(d.name,padL-8,y+4);
+    cx.fillStyle=d.color;cx.textAlign='left';
+    var x=padL,h=bh,rr=3;cx.beginPath();cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
+    cx.fillStyle='#141311';cx.font='bold 11px "JetBrains Mono", monospace';cx.fillText(d.v.toFixed(1)+'%',padL+w+7,y+4);
+    cx.font='11px "JetBrains Mono", monospace';
+  });
+  cx.textAlign='left';
 }
 
-/* ---------- scatter ---------- */
-var sc=document.getElementById('scatter'), sctx=sc.getContext('2d');
-function sizeCanvas(cv,cx){var r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;cx.setTransform(dpr,0,0,dpr,0,0);return r;}
-function renderScatter(){
-  var r=sizeCanvas(sc,sctx),W=r.width,H=r.height,pad=42;
-  sctx.clearRect(0,0,W,H);
-  var maxM=Math.max.apply(null,BOOK.map(function(d){return d.mrr;}));
-  function X(p){return pad+p*(W-pad-14);}
-  function Y(m){return (H-pad)-(m/maxM)*(H-pad-16);}
-  sctx.font='9px JetBrains Mono, monospace';sctx.lineWidth=1;
-  // gridlines + numeric ticks
-  sctx.strokeStyle='rgba(255,255,255,.08)';sctx.fillStyle='#9AA3B0';
-  [0,0.25,0.5,0.75,1].forEach(function(p){var x=X(p);sctx.beginPath();sctx.moveTo(x,8);sctx.lineTo(x,H-pad);sctx.stroke();sctx.fillText(p.toFixed(2),x-8,H-pad+15);});
-  [0,0.25,0.5,0.75,1].forEach(function(f){var y=Y(f*maxM);sctx.beginPath();sctx.moveTo(pad,y);sctx.lineTo(W-6,y);sctx.stroke();sctx.fillText('$'+Math.round(f*maxM/1000)+'k',3,y+3);});
-  // priority quadrant shading (high prob + high value)
-  var tx=X(THRESH);
-  sctx.fillStyle='rgba(190,74,49,.05)';sctx.fillRect(tx,8,W-6-tx,(H-pad)/2-8);
-  // axes
-  sctx.strokeStyle='rgba(255,255,255,.18)';sctx.beginPath();sctx.moveTo(pad,H-pad);sctx.lineTo(W-6,H-pad);sctx.moveTo(pad,H-pad);sctx.lineTo(pad,8);sctx.stroke();
-  // points — translucent fill + crisp ring so overlapping bubbles stay separable
-  sctx.lineWidth=1;
-  filtered().forEach(function(d){var rad=3+Math.sqrt(d.risk)/95,cc=riskColor(d.prob);sctx.beginPath();sctx.arc(X(d.prob),Y(d.mrr),rad,0,7);sctx.fillStyle=cc+'55';sctx.fill();sctx.strokeStyle=cc+'dd';sctx.stroke();});
-  // flag threshold
-  sctx.strokeStyle='rgba(190,74,49,.55)';sctx.setLineDash([4,4]);sctx.beginPath();sctx.moveTo(tx,8);sctx.lineTo(tx,H-pad);sctx.stroke();sctx.setLineDash([]);
-  sctx.fillStyle='#FB7185';sctx.fillText('flag ≥ '+THRESH,tx+4,16);sctx.fillText('◤ priority',W-64,16);
-  // axis titles
-  sctx.fillStyle='#5B6B82';sctx.fillText('X: churn probability',W-128,H-4);
-  sctx.save();sctx.translate(11,H-pad-2);sctx.rotate(-Math.PI/2);sctx.fillText('Y: MRR (AUD)',0,0);sctx.restore();
-}
-
-/* ---------- gauge (ROI, driven by what-if) ---------- */
-function renderGauge(roi){
-  var svg=document.getElementById('gauge'), max=20;
-  var frac=Math.max(0,Math.min(1,roi/max));
-  var cx=105,cy=115,r=90, a0=Math.PI, a1=0;
-  function pt(a){return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
-  function arc(from,to,color,w){
-    var s=pt(from),e=pt(to),large=(to-from)>Math.PI?1:0;
-    return '<path d="M'+s[0]+' '+s[1]+' A'+r+' '+r+' 0 '+large+' 1 '+e[0]+' '+e[1]+'" stroke="'+color+'" stroke-width="'+w+'" fill="none" stroke-linecap="round"/>';
-  }
-  var needleA=a0+(a1-a0)*frac; // note a1<a0 so sweeps clockwise across top
-  // background segments (red→amber→green zones)
-  var svgc='';
-  svgc+=arc(a0, a0+(-Math.PI)*0.33, '#BE4A31', 12);
-  svgc+=arc(a0+(-Math.PI)*0.33, a0+(-Math.PI)*0.66, '#B0853C', 12);
-  svgc+=arc(a0+(-Math.PI)*0.66, a1, '#4E7C5A', 12);
-  // value overlay arc
-  svgc+=arc(a0, a0+(-Math.PI)*frac, 'rgba(20,19,17,.35)', 4);
-  // needle
-  var np=pt(needleA);
-  svgc+='<line x1="'+cx+'" y1="'+cy+'" x2="'+np[0]+'" y2="'+np[1]+'" stroke="#141311" stroke-width="2.5" stroke-linecap="round"/>';
-  svgc+='<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="#141311"/>';
-  svgc+='<text x="15" y="128" fill="#616E86" font-size="9" font-family="JetBrains Mono">0x</text>';
-  svgc+='<text x="180" y="128" fill="#616E86" font-size="9" font-family="JetBrains Mono">'+max+'x</text>';
-  svg.innerHTML=svgc;
-  document.getElementById('gaugeC').textContent=roi.toFixed(1)+'x';
-  document.getElementById('gaugeC').style.color=roi>=10?'var(--emerald)':(roi>=4?'var(--amber)':'var(--rose)');
-}
-
-/* ---------- matrix (with data bars) ---------- */
-var sortK='risk',sortDir=-1;
+/* ---------- table ---------- */
 function renderTable(){
-  var data=filtered().slice().sort(function(a,b){var x=a[sortK],y=b[sortK];if(typeof x==='string')return x<y?sortDir:x>y?-sortDir:0;return (x-y)*sortDir;}).slice(0,12);
-  var maxRisk=Math.max.apply(null,data.map(function(d){return d.risk;}))||1;
-  document.getElementById('tbody').innerHTML=data.map(function(d){
-    var w=(d.risk/maxRisk*100).toFixed(0);
-    return '<tr><td class="mono">'+d.id+'</td><td>'+d.state+'</td><td>'+d.ind+'</td><td class="num mono">'+fmtMoney(d.mrr)+'</td>'+
-      '<td class="num"><span class="pill '+riskClass(d.prob)+'">'+(d.prob*100).toFixed(0)+'%</span></td>'+
-      '<td class="num dbar"><span class="df" style="width:'+w+'%"></span><span class="dv">'+fmtMoney(d.risk)+'</span></td></tr>';
-  }).join('');
-  document.querySelectorAll('#tbl th').forEach(function(th){th.classList.toggle('sorted',th.dataset.k===sortK);th.classList.toggle('asc',th.dataset.k===sortK&&sortDir===1);});
+  var rows=STATES.slice().sort(function(a,b){return b.v-a.v;});
+  var maxV=Math.max.apply(null,rows.map(function(d){return d.v;}));
+  document.getElementById('tbody').innerHTML=rows.map(function(d){
+    var pct=(d.v/NAT.total*100),w=(d.v/maxV*100);
+    return '<tr><td class="mono"><span class="chip"><i style="background:'+d.color+'"></i>'+d.name+'</span></td>'+
+      '<td class="num mono">'+fmt(d.v)+'</td><td class="num mono">'+pct.toFixed(1)+'%</td>'+
+      '<td class="num"><span class="up">+'+fmt(d.add)+'</span></td></tr>';
+  }).join('')+
+    '<tr><td class="mono"><b>Australia</b></td><td class="num mono"><b>'+fmt(NAT.total)+'</b></td><td class="num mono">100%</td><td class="num"><span class="up">+'+fmt(NAT.net)+'</span></td></tr>';
 }
-document.querySelectorAll('#tbl th').forEach(function(th){
-  th.addEventListener('click',function(){var k=th.dataset.k;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=(k==='id'||k==='state'||k==='ind')?1:-1;}renderTable();});
-});
 
-/* ---------- what-if calculator + gauge ---------- */
-var up=document.getElementById('up'),cp=document.getElementById('cp');
-function calc(){
-  var save=+up.value/100, cost=+cp.value;
-  var recoverable=ARR_AT_RISK_TOTAL*save, campaign=FLAGGED*cost, net=recoverable-campaign, roi=campaign?net/campaign:0;
-  document.getElementById('upV').textContent=up.value+'%';
-  document.getElementById('cpV').textContent='$'+cp.value;
-  document.getElementById('netV').textContent=fmtMoney(net);
-  document.getElementById('roiV').textContent=roi.toFixed(1)+'x';
-  document.getElementById('netV').style.color=net>=0?'var(--emerald)':'var(--rose)';
-  document.getElementById('calcNote').textContent='Recoverable '+fmtK(recoverable)+' − campaign '+fmtK(campaign)+' across '+FLAGGED.toLocaleString('en-AU')+' flagged accounts.';
-  renderGauge(roi);
-}
-up.addEventListener('input',calc);cp.addEventListener('input',calc);
-
-/* ---------- master refresh ---------- */
-function refreshAll(){renderSlicers();renderKPIs();renderBars();renderScatter();renderTable();buildCloud();}
-
-/* ---- shared 3D axis helpers (camera-facing text sprites + axis lines) ---- */
+/* ================= 3D STATE BARS ================= */
 function makeTextSprite(txt,color,fs){
-  fs=fs||40;var pad=10,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  fs=fs||28;var pad=8,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
   ctx.font='bold '+fs+'px "JetBrains Mono", monospace';var w=Math.ceil(ctx.measureText(txt).width);
   cv.width=w+pad*2;cv.height=fs+pad*2;ctx.font='bold '+fs+'px "JetBrains Mono", monospace';
   ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(txt,pad,cv.height/2);
@@ -495,130 +292,58 @@ function makeTextSprite(txt,color,fs){
   var sc=0.42;sp.scale.set(cv.width*sc,cv.height*sc,1);return sp;
 }
 function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([a,b]);return new THREE.Line(g,new THREE.LineBasicMaterial({color:color,transparent:true,opacity:op||0.55}));}
-
-/* ================= 3D ACCOUNT RISK CLOUD ================= */
-var buildCloud=function(){};
+function hex2int(h){return parseInt(h.slice(1),16);}
+/* 3D RADIAL BAR CHART — states in a ring, click a bar to focus */
 (function(){
-  var canvas=document.getElementById('cloud'),wrap=document.getElementById('cloudWrap'),tip=document.getElementById('tip');
+  var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
   if(typeof THREE==='undefined')return;
-  var W=wrap.clientWidth||600,H=wrap.clientHeight||340;
+  var order=STATES.slice().sort(function(a,b){return b.v-a.v;}), N=order.length;
+  var W=wrap.clientWidth||600,H=wrap.clientHeight||360;
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
-  var scene=new THREE.Scene();
-  var camera=new THREE.PerspectiveCamera(55,W/H,1,4000);camera.position.set(60,120,720);camera.lookAt(0,0,0);
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(0,320,560);camera.lookAt(0,30,0);
   var group=new THREE.Group();scene.add(group);
-  var pts=null,meta=[];
-  function build(){
-    if(pts){group.remove(pts);pts.geometry.dispose();pts.material.dispose();}   // keep axes; swap only the points
-    var data=filtered();meta=data;
-    var n=data.length, pos=new Float32Array(n*3), col=new Float32Array(n*3), siz=new Float32Array(n);
-    var c=new THREE.Color();
-    for(var i=0;i<n;i++){
-      var d=data[i];
-      pos[i*3]  =(d.prob-0.5)*760;                    // X = churn probability
-      pos[i*3+1]=(Math.sqrt(d.mrr/7000)-0.5)*520;     // Y = MRR (value)
-      pos[i*3+2]=(d.tenure/48-0.5)*440;               // Z = account tenure (months)
-      c.set(riskColor(d.prob));col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
-      siz[i]=10+Math.sqrt(d.risk)/26;
-    }
-    var g=new THREE.BufferGeometry();
-    g.setAttribute('position',new THREE.BufferAttribute(pos,3));
-    g.setAttribute('color',new THREE.BufferAttribute(col,3));
-    g.setAttribute('asize',new THREE.BufferAttribute(siz,1));
-    var mat=new THREE.ShaderMaterial({
-      transparent:true,depthWrite:false,
-      vertexShader:'attribute float asize;varying vec3 vC;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=max(4.0,asize*(330.0/-mv.z));gl_Position=projectionMatrix*mv;}',
-      fragmentShader:'varying vec3 vC;void main(){vec2 u=gl_PointCoord-0.5;float d=length(u);if(d>0.5)discard;float a=smoothstep(0.5,0.14,d);gl_FragColor=vec4(vC,a);}',
-      vertexColors:true
-    });
-    pts=new THREE.Points(g,mat);group.add(pts);
-  }
-  buildCloud=build;build();
-
-  // ---- plot frame: floor grid + ticked, labelled axes (added once; persists across rebuilds) ----
-  (function(){
-    var HX=380,HY=260,HZ=220;                         // half-extents match the point mapping
-    var gm=new THREE.LineBasicMaterial({color:0x2a3450,transparent:true,opacity:.4});
-    var tk='#8794a8';
-    // floor grid on y = -HY
-    var k;
-    for(k=-1;k<=1;k+=0.5){ group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(k*HX,-HY,-HZ),new THREE.Vector3(k*HX,-HY,HZ)]),gm)); }
-    for(k=-1;k<=1;k+=0.5){ group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-HX,-HY,k*HZ),new THREE.Vector3(HX,-HY,k*HZ)]),gm)); }
-    // axis lines along the box edges
-    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(HX,-HY,-HZ),0xF43F5E,.7));  // X
-    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,HY,-HZ),0x34D399,.7));  // Y
-    group.add(axisLine(new THREE.Vector3(-HX,-HY,-HZ),new THREE.Vector3(-HX,-HY,HZ),0x60A5FA,.7));  // Z
-    // ticks — X: churn probability
-    [0,0.25,0.5,0.75,1].forEach(function(p){var s=makeTextSprite(p.toFixed(2),tk,24);s.position.set((p-0.5)*760,-HY-28,-HZ);group.add(s);});
-    // ticks — Y: MRR (matches sqrt mapping)
-    [1000,3000,6000].forEach(function(v){var s=makeTextSprite('$'+(v/1000)+'k',tk,24);s.position.set(-HX-46,(Math.sqrt(v/7000)-0.5)*520,-HZ);group.add(s);});
-    // ticks — Z: tenure (months)
-    [6,24,42].forEach(function(t){var s=makeTextSprite(t+'mo',tk,24);s.position.set(-HX-6,-HY-28,(t/48-0.5)*440);group.add(s);});
-    // axis titles
-    var sx=makeTextSprite('CHURN PROB','#FB7185',30);sx.position.set(HX+78,-HY,-HZ);group.add(sx);
-    var sy=makeTextSprite('MRR (AUD)','#34D399',30);sy.position.set(-HX,HY+34,-HZ);group.add(sy);
-    var sz=makeTextSprite('TENURE','#60A5FA',30);sz.position.set(-HX,-HY-28,HZ+70);group.add(sz);
-  })();
-
-  var drag=false,px=0,py=0,ry=-0.35,rx=0.22,vy=0.0016;
-  wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
-  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
-  wrap.addEventListener('pointermove',function(e){
-    var r=wrap.getBoundingClientRect();
-    if(drag){ry+=(e.clientX-px)*0.006;rx+=(e.clientY-py)*0.006;rx=Math.max(-1,Math.min(1,rx));px=e.clientX;py=e.clientY;}
-    hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);
+  var R=195, SC=0.00028, sel=-1;
+  var maxV=Math.max.apply(null,order.map(function(d){return d.v;})), Ymax=maxV*SC+40;
+  group.add(axisLine(new THREE.Vector3(0,0,0),new THREE.Vector3(0,Ymax,0),0x9FC3AC,0.45));
+  var gmat=new THREE.LineBasicMaterial({color:0x2f3a49,transparent:true,opacity:.35});
+  [250000,500000,750000].forEach(function(v){var yy=v*SC;var s=makeTextSprite((v/1000)+'k','#8794a8',22);s.position.set(-20,yy,0);group.add(s);
+    var pts=[];for(var a=0;a<=54;a++){var t=a/54*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(t)*R*1.06,yy,Math.sin(t)*R*1.06));}
+    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),gmat));});
+  var lblY=makeTextSprite('BUSINESSES BY STATE','#9FC3AC',24);lblY.position.set(0,Ymax+24,0);group.add(lblY);
+  var bars=[];
+  order.forEach(function(d,i){
+    var ang=-Math.PI/2+i/N*Math.PI*2, bx=Math.cos(ang)*R, bz=Math.sin(ang)*R, h=Math.max(2,d.v*SC);
+    var g=new THREE.Group();g.position.set(bx,0,bz);group.add(g);
+    var m=new THREE.Mesh(new THREE.BoxGeometry(48,1,48),new THREE.MeshBasicMaterial({color:hex2int(d.color),transparent:true,opacity:.95}));m.scale.y=h;m.position.y=h/2;g.add(m);
+    var wf=new THREE.Mesh(new THREE.BoxGeometry(49,1,49),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.12}));wf.scale.y=h;wf.position.y=h/2;g.add(wf);
+    var lbl=makeTextSprite(d.short,'#C9C3B8',22);lbl.position.set(0,-20,0);g.add(lbl);
+    var vlbl=makeTextSprite(Math.round(d.v/1000)+'k','#EFE9DF',22);vlbl.position.set(0,h+18,0);g.add(vlbl);
+    bars.push({g:g,m:m,wf:wf,d:d,bx:bx,bz:bz,h:h});
   });
-  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
-
+  function applySel(){bars.forEach(function(b,i){var out=(i===sel)?1.3:1;b.g.position.set(b.bx*out,0,b.bz*out);b.m.material.opacity=(sel<0||i===sel)?0.95:0.35;b.wf.material.opacity=(sel<0||i===sel)?0.16:0.05;});}
+  var drag=false,px=0,py=0,ry=0.35,rx=0.5,vy=0.001,moved=false;
+  wrap.addEventListener('pointerdown',function(e){drag=true;moved=false;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+  addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
+  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){var dx=e.clientX-px;if(Math.abs(dx)>3||Math.abs(e.clientY-py)>3)moved=true;ry+=dx*0.006;rx+=(e.clientY-py)*0.005;rx=Math.max(0.1,Math.min(1.1,rx));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
+  wrap.addEventListener('pointerleave',function(){if(sel<0)tip.style.opacity=0;});
+  wrap.addEventListener('click',function(e){if(moved)return;var r=wrap.getBoundingClientRect();var i=pick(e.clientX-r.left,e.clientY-r.top,r.width,r.height);sel=(i===sel)?-1:i;applySel();if(sel>=0)showTip(sel,e.clientX-r.left,e.clientY-r.top,r.width,r.height);else tip.style.opacity=0;});
   var proj=new THREE.Vector3();
-  function hover(mx,my,rw,rh){
-    if(!pts)return;var best=-1,bd=18;
-    var arr=pts.geometry.attributes.position.array;
-    for(var i=0;i<meta.length;i++){
-      proj.set(arr[i*3],arr[i*3+1],arr[i*3+2]).applyMatrix4(group.matrixWorld).project(camera);
-      var sx=(proj.x*0.5+0.5)*rw, sy=(-proj.y*0.5+0.5)*rh;
-      var dd=Math.hypot(sx-mx,sy-my);
-      if(dd<bd&&proj.z<1){bd=dd;best=i;}
-    }
-    if(best>=0){var d=meta[best];
-      tip.innerHTML='<b>'+d.id+'</b> · '+d.state+'<br>'+d.ind+'<br>MRR '+fmtMoney(d.mrr)+'<br>churn '+(d.prob*100).toFixed(0)+'% · risk '+fmtMoney(d.risk);
-      tip.style.left=Math.min(mx+14,rw-170)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;
-    } else tip.style.opacity=0;
-  }
-
-  function loop(){
-    if(!drag)ry+=vy;
-    group.rotation.y+=(ry-group.rotation.y)*0.08;
-    group.rotation.x+=(rx-group.rotation.x)*0.08;
-    renderer.render(scene,camera);
-    if(!reduce)requestAnimationFrame(loop);
-  }
+  function pick(mx,my,rw,rh){var best=-1,bd=46;for(var i=0;i<bars.length;i++){var b=bars[i];proj.set(b.g.position.x,b.h,b.g.position.z).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}return best;}
+  function showTip(i,mx,my,rw,rh){var d=bars[i].d;tip.innerHTML='<b>'+d.name+'</b><br>'+fmt(d.v)+' businesses<br>'+(d.v/NAT.total*100).toFixed(1)+'% of Australia · +'+fmt(d.add);tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
+  function hover(mx,my,rw,rh){if(sel>=0)return;var i=pick(mx,my,rw,rh);if(i>=0)showTip(i,mx,my,rw,rh);else tip.style.opacity=0;}
+  function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
   function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
-  addEventListener('resize',resize);
-  if('ResizeObserver' in window){new ResizeObserver(resize).observe(wrap);}
-  if(reduce)renderer.render(scene,camera);else loop();
+  addEventListener('resize',resize);if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);
+  applySel();if(reduce)renderer.render(scene,camera);else loop();
 })();
 
-/* ================= subtle backdrop ================= */
-(function(){
-  var canvas=document.getElementById('bg3d');if(typeof THREE==='undefined')return;
-  var W=innerWidth,H=innerHeight;
-  var rn=new THREE.WebGLRenderer({canvas:canvas,alpha:true});rn.setPixelRatio(Math.min(devicePixelRatio||1,2));rn.setSize(W,H,false);
-  var sc2=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,W/H,1,2000);cam.position.z=600;
-  var N=80,p=new Float32Array(N*3);for(var i=0;i<N*3;i++)p[i]=(Math.random()-0.5)*1200;
-  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
-  var grp=new THREE.Points(g,new THREE.PointsMaterial({color:0xF43F5E,size:2.2,transparent:true,opacity:.45}));
-  sc2.add(grp);
-  function f(){grp.rotation.y+=0.0006;grp.rotation.x+=0.0002;rn.render(sc2,cam);if(!reduce)requestAnimationFrame(f);}
-  addEventListener('resize',function(){W=innerWidth;H=innerHeight;cam.aspect=W/H;cam.updateProjectionMatrix();rn.setSize(W,H,false);});
-  if(reduce)rn.render(sc2,cam);else f();
-})();
-
-/* ---------- init ---------- */
-up.value='35';cp.value='50';   // stable defaults on load (net $1,104,459 / 14.8x), even after bfcache restore
-refreshAll();calc();
-addEventListener('resize',renderScatter);
-if('ResizeObserver' in window){new ResizeObserver(renderScatter).observe(sc);}
+/* init */
+renderTable();
+requestAnimationFrame(function(){requestAnimationFrame(function(){drawFlow();drawStates();drawSurv();});});
+setTimeout(function(){drawFlow();drawStates();drawSurv();},400);
+addEventListener('resize',function(){drawFlow();drawStates();drawSurv();});
+if('ResizeObserver' in window){new ResizeObserver(function(){drawFlow();}).observe(flow);new ResizeObserver(function(){drawStates();}).observe(statesC);new ResizeObserver(function(){drawSurv();}).observe(survC);}
 </script>
 </body>
 </html>
