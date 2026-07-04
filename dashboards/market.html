@@ -3,408 +3,376 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Market-Performance Intelligence · Tableau-style Dashboard | Gaurav Warke</title>
-<meta name="description" content="Tableau-style analytical dashboard — GA4 + orders + ad spend unified per channel; dual-axis trend, decision quadrant, ROAS/CAC matrix, live budget-reallocation model, and a real Tableau Public embed slot.">
+<title>Australian Government Advertising Spend · Real open-data analysis | Gaurav Warke</title>
+<meta name="description" content="Where the public advertising dollar goes — a real open-data analysis of Commonwealth and state government advertising spend: channel mix, multi-year trend, media vs development, and a cross-jurisdiction comparison. Sources: Dept of Finance, Audit Office NSW, data.qld.gov.au.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Playfair+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Tableau dark analytical */
-  --canvas:#12161C;--pane:#191F27;--card:#1B222B;--card2:#20272F;--edge:#2C343E;--edgeH:#3C4653;
-  --t-blue:#4E79A7;--t-blue2:#6B93C0;--t-orange:#F28E2B;--t-orange2:#FFB25E;--t-red:#E15759;--t-green:#59A14F;--t-teal:#76B7B2;--t-purple:#B07AA1;--t-yellow:#EDC948;
-  --t1:#E9EDF2;--t2:#9AA6B4;--t3:#68727E;--good:#59A14F;--bad:#E15759;
+  /* light editorial */
+  --canvas:#EFEDE7;--pane:#EAE7E0;--card:#FBFAF7;--card2:#F3F1EB;--edge:#E1DDD4;--edgeH:#CBC6BB;
+  --ink:#141311;--ink2:#3A3833;
+  /* muted earthy semantic accents */
+  --blue:#456187;--blue2:#5B7BA6;--amber:#B0853C;--rose:#BE4A31;--emerald:#4E7C5A;--violet:#6E5A86;
+  --t1:#141311;--t2:#57544E;--t3:#8B877F;--good:#4E7C5A;--bad:#BE4A31;
+  --sans:'Archivo','Helvetica Neue',Arial,sans-serif;--serif:'Playfair Display',Georgia,serif;--mono:'JetBrains Mono',monospace;
+  /* channel colour ramp (earthy) */
+  --c1:#2f3b4d;--c2:#456187;--c3:#6E7C63;--c4:#B0853C;--c5:#9A5B3B;--c6:#8B877F;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#333c47;border-radius:8px}
+body{font-family:var(--sans);background:var(--canvas);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cfc9bd;border-radius:8px}
 a{color:inherit}
 
-/* Tableau toolbar */
-.tbar{position:sticky;top:0;z-index:60;background:#161B22;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.8rem;padding:.5rem .95rem}
-.tbar .wb{display:flex;flex-direction:column;line-height:1.15}
-.tbar .wb b{font-size:.85rem;font-weight:700;letter-spacing:-.2px}
-.tbar .wb span{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.tbadge{display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:5px;padding:.26rem .55rem;font-weight:600}
-.tbadge svg{width:12px;height:12px}
-.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--t2);text-decoration:none}
-.back:hover{color:var(--t-blue2)}
+/* top bar */
+.tbar{position:sticky;top:0;z-index:60;background:rgba(239,237,231,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.85rem;padding:.55rem 1rem}
+.tbar .wb{display:flex;flex-direction:column;line-height:1.18}
+.tbar .wb b{font-size:.9rem;font-weight:800;letter-spacing:-.3px}
+.tbar .wb span{font-size:.6rem;color:var(--t3);font-family:var(--mono)}
+.back{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--t2);text-decoration:none;font-weight:600}
+.back:hover{color:var(--ink)}
 .tbar .sp{flex:1}
-.tbtn{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--t2);text-decoration:none;border:1px solid var(--edge);border-radius:5px;padding:.32rem .62rem}
-.tbtn:hover{border-color:var(--t-blue);color:var(--t-blue2)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--good);display:inline-block;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.src-chip{display:inline-flex;align-items:center;gap:.45rem;font-size:.62rem;font-family:var(--mono);color:var(--t2);border:1px solid var(--edge);background:var(--card);border-radius:100px;padding:.28rem .7rem;font-weight:600}
+.src-chip i{width:6px;height:6px;border-radius:50%;background:var(--emerald);display:inline-block}
+.tbtn{font-size:.72rem;font-family:var(--mono);color:var(--t2);text-decoration:none;border:1px solid var(--edge);border-radius:6px;padding:.34rem .64rem;font-weight:600}
+.tbtn:hover{border-color:var(--ink);color:var(--ink)}
 
-/* title band + BANs */
-.band{background:var(--pane);border-bottom:1px solid var(--edge);padding:.95rem 1.2rem}
-.band h1{font-family:'Sora',sans-serif;font-size:clamp(1.3rem,3vw,1.75rem);font-weight:800;letter-spacing:-.7px}
-.band h1 em{color:var(--t-blue2);font-style:normal}
-.band p{color:var(--t2);font-size:.8rem;max-width:840px;margin-top:.25rem}
-.bans{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--edge);border-bottom:1px solid var(--edge)}
-.ban{background:var(--pane);padding:.75rem 1.2rem;position:relative}
-.ban b{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-1px;display:block;line-height:1}
-.ban .sub{font-size:.62rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-family:'JetBrains Mono',monospace;margin-top:.25rem}
-.ban .act{position:absolute;top:.7rem;right:1rem;font-size:.54rem;font-weight:700;font-family:'JetBrains Mono',monospace;padding:.1rem .4rem;border-radius:3px}
-.act.hold{background:rgba(78,121,167,.18);color:var(--t-blue2)}.act.cut{background:rgba(225,87,89,.18);color:var(--t-red)}.act.scale{background:rgba(89,161,79,.2);color:var(--t-green)}
+/* title band */
+.band{background:transparent;border-bottom:1px solid var(--edge);padding:1.25rem 1.3rem .5rem}
+.band .eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);font-weight:600}
+.band h1{font-family:var(--sans);font-size:clamp(1.5rem,3.4vw,2.35rem);font-weight:900;letter-spacing:-1px;line-height:1.04;margin-top:.35rem}
+.band h1 em{font-family:var(--serif);font-style:italic;font-weight:400}
+.band p{color:var(--t2);font-size:.86rem;max-width:900px;margin-top:.55rem}
 
-/* dashboard: left shelf + main */
+/* plain-english banner */
+.tldr{margin:1rem 1.3rem 0;background:var(--card);border:1px solid var(--edge);border-left:3px solid var(--blue);border-radius:11px;padding:1.15rem 1.35rem}
+.tldr-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.tldr-h{font-size:clamp(1.15rem,2.3vw,1.5rem);font-weight:800;letter-spacing:-.5px;line-height:1.22;margin:.5rem 0 .55rem}
+.tldr-h em{font-family:var(--serif);font-style:italic;font-weight:400}
+.tldr-p{font-size:.86rem;color:var(--t2);max-width:940px;line-height:1.68}
+.tldr-p b{color:var(--ink);font-weight:700}
+
+/* BAN ribbon */
+.bans{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--edge);border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin-top:1.1rem}
+.ban{background:var(--card);padding:.9rem 1.3rem}
+.ban b{font-family:var(--sans);font-size:1.75rem;font-weight:900;letter-spacing:-1.2px;display:block;line-height:1}
+.ban .sub{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;font-weight:700;font-family:var(--mono);margin-top:.35rem}
+.ban .d{font-size:.64rem;color:var(--t2);margin-top:.2rem}
+
+/* layout */
 .dash{display:grid;grid-template-columns:250px 1fr;gap:1px;background:var(--edge)}
-.shelf{background:var(--pane);border-right:1px solid var(--edge);padding:.95rem .8rem;display:flex;flex-direction:column;gap:1rem;position:sticky;top:47px;align-self:start;height:calc(100vh - 47px);overflow-y:auto}
-.main{background:var(--canvas);padding:1rem 1.1rem;display:grid;gap:.95rem;align-content:start}
+.shelf{background:var(--pane);border-right:1px solid var(--edge);padding:1rem .85rem;display:flex;flex-direction:column;gap:1rem;position:sticky;top:49px;align-self:start;height:calc(100vh - 49px);overflow-y:auto}
+.main{background:var(--canvas);padding:1.05rem 1.15rem;display:grid;gap:1rem;align-content:start}
 
-/* shelf cards */
-.sh-card{border:1px solid var(--edge);border-radius:4px;background:var(--card)}
-.sh-h{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);font-weight:700;font-family:'JetBrains Mono',monospace;padding:.5rem .65rem;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:.4rem}
-.sh-h .ic{width:9px;height:9px;border-radius:2px;background:var(--t-blue)}
-.sh-b{padding:.65rem}
-.param-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem}
-.param-lbl{font-size:.72rem;color:var(--t2)}
-.param-num{font-family:'Sora',sans-serif;font-weight:700;color:var(--t-blue2);font-size:.9rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:#333c47;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--t-blue);cursor:pointer;border:2px solid #12161c;box-shadow:0 0 0 1px var(--t-blue)}
-input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--t-blue);cursor:pointer;border:2px solid #12161c}
-.param-out{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.6rem}
-.po{background:var(--card2);border:1px solid var(--edge);border-radius:5px;padding:.55rem .3rem;text-align:center}
-.po-v{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800}
-.po-l{font-size:.5rem;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-top:.15rem;font-family:'JetBrains Mono',monospace}
-.chk{display:flex;align-items:center;gap:.45rem;font-size:.74rem;color:var(--t2);padding:.28rem .35rem;border-radius:4px;cursor:pointer;user-select:none}
+.sh-card{border:1px solid var(--edge);border-radius:8px;background:var(--card)}
+.sh-h{font-size:.58rem;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);font-weight:700;font-family:var(--mono);padding:.55rem .7rem;border-bottom:1px solid var(--edge)}
+.sh-b{padding:.7rem}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.seg button{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--t2);background:var(--card2);border:1px solid var(--edge);border-radius:6px;padding:.5rem .3rem;cursor:pointer;transition:.12s}
+.seg button:hover{border-color:var(--edgeH)}
+.seg button.on{background:linear-gradient(160deg,#2a2823,#141311);color:#F4F1EA;border-color:#141311}
+.chk{display:flex;align-items:center;gap:.5rem;font-size:.76rem;color:var(--t2);padding:.32rem .35rem;border-radius:6px;cursor:pointer;user-select:none}
 .chk:hover{background:var(--card2)}
-.chk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none}
-.chk.on .tick{background:var(--t-blue);border-color:var(--t-blue)}
+.chk .tick{width:13px;height:13px;border-radius:3px;border:1.5px solid var(--edgeH);display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--card)}
+.chk.on .tick{background:var(--ink);border-color:var(--ink)}
 .chk.on .tick::after{content:'';width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-1px)}
-.chk .sw{width:9px;height:9px;border-radius:2px;flex:none}
-.note{font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.55;margin-top:.5rem}
+.chk .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.note{font-size:.64rem;color:var(--t3);font-family:var(--mono);line-height:1.6;margin-top:.5rem}
+.prov{font-size:.64rem;color:var(--t2);line-height:1.65}
+.prov b{color:var(--ink)}
+.prov a{color:var(--blue);text-decoration:none;font-weight:600}
 
-/* worksheet card */
-.ws{background:var(--card);border:1px solid var(--edge);border-radius:4px}
-.ws-h{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.55rem .85rem;border-bottom:1px solid var(--edge)}
-.ws-t{font-size:.82rem;font-weight:700}
-.ws-t .tag{color:var(--t-blue2);font-size:.55rem;font-family:'JetBrains Mono',monospace;border:1px solid #35455a;border-radius:3px;padding:.03rem .3rem;vertical-align:middle;margin-left:.3rem}
-.ws-s{font-size:.62rem;color:var(--t3);font-family:'JetBrains Mono',monospace}
-.ws-b{padding:.85rem}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:.95rem}
+/* worksheet cards */
+.ws{background:var(--card);border:1px solid var(--edge);border-radius:9px}
+.ws-h{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.65rem .9rem;border-bottom:1px solid var(--edge)}
+.ws-t{font-size:.85rem;font-weight:800;letter-spacing:-.2px}
+.ws-s{font-size:.62rem;color:var(--t3);font-family:var(--mono)}
+.ws-b{padding:.9rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 
-/* Tableau Public embed hero */
-.embed-hero{position:relative;min-height:300px;border-radius:4px;overflow:hidden;background:linear-gradient(135deg,#1a2028,#161b22)}
-#tvizHost{width:100%}
-#tvizHost tableau-viz,#tvizHost iframe{width:100%!important;min-height:420px;border:0}
-.embed-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.8rem 1.4rem;gap:.7rem;min-height:300px}
-.embed-empty .badge{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--t-blue2);border:1px solid #35455a;background:rgba(78,121,167,.12);border-radius:100px;padding:.24rem .8rem;font-weight:600}
-.embed-empty h3{font-size:1.05rem;font-weight:800;font-family:'Sora',sans-serif}
-.embed-empty p{font-size:.74rem;color:var(--t2);max-width:560px;line-height:1.6}
-.embed-form{display:flex;gap:.5rem;width:100%;max-width:560px;margin-top:.3rem;flex-wrap:wrap;justify-content:center}
-.embed-form input{flex:1;min-width:240px;background:var(--card2);border:1px solid var(--edge);border-radius:6px;padding:.6rem .75rem;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:.74rem;outline:none}
-.embed-form input:focus{border-color:var(--t-blue)}
-.embed-form button{background:var(--t-blue);color:#fff;border:none;border-radius:6px;padding:.6rem 1rem;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit}
-.embed-form button:hover{background:#5c88b8}
-.embed-steps{font-size:.66rem;color:var(--t3);font-family:'JetBrains Mono',monospace;line-height:1.7;text-align:left;max-width:560px}
-.embed-steps b{color:var(--t-blue2)}
-.embed-err{font-size:.66rem;color:var(--t-red);font-family:'JetBrains Mono',monospace;min-height:1rem}
+/* light canvases */
+#trend,#chmix,#juris{width:100%;display:block}
+#trend{height:250px}#chmix{height:250px}#juris{height:210px}
 
-/* 3D bars */
-#sceneWrap{position:relative;height:300px;border-radius:4px;overflow:hidden;background:radial-gradient(ellipse at 50% 62%,rgba(78,121,167,.08),transparent 70%);cursor:grab}
+/* 3D panel (kept dark) */
+#sceneWrap{position:relative;height:320px;border-radius:7px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,rgba(69,97,135,.16),transparent 70%),#16150F;cursor:grab}
 #sceneWrap.drag{cursor:grabbing}
 #scene{width:100%;height:100%;display:block}
-.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:var(--t3);font-family:'JetBrains Mono',monospace;pointer-events:none}
-.cloud-legend{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:.28rem;font-size:.6rem;font-family:'JetBrains Mono',monospace;pointer-events:none}
-.lg{display:flex;align-items:center;gap:.38rem;color:var(--t2)}.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
-.tip{position:absolute;pointer-events:none;background:#0f1319;border:1px solid var(--edgeH);border-radius:7px;padding:.5rem .65rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:150px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.tip b{color:var(--t-blue2)}
-
-/* canvases */
-#trend,#quad{width:100%;height:250px;display:block}
+.cloud-hint{position:absolute;bottom:8px;left:10px;font-size:.6rem;color:rgba(255,255,255,.5);font-family:var(--mono);pointer-events:none}
+.cloud-legend{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:.28rem;font-size:.6rem;font-family:var(--mono);pointer-events:none}
+.lg{display:flex;align-items:center;gap:.38rem;color:rgba(255,255,255,.8)}.lg i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.axes-key{position:absolute;top:10px;left:10px;font-size:.58rem;font-family:var(--mono);color:rgba(255,255,255,.8);line-height:1.6;pointer-events:none;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:.42rem .58rem}
+.tip{position:absolute;pointer-events:none;background:#0f0e0b;border:1px solid rgba(255,255,255,.18);color:#F4F1EA;border-radius:8px;padding:.5rem .65rem;font-size:.66rem;opacity:0;transition:opacity .12s;z-index:5;min-width:150px;font-family:var(--mono);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tip b{color:#B7C6DC}
 
 /* table */
-table{width:100%;border-collapse:collapse;font-size:.76rem}
-th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:.5rem .6rem;border-bottom:1px solid var(--edge);white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{text-align:left;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:.55rem .65rem;border-bottom:1px solid var(--edge);white-space:nowrap}
 th.num,td.num{text-align:right}
-td{padding:.55rem .6rem;border-bottom:1px solid rgba(255,255,255,.035);color:var(--t2);white-space:nowrap}
-tr:hover td{background:rgba(78,121,167,.05)}
-.mono{font-family:'JetBrains Mono',monospace;color:var(--t1)}
-.chip{display:inline-flex;align-items:center;gap:.4rem}.chip i{width:9px;height:9px;border-radius:2px}
-.pill{padding:.16rem .55rem;border-radius:4px;font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace}
-.pill.scale{background:rgba(89,161,79,.16);color:var(--t-green)}.pill.hold{background:rgba(78,121,167,.18);color:var(--t-blue2)}.pill.cut{background:rgba(225,87,89,.16);color:var(--t-red)}
+td{padding:.6rem .65rem;border-bottom:1px solid var(--edge);color:var(--t2);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--card2)}
+.mono{font-family:var(--mono);color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:.45rem}.chip i{width:10px;height:10px;border-radius:3px}
+.bar-cell{position:relative;min-width:120px}
+.bar-cell .bar{position:absolute;left:0;top:50%;transform:translateY(-50%);height:16px;border-radius:3px;opacity:.9}
 
-footer{padding:1.2rem;text-align:center;color:var(--t3);font-size:.72rem;background:var(--pane);border-top:1px solid var(--edge)}
-footer a{color:var(--t-blue2);text-decoration:none}
+footer{padding:1.4rem;text-align:center;color:var(--t3);font-size:.72rem;background:var(--pane);border-top:1px solid var(--edge)}
+footer a{color:var(--blue);text-decoration:none;font-weight:600}
 
 @media(max-width:960px){.dash{grid-template-columns:1fr}.shelf{position:static;height:auto;border-right:none;border-bottom:1px solid var(--edge)}.bans{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- TABLEAU TOOLBAR -->
+<!-- TOP BAR (no tool-mimicry badge) -->
 <div class="tbar">
   <a class="back" href="../index.html#projects">← Portfolio</a>
-  <div class="wb"><b>Market-Performance Intelligence</b><span>Workbook · Melbourne D2C · GA4 + orders + ad spend · 26 wks</span></div>
-  <span class="tbadge"><svg viewBox="0 0 24 24" fill="none" stroke="var(--t-blue2)" stroke-width="2"><path d="M12 3v18M3 12h18M6.5 7.5v9M17.5 7.5v9"/></svg>Tableau-style dashboard</span>
+  <div class="wb"><b>Australian Government Advertising Spend</b><span>Commonwealth + state open data · real published records</span></div>
   <div class="sp"></div>
-  <span style="font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace"><span class="live-dot"></span> live</span>
-  <a class="tbtn" href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">Source ↗</a>
+  <span class="src-chip"><i></i>live from open data</span>
+  <a class="tbtn" href="https://www.finance.gov.au/publications/reports/advertising" target="_blank" rel="noopener">Data source ↗</a>
 </div>
 
-<!-- TITLE + BANs -->
+<!-- TITLE -->
 <div class="band">
-  <h1>Market-Performance <em>Intelligence</em> System</h1>
-  <p>GA4 + orders + ad spend for a Melbourne D2C brand, unified per channel over 26 weeks. The question every week: where should the next marketing dollar go? Move the reallocation parameter on the left — the upside recomputes at each channel's measured ROAS.</p>
+  <div class="eyebrow">Public sector · media &amp; marketing analytics</div>
+  <h1>Where the government advertising <em>dollar</em> goes</h1>
+  <p>Every figure here is real, published open data — the Australian Government's own advertising reports plus state auditor and open-data releases. The question: how much do governments spend advertising to the public, on which media, and how is that shifting? No modelled or synthetic numbers.</p>
 </div>
+
+<!-- PLAIN ENGLISH -->
+<div class="tldr">
+  <div class="tldr-tag">What this means — in plain English</div>
+  <h2 class="tldr-h">In 2023-24 the Australian Government spent <em>$250.6 million</em> on campaign advertising — and almost half of the media budget now goes to digital, not television.</h2>
+  <p class="tldr-p">This is money the public sector pays to reach citizens: road-safety, health, recruitment and awareness campaigns. Of the <b>$173.8M actually placed in media</b>, <b>44% went to digital</b> ($75.9M) — now bigger than television ($54.7M). The other <b>$76.6M</b> was campaign development (production, research). Spend swings with the cycle — it was <b>$339M in 2021-22</b> (COVID), fell to $179M, and rebounded to $250.6M. <b>The call:</b> the media mix has tipped digital-first, so that's where rate negotiation and measurement discipline now protect the most public money.</p>
+</div>
+
+<!-- BAN RIBBON -->
 <div class="bans">
-  <div class="ban"><b style="color:var(--t-blue2)">2.02x</b><div class="sub">Google Ads ROAS</div><span class="act hold">HOLD</span></div>
-  <div class="ban"><b style="color:var(--t-red)">1.24x</b><div class="sub">Meta Ads ROAS</div><span class="act cut">CUT</span></div>
-  <div class="ban"><b style="color:var(--t-green)" id="banUplift">$0</b><div class="sub">Revenue Upside</div></div>
-  <div class="ban"><b style="color:var(--t-yellow)" id="banBlend">0.00x</b><div class="sub">Blended ROAS</div></div>
+  <div class="ban"><b>$250.6M</b><div class="sub">Total campaign spend</div><div class="d">Commonwealth · 2023-24</div></div>
+  <div class="ban"><b style="color:var(--blue)">$173.8M</b><div class="sub">Media placement</div><div class="d">69% of total</div></div>
+  <div class="ban"><b style="color:var(--amber)">44%</b><div class="sub">Digital share</div><div class="d">$75.9M — biggest channel</div></div>
+  <div class="ban"><b style="color:var(--good)">+40%</b><div class="sub">Year on year</div><div class="d">vs $179.3M in 2022-23</div></div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="dash">
-  <!-- LEFT ANALYTICS SHELF -->
   <aside class="shelf">
     <div class="sh-card">
-      <div class="sh-h"><span class="ic" style="background:var(--t-blue)"></span>Parameter · Budget shift</div>
+      <div class="sh-h">View · Commonwealth trend</div>
       <div class="sh-b">
-        <div class="param-top"><span class="param-lbl">Meta → Google</span><span class="param-num" id="pcV">20%</span></div>
-        <input type="range" id="pc" min="0" max="40" value="20" autocomplete="off">
-        <div class="param-out">
-          <div class="po"><div class="po-v" style="color:var(--t-green)" id="oUplift">$0</div><div class="po-l">Added Rev</div></div>
-          <div class="po"><div class="po-v" style="color:var(--t-blue2)" id="oBlend">0.00x</div><div class="po-l">Blended</div></div>
+        <div class="seg" id="measSeg">
+          <button data-meas="total" class="on">Total</button>
+          <button data-meas="split">Media / dev</button>
         </div>
-        <div class="note" id="reNote"></div>
+        <div class="note">Total campaign spend, or split into media placement vs development. Channel detail is published for 2023-24.</div>
       </div>
     </div>
 
     <div class="sh-card">
-      <div class="sh-h"><span class="ic" style="background:var(--t-green)"></span>Filter · Channel</div>
+      <div class="sh-h">Filter · Media channel</div>
       <div class="sh-b" id="chFilter"></div>
     </div>
 
     <div class="sh-card">
-      <div class="sh-h"><span class="ic" style="background:var(--t-orange)"></span>Analytics · Reference lines</div>
+      <div class="sh-h">Source · Data provenance</div>
       <div class="sh-b">
-        <div class="chk on" data-ref="scale"><span class="tick"></span>SCALE line · ROAS 3.0</div>
-        <div class="chk on" data-ref="cut"><span class="tick"></span>CUT line · ROAS 1.5</div>
-        <div class="note">Toggle the decision thresholds on the trend and quadrant.</div>
-      </div>
-    </div>
-
-    <div class="sh-card">
-      <div class="sh-h"><span class="ic"></span>Legend</div>
-      <div class="sh-b">
-        <div class="chk" style="cursor:default"><span class="sw" style="background:var(--t-blue)"></span>Google Ads</div>
-        <div class="chk" style="cursor:default"><span class="sw" style="background:var(--t-orange)"></span>Meta Ads</div>
-        <div class="note">Bubble size = weekly revenue.</div>
+        <div class="prov">
+          <b>Commonwealth:</b> Dept of Finance — Campaign Advertising Reports 2021-22 → 2023-24.<br>
+          <b>NSW:</b> Audit Office of NSW — Government Advertising 2022-23.<br>
+          <b>QLD:</b> <a href="https://www.data.qld.gov.au/dataset/queensland-government-advertising-spend" target="_blank" rel="noopener">data.qld.gov.au</a> — annual placement spend.
+        </div>
+        <div class="note">Figures are as published; channel totals rounded to the nearest $0.1M by the source.</div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
 
-    <!-- Tableau Public embed hero -->
-    <div class="ws" id="published">
-      <div class="ws-h"><span class="ws-t">Published Interactive Viz<span class="tag">Tableau Public embed</span></span><span class="ws-s">paste your viz URL → live</span></div>
-      <div class="ws-b">
-        <div class="embed-hero">
-          <div id="tvizHost"></div>
-          <div class="embed-empty" id="embedEmpty">
-            <span class="badge">◇ Tableau Public · Embedding API v3</span>
-            <h3>Embed your live Tableau viz here</h3>
-            <p>This centerpiece is wired to the official <b>Tableau Embedding API v3</b>. Publish this workbook to <b>Tableau Public</b>, paste the viz URL below, and it renders inline — fully interactive, no code changes.</p>
-            <div class="embed-form">
-              <input type="text" id="vizUrl" placeholder="https://public.tableau.com/views/YourWorkbook/YourDashboard">
-              <button id="vizGo">Embed viz →</button>
-            </div>
-            <div class="embed-err" id="vizErr"></div>
-            <div class="embed-steps">
-              <b>1.</b> Tableau Public (desktop) → File → Save to Tableau Public<br>
-              <b>2.</b> On the published page, copy the browser URL (…/views/Workbook/Sheet)<br>
-              <b>3.</b> Paste it above → the viz embeds live in this slot
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="row2">
-      <!-- dual-axis trend -->
+      <!-- trend -->
       <div class="ws">
-        <div class="ws-h"><span class="ws-t">Weekly ROAS &amp; Spend</span><span class="ws-s">dual axis · line = ROAS · area = spend</span></div>
-        <div class="ws-b"><canvas id="trend"></canvas><div class="note">Google holds a steady ~2x; Meta drifts below the 1.5 CUT line — reallocate rather than keep funding it.</div></div>
+        <div class="ws-h"><span class="ws-t">Spend by year</span><span class="ws-s">Commonwealth · $M</span></div>
+        <div class="ws-b"><canvas id="trend"></canvas><div class="note">2021-22 was inflated by COVID campaigns; 2023-24 rebounded to $250.6M. Bars for 2023-24 split into media vs development.</div></div>
       </div>
-      <!-- decision quadrant -->
+      <!-- channel mix -->
       <div class="ws">
-        <div class="ws-h"><span class="ws-t">Decision Quadrant</span><span class="ws-s">weekly spend × ROAS · bubble = revenue</span></div>
-        <div class="ws-b"><canvas id="quad"></canvas><div class="note">Each bubble is one channel-week. Google clusters in the HOLD band; Meta sits below CUT — the visual case to shift budget.</div></div>
+        <div class="ws-h"><span class="ws-t">Where the media budget goes</span><span class="ws-s">2023-24 media placement</span></div>
+        <div class="ws-b"><canvas id="chmix"></canvas><div class="note">Digital has overtaken television as the single biggest channel for government media placement.</div></div>
       </div>
     </div>
 
     <!-- 3D channel bars -->
     <div class="ws">
-      <div class="ws-h"><span class="ws-t">Spend vs Revenue by Channel<span class="tag">custom viz · 3D</span></span><span class="ws-s">4 channels · updates with reallocation</span></div>
+      <div class="ws-h"><span class="ws-t">Channel mix in 3D</span><span class="ws-s">2023-24 · drag to rotate</span></div>
       <div class="ws-b">
         <div id="sceneWrap">
           <canvas id="scene"></canvas>
-          <div class="cloud-legend">
-            <span class="lg"><i style="background:#4E79A7"></i>Google</span><span class="lg"><i style="background:#F28E2B"></i>Meta</span>
-            <span class="lg"><i style="background:#76B7B2"></i>TikTok</span><span class="lg"><i style="background:#B07AA1"></i>Pinterest</span>
+          <div class="cloud-legend" id="legend3d"></div>
+          <div class="axes-key">
+            <div><b style="color:#C98A6A">slice</b> = media channel</div>
+            <div><b style="color:#8FB79A">size</b> = share of media spend</div>
+            <div><b style="color:#8FA6C6">click</b> = explode a slice</div>
           </div>
-          <div class="axes-key" style="position:absolute;top:10px;left:10px;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--t2);line-height:1.6;pointer-events:none;background:rgba(15,19,25,.6);border:1px solid var(--edge);border-radius:5px;padding:.4rem .55rem">
-            <div><b style="color:#E15759">X</b> = channel</div>
-            <div><b style="color:#59A14F">Y</b> = value (AUD $)</div>
-            <div><b style="color:#6B93C0">Z</b> = spend ↔ revenue</div>
-          </div>
-          <div class="cloud-hint">◐ drag to rotate · hover a bar</div>
+          <div class="cloud-hint">◐ drag to rotate · click a slice</div>
           <div class="tip" id="tip"></div>
         </div>
       </div>
     </div>
 
-    <!-- decision matrix -->
+    <!-- cross-jurisdiction -->
     <div class="ws">
-      <div class="ws-h"><span class="ws-t">Channel Decision Matrix</span><span class="ws-s">the weekly source of truth</span></div>
+      <div class="ws-h"><span class="ws-t">Across jurisdictions</span><span class="ws-s">latest published media spend · $M</span></div>
+      <div class="ws-b"><canvas id="juris"></canvas><div class="note">Commonwealth media placement dwarfs individual states; among states, NSW spends the most. Each bar is labelled with its reporting year (jurisdictions publish on different cycles).</div></div>
+    </div>
+
+    <!-- table -->
+    <div class="ws">
+      <div class="ws-h"><span class="ws-t">Channel breakdown</span><span class="ws-s">2023-24 media placement · the source of truth</span></div>
       <div class="ws-b" style="overflow-x:auto">
-        <table><thead><tr><th>Channel</th><th class="num">Spend</th><th class="num">Revenue</th><th class="num">ROAS</th><th class="num">CAC</th><th>Action</th></tr></thead><tbody id="tbody"></tbody></table>
+        <table><thead><tr><th>Media channel</th><th class="num">Spend</th><th class="num">Share</th><th>Relative</th></tr></thead><tbody id="tbody"></tbody></table>
       </div>
     </div>
 
   </div>
 </div>
 
-<footer>Built by <a href="../index.html">Gaurav Warke</a> · Tableau-style dashboard on synthetic AU marketing data · <a href="https://github.com/GauravWarke/market-performance-intelligence" target="_blank" rel="noopener">source on GitHub ↗</a></footer>
+<footer>Built by <a href="../index.html">Gaurav Warke</a> · real open-data analysis · sources: <a href="https://www.finance.gov.au/publications/reports/advertising" target="_blank" rel="noopener">Dept of Finance</a>, <a href="https://www.audit.nsw.gov.au/our-work/reports/government-advertising-2022-23" target="_blank" rel="noopener">Audit Office NSW</a>, <a href="https://www.data.qld.gov.au/dataset/queensland-government-advertising-spend" target="_blank" rel="noopener">data.qld.gov.au</a></footer>
 
-<!-- Tableau Embedding API v3 (powers the live embed once a viz URL is provided) -->
-<script type="module" src="https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function fmtMoney(n){return '$'+Math.round(n).toLocaleString('en-AU');}
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-var CH={
-  google:   {name:'Google Ads',   spend:202070,revenue:408471,roas:2.02,cac:54.97,color:'#4E79A7'},
-  meta:     {name:'Meta Ads',     spend:181600,revenue:225830,roas:1.24,cac:67.84,color:'#F28E2B'},
-  tiktok:   {name:'TikTok Ads',   spend:78400, revenue:246960,roas:3.15,cac:41.20,color:'#76B7B2'},
-  pinterest:{name:'Pinterest Ads',spend:52300, revenue:87864, roas:1.68,cac:71.50,color:'#B07AA1'}
-};
-var CHK=['google','meta','tiktok','pinterest'];
-function decide(roas){return roas>=3?['SCALE','scale']:(roas<1.5?['CUT','cut']:['HOLD','hold']);}
+function fmtM(n){return '$'+(n/1e6).toFixed(1)+'M';}
 
-/* ---- weekly data (drives trend + quadrant, sums to channel totals) ---- */
-var WK=26;
-function genWeeks(roasSeed,spendSeed,baseRoas,totalSpend){
-  var rr=mulberry32(roasSeed),sr=mulberry32(spendSeed),roas=[],w=[],sw=0;
-  for(var i=0;i<WK;i++){roas.push(Math.max(0.2,baseRoas+(rr()-0.5)*0.5));var ww=0.6+sr();w.push(ww);sw+=ww;}
-  var spend=w.map(function(x){return x/sw*totalSpend;});
-  var rev=spend.map(function(s,i){return s*roas[i];});
-  return {roas:roas,spend:spend,rev:rev};
+/* ---------- REAL DATA (published open data) ---------- */
+/* Commonwealth campaign advertising — Dept of Finance annual reports */
+var FED=[
+  {y:'2021-22',total:339200000,media:null,dev:null},
+  {y:'2022-23',total:179300000,media:null,dev:null},
+  {y:'2023-24',total:250600000,media:173800000,dev:76600000}
+];
+/* 2023-24 media placement by channel — Dept of Finance 2023-24 report */
+var CH=[
+  {key:'digital',name:'Digital',   v:75900000,color:'#2f3b4d'},
+  {key:'tv',     name:'Television', v:54700000,color:'#456187'},
+  {key:'ooh',    name:'Out-of-home',v:17700000,color:'#6E7C63'},
+  {key:'radio',  name:'Radio',     v:15200000,color:'#B0853C'},
+  {key:'cinema', name:'Cinema',    v:6200000, color:'#9A5B3B'},
+  {key:'press',  name:'Press',     v:3700000, color:'#8B877F'}
+];
+var chOn={digital:true,tv:true,ooh:true,radio:true,cinema:true,press:true};
+/* cross-jurisdiction — latest published media / placement spend */
+var JUR=[
+  {name:'Commonwealth',v:173800000,yr:'2023-24',color:'#2f3b4d'},
+  {name:'New South Wales',v:131460000,yr:'2022-23',color:'#456187'},
+  {name:'Queensland',v:50718130,yr:'2023-24',color:'#B0853C'}
+];
+var measure='total';
+
+/* ---------- canvas helper ---------- */
+function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
+function hexA(hex,a){var n=parseInt(hex.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+
+/* ---------- trend: yearly columns ---------- */
+var trend=document.getElementById('trend');
+function drawTrend(){
+  var f=fitCanvas(trend);if(!f)return;var cx=f.cx,W=f.W,H=f.H,padL=38,padB=30,padT=16;cx.clearRect(0,0,W,H);
+  var maxV=Math.max.apply(null,FED.map(function(d){return d.total;}))*1.12;
+  function Y(v){return (H-padB)-v/maxV*(H-padB-padT);}
+  cx.font='10px '+'"JetBrains Mono", monospace';
+  // gridlines + $ ticks
+  cx.strokeStyle=hexA('#141311',.07);cx.fillStyle='#8B877F';cx.lineWidth=1;
+  [0,100000000,200000000,300000000].forEach(function(v){var y=Y(v);cx.beginPath();cx.moveTo(padL,y);cx.lineTo(W-8,y);cx.stroke();cx.fillText('$'+(v/1e6)+'M',4,y+3);});
+  // axis
+  cx.strokeStyle=hexA('#141311',.28);cx.beginPath();cx.moveTo(padL,H-padB);cx.lineTo(W-8,H-padB);cx.stroke();
+  var n=FED.length,slot=(W-padL-16)/n,bw=Math.min(64,slot*0.5);
+  FED.forEach(function(d,i){
+    var cxpos=padL+slot*(i+0.5),x=cxpos-bw/2;
+    if(measure==='split'&&d.media!=null){
+      var ym=Y(d.media),yt=Y(d.total);
+      cx.fillStyle='#456187';cx.fillRect(x,ym,bw,(H-padB)-ym);
+      cx.fillStyle='#B0853C';cx.fillRect(x,yt,bw,ym-yt);
+    }else{
+      cx.fillStyle=i===n-1?'#141311':'#6f6b63';cx.fillRect(x,Y(d.total),bw,(H-padB)-Y(d.total));
+    }
+    cx.fillStyle='#141311';cx.font='bold 11px "JetBrains Mono", monospace';cx.textAlign='center';
+    cx.fillText(fmtM(d.total),cxpos,Y(d.total)-6);
+    cx.fillStyle='#8B877F';cx.font='10px "JetBrains Mono", monospace';cx.fillText(d.y,cxpos,H-10);cx.textAlign='left';
+  });
+  if(measure==='split'){
+    cx.fillStyle='#456187';cx.fillRect(padL,padT-6,9,9);cx.fillStyle='#57544E';cx.font='10px "JetBrains Mono", monospace';cx.fillText('media',padL+13,padT+2);
+    cx.fillStyle='#B0853C';cx.fillRect(padL+70,padT-6,9,9);cx.fillStyle='#57544E';cx.fillText('development',padL+83,padT+2);
+  }
 }
-var WKD={
-  google:   genWeeks(11,71, CH.google.roas,   CH.google.spend),
-  meta:     genWeeks(29,83, CH.meta.roas,     CH.meta.spend),
-  tiktok:   genWeeks(43,97, CH.tiktok.roas,   CH.tiktok.spend),
-  pinterest:genWeeks(57,113,CH.pinterest.roas,CH.pinterest.spend)
-};
 
-/* ---- channel filter + reference-line toggles ---- */
-var chOn={google:true,meta:true,tiktok:true,pinterest:true}, refOn={scale:true,cut:true};
-
-/* ---- reallocation ---- */
-var pc=document.getElementById('pc');
-var state={gSpend:CH.google.spend,gRev:CH.google.revenue,mSpend:CH.meta.spend,mRev:CH.meta.revenue};
-function runRealloc(){
-  var f=+pc.value/100, move=CH.meta.spend*f;
-  state.gSpend=CH.google.spend+move; state.gRev=state.gSpend*CH.google.roas;
-  state.mSpend=CH.meta.spend-move;   state.mRev=state.mSpend*CH.meta.roas;
-  var baseTotal=CH.google.spend*CH.google.roas+CH.meta.spend*CH.meta.roas;
-  var newTotal=state.gRev+state.mRev, uplift=newTotal-baseTotal, blended=newTotal/(state.gSpend+state.mSpend);
-  document.getElementById('pcV').textContent=(f*100).toFixed(0)+'%';
-  document.getElementById('oUplift').textContent=fmtMoney(uplift);
-  document.getElementById('oBlend').textContent=blended.toFixed(2)+'x';
-  document.getElementById('banUplift').textContent=fmtMoney(uplift);
-  document.getElementById('banBlend').textContent=blended.toFixed(2)+'x';
-  document.getElementById('reNote').textContent='Moving '+fmtMoney(move)+' from Meta (1.24x) to Google (2.02x) adds ~'+fmtMoney(uplift)+' revenue at the same total spend.';
-  if(window.updateBars)window.updateBars();
-}
-pc.addEventListener('input',runRealloc);
-
-/* ---- channel filter UI ---- */
-function renderChFilter(){
-  document.getElementById('chFilter').innerHTML=
-    CHK.map(function(k){return '<div class="chk'+(chOn[k]?' on':'')+'" data-ch="'+k+'"><span class="tick"></span><span class="sw" style="background:'+CH[k].color+'"></span>'+CH[k].name+'</div>';}).join('');
-  document.querySelectorAll('#chFilter .chk').forEach(function(n){n.addEventListener('click',function(){var k=n.dataset.ch;chOn[k]=!chOn[k];if(CHK.every(function(c){return !chOn[c];}))chOn[k]=true;renderChFilter();renderTable();drawTrend();drawQuad();if(window.updateBars)window.updateBars();});});
+/* ---------- channel mix: horizontal bars ---------- */
+var chmix=document.getElementById('chmix');
+function drawChmix(){
+  var f=fitCanvas(chmix);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
+  var rows=CH.filter(function(c){return chOn[c.key];});
+  var maxV=Math.max.apply(null,CH.map(function(c){return c.v;}));
+  var padL=96,padR=64,top=10,rh=(H-top-6)/rows.length,bh=Math.min(24,rh*0.62);
+  cx.font='11px "JetBrains Mono", monospace';
+  rows.forEach(function(c,i){
+    var y=top+rh*i+rh/2, w=(c.v/maxV)*(W-padL-padR);
+    cx.fillStyle='#57544E';cx.textAlign='right';cx.fillText(c.name,padL-8,y+4);
+    cx.fillStyle=c.color;cx.beginPath();
+    var x=padL,h=bh,rr=3;cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
+    cx.fillStyle='#141311';cx.font='bold 11px "JetBrains Mono", monospace';cx.textAlign='left';cx.fillText(fmtM(c.v),padL+w+7,y+4);
+    cx.font='11px "JetBrains Mono", monospace';
+  });
+  cx.textAlign='left';
 }
 
-/* ---- reference toggles ---- */
-document.querySelectorAll('.chk[data-ref]').forEach(function(n){n.addEventListener('click',function(){var k=n.dataset.ref;refOn[k]=!refOn[k];n.classList.toggle('on',refOn[k]);drawTrend();drawQuad();});});
+/* ---------- cross-jurisdiction ---------- */
+var juris=document.getElementById('juris');
+function drawJuris(){
+  var f=fitCanvas(juris);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
+  var maxV=Math.max.apply(null,JUR.map(function(d){return d.v;}))*1.02;
+  var padL=130,padR=70,top=12,rh=(H-top-8)/JUR.length,bh=Math.min(30,rh*0.55);
+  cx.font='11px "JetBrains Mono", monospace';
+  JUR.forEach(function(d,i){
+    var y=top+rh*i+rh/2,w=(d.v/maxV)*(W-padL-padR);
+    cx.fillStyle='#57544E';cx.textAlign='right';cx.font='bold 11px "JetBrains Mono", monospace';cx.fillText(d.name,padL-8,y+1);
+    cx.fillStyle='#8B877F';cx.font='9px "JetBrains Mono", monospace';cx.fillText(d.yr,padL-8,y+13);
+    cx.fillStyle=d.color;cx.textAlign='left';
+    var x=padL,h=bh,rr=3;cx.beginPath();cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
+    cx.fillStyle='#141311';cx.font='bold 12px "JetBrains Mono", monospace';cx.fillText(fmtM(d.v),padL+w+8,y+4);
+  });
+  cx.textAlign='left';
+}
 
-/* ---- table ---- */
+/* ---------- table ---------- */
 function renderTable(){
-  var rows=CHK.filter(function(k){return chOn[k];}).map(function(k){return CH[k];})
-    .sort(function(a,b){return b.roas-a.roas;});
-  document.getElementById('tbody').innerHTML=rows.map(function(c){
-    var d=decide(c.roas);
-    return '<tr><td class="mono"><span class="chip"><i style="background:'+c.color+'"></i>'+c.name+'</span></td><td class="num mono">'+fmtMoney(c.spend)+'</td><td class="num mono">'+fmtMoney(c.revenue)+'</td><td class="num mono">'+c.roas.toFixed(2)+'x</td><td class="num mono">'+fmtMoney(c.cac)+'</td><td><span class="pill '+d[1]+'">'+d[0]+'</span></td></tr>';
+  var tot=CH.reduce(function(a,c){return a+c.v;},0);
+  var maxV=Math.max.apply(null,CH.map(function(c){return c.v;}));
+  document.getElementById('tbody').innerHTML=CH.map(function(c){
+    var pct=(c.v/tot*100),w=(c.v/maxV*100);
+    return '<tr><td class="mono"><span class="chip"><i style="background:'+c.color+'"></i>'+c.name+'</span></td>'+
+      '<td class="num mono">'+fmtM(c.v)+'</td><td class="num mono">'+pct.toFixed(1)+'%</td>'+
+      '<td class="bar-cell"><span class="bar" style="width:'+w+'%;background:'+c.color+'"></span></td></tr>';
   }).join('');
 }
 
-/* ---- canvas helper ---- */
-function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
-
-/* ---- dual-axis trend (ROAS line + spend area) ---- */
-var trend=document.getElementById('trend');
-function drawTrend(){
-  var f=fitCanvas(trend);if(!f)return;var cx=f.cx,W=f.W,H=f.H,pad=32;cx.clearRect(0,0,W,H);
-  var vis=CHK.filter(function(k){return chOn[k];});
-  var allSpend=[];vis.forEach(function(k){allSpend=allSpend.concat(WKD[k].spend);});
-  var maxR=3.6, maxS=(allSpend.length?Math.max.apply(null,allSpend):1)*1.25;
-  function X(i){return pad+i/(WK-1)*(W-pad-8);}
-  function YR(v){return (H-pad)-v/maxR*(H-pad-12);}
-  function YS(v){return (H-pad)-v/maxS*(H-pad-12);}
-  cx.strokeStyle='rgba(255,255,255,.08)';cx.lineWidth=1;cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
-  // spend area (secondary axis, faint) for visible channels
-  function hexA(hex,a){var n=parseInt(hex.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
-  vis.forEach(function(k){var sp=WKD[k].spend,col=CH[k].color;cx.fillStyle=hexA(col,0.08);cx.beginPath();cx.moveTo(X(0),H-pad);sp.forEach(function(v,i){cx.lineTo(X(i),YS(v));});cx.lineTo(X(WK-1),H-pad);cx.closePath();cx.fill();});
-  // reference lines
-  cx.font='9px JetBrains Mono, monospace';
-  if(refOn.scale){cx.strokeStyle='rgba(89,161,79,.4)';cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(pad,YR(3));cx.lineTo(W-6,YR(3));cx.stroke();cx.fillStyle='#59A14F';cx.fillText('SCALE 3.0',pad+3,YR(3)-3);}
-  if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(pad,YR(1.5));cx.lineTo(W-6,YR(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT 1.5',pad+3,YR(1.5)-3);}
-  cx.setLineDash([]);
-  // ROAS lines per channel
-  vis.forEach(function(k){var roas=WKD[k].roas,col=CH[k].color;cx.strokeStyle=col;cx.lineWidth=2;cx.beginPath();roas.forEach(function(v,i){i?cx.lineTo(X(i),YR(v)):cx.moveTo(X(i),YR(v));});cx.stroke();});
-  cx.fillStyle='#5B6B82';cx.fillText('Y-left: ROAS →   Y-right(area): weekly spend',pad+2,14);cx.fillText('X: wk 1',pad,H-8);cx.fillText('wk 26',W-42,H-8);
+/* ---------- channel filter UI ---------- */
+function renderChFilter(){
+  document.getElementById('chFilter').innerHTML=CH.map(function(c){
+    return '<div class="chk'+(chOn[c.key]?' on':'')+'" data-ch="'+c.key+'"><span class="tick"></span><span class="sw" style="background:'+c.color+'"></span>'+c.name+'</div>';
+  }).join('');
+  document.querySelectorAll('#chFilter .chk').forEach(function(n){n.addEventListener('click',function(){var k=n.dataset.ch;chOn[k]=!chOn[k];if(CH.every(function(c){return !chOn[c.key];}))chOn[k]=true;renderChFilter();drawChmix();if(window.updateBars)window.updateBars();});});
 }
+document.getElementById('legend3d').innerHTML=CH.map(function(c){return '<span class="lg"><i style="background:'+c.color+'"></i>'+c.name+'</span>';}).join('');
 
-/* ---- decision quadrant scatter ---- */
-var quad=document.getElementById('quad');
-function drawQuad(){
-  var f=fitCanvas(quad);if(!f)return;var cx=f.cx,W=f.W,H=f.H,pad=36;cx.clearRect(0,0,W,H);
-  var vis=CHK.filter(function(k){return chOn[k];});
-  var allS=[],allRev=[];vis.forEach(function(k){allS=allS.concat(WKD[k].spend);allRev=allRev.concat(WKD[k].rev);});
-  var maxS=(allS.length?Math.max.apply(null,allS):1)*1.12, maxR=3.6, maxRev=(allRev.length?Math.max.apply(null,allRev):1);
-  function X(v){return pad+v/maxS*(W-pad-10);}
-  function Y(v){return (H-pad)-v/maxR*(H-pad-12);}
-  cx.font='9px JetBrains Mono, monospace';cx.lineWidth=1;
-  // gridlines + numeric ticks
-  cx.strokeStyle='rgba(255,255,255,.05)';cx.fillStyle='#5B6B82';
-  [0,0.25,0.5,0.75,1].forEach(function(fp){var x=X(fp*maxS);cx.beginPath();cx.moveTo(x,8);cx.lineTo(x,H-pad);cx.stroke();cx.fillText('$'+Math.round(fp*maxS/1000)+'k',x-8,H-pad+13);});
-  [0,1,2,3].forEach(function(rv){var y=Y(rv);cx.beginPath();cx.moveTo(pad,y);cx.lineTo(W-6,y);cx.stroke();cx.fillText(rv+'x',3,y+3);});
-  cx.strokeStyle='rgba(255,255,255,.14)';cx.beginPath();cx.moveTo(pad,H-pad);cx.lineTo(W-6,H-pad);cx.moveTo(pad,H-pad);cx.lineTo(pad,8);cx.stroke();
-  cx.fillStyle='#5B6B82';cx.fillText('X: weekly spend (AUD) →',W-152,H-6);
-  cx.save();cx.translate(12,H-pad-4);cx.rotate(-Math.PI/2);cx.fillText('Y: ROAS →  ● size: revenue',0,0);cx.restore();
-  cx.setLineDash([4,4]);
-  if(refOn.scale){cx.strokeStyle='rgba(89,161,79,.4)';cx.beginPath();cx.moveTo(pad,Y(3));cx.lineTo(W-6,Y(3));cx.stroke();cx.fillStyle='#59A14F';cx.fillText('SCALE',W-46,Y(3)-3);}
-  if(refOn.cut){cx.strokeStyle='rgba(225,87,89,.45)';cx.beginPath();cx.moveTo(pad,Y(1.5));cx.lineTo(W-6,Y(1.5));cx.stroke();cx.fillStyle='#E15759';cx.fillText('CUT',W-40,Y(1.5)-3);}
-  cx.setLineDash([]);
-  function hexA(hex,a){var n=parseInt(hex.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
-  cx.lineWidth=1.1;
-  vis.forEach(function(k){var dat=WKD[k],fill=hexA(CH[k].color,0.32),edge=hexA(CH[k].color,0.95);for(var i=0;i<WK;i++){var rad=3+Math.sqrt(dat.rev[i]/maxRev)*8;cx.beginPath();cx.arc(X(dat.spend[i]),Y(dat.roas[i]),rad,0,7);cx.fillStyle=fill;cx.fill();cx.strokeStyle=edge;cx.stroke();}});
-}
+/* ---------- measure toggle ---------- */
+document.querySelectorAll('#measSeg button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('#measSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');measure=b.dataset.meas;drawTrend();});});
 
-/* ================= 3D CHANNEL BARS (X=channel · Y=AUD · Z=spend/revenue) ================= */
+/* ================= 3D CHANNEL BARS ================= */
 var updateBars=function(){};
-function chVal(k){ if(k==='google')return {s:state.gSpend,r:state.gRev}; if(k==='meta')return {s:state.mSpend,r:state.mRev}; return {s:CH[k].spend,r:CH[k].revenue}; }
-function hex2int(h){return parseInt(h.slice(1),16);}
-/* shared: canvas-texture text sprite that always faces the camera (labels axis tips) */
 function makeTextSprite(txt,color,fs){
-  fs=fs||40;var pad=10,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+  fs=fs||34;var pad=8,cv=document.createElement('canvas'),ctx=cv.getContext('2d');
   ctx.font='bold '+fs+'px "JetBrains Mono", monospace';var w=Math.ceil(ctx.measureText(txt).width);
   cv.width=w+pad*2;cv.height=fs+pad*2;ctx.font='bold '+fs+'px "JetBrains Mono", monospace';
   ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(txt,pad,cv.height/2);
@@ -413,92 +381,59 @@ function makeTextSprite(txt,color,fs){
   var sc=0.42;sp.scale.set(cv.width*sc,cv.height*sc,1);return sp;
 }
 function axisLine(a,b,color,op){var g=new THREE.BufferGeometry().setFromPoints([a,b]);return new THREE.Line(g,new THREE.LineBasicMaterial({color:color,transparent:true,opacity:op||0.55}));}
+function hex2int(h){return parseInt(h.slice(1),16);}
+/* 3D PIE CHART — media channels as extruded wedges, click a slice to explode */
 (function(){
   var canvas=document.getElementById('scene'),wrap=document.getElementById('sceneWrap'),tip=document.getElementById('tip');
   if(typeof THREE==='undefined')return;
-  var W=wrap.clientWidth||600,H=wrap.clientHeight||300;
+  var W=wrap.clientWidth||600,H=wrap.clientHeight||320;
   var renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.setSize(W,H,false);
-  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(40,230,700);camera.lookAt(0,80,0);
+  var scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,W/H||1,1,4000);camera.position.set(0,300,340);camera.lookAt(0,0,0);
   var group=new THREE.Group();scene.add(group);
-  var grid=new THREE.GridHelper(820,12,0x243247,0x18202e);group.add(grid);
-  var SC=0.00045, X0=-315, GAP=210, ZSPEND=-80, ZREV=80, Yc={x:'#E15759',y:'#59A14F',z:'#6B93C0'};
-  // ---- labelled axes ----
-  var Ymax=Math.max.apply(null,CHK.map(function(k){return CH[k].revenue;}))*SC+40; // ~224
-  group.add(axisLine(new THREE.Vector3(X0,0,0),new THREE.Vector3(X0+GAP*3+120,0,0),0xE15759,0.5));           // X
-  group.add(axisLine(new THREE.Vector3(X0,0,ZSPEND-30),new THREE.Vector3(X0,Ymax,ZSPEND-30),0x59A14F,0.5));   // Y
-  group.add(axisLine(new THREE.Vector3(X0,0,ZSPEND-30),new THREE.Vector3(X0,0,ZREV+30),0x6B93C0,0.5));        // Z
-  var lx=makeTextSprite('X: CHANNEL',Yc.x);lx.position.set(X0+GAP*3+140,6,0);group.add(lx);
-  var ly=makeTextSprite('Y: AUD $',Yc.y);ly.position.set(X0-14,Ymax+18,ZSPEND-30);group.add(ly);
-  var lzs=makeTextSprite('SPEND',Yc.z);lzs.position.set(X0-70,6,ZSPEND);group.add(lzs);
-  var lzr=makeTextSprite('REVENUE',Yc.z);lzr.position.set(X0-80,6,ZREV);group.add(lzr);
-  // Y tick labels + horizontal reference gridlines (so bar heights read against the scale)
-  var EXBAR=X0+GAP*3+120, gmat=new THREE.LineBasicMaterial({color:0x2a3648,transparent:true,opacity:.35});
-  [0.25,0.5,0.75,1].forEach(function(t){
-    var yy=t*(Ymax-40), v=yy/SC;
-    var s=makeTextSprite('$'+Math.round(v/1000)+'k','#8794a8',28);s.position.set(X0-46,yy,ZSPEND-30);group.add(s);
-    group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(X0,yy,ZSPEND-30),new THREE.Vector3(EXBAR,yy,ZSPEND-30)]),gmat));
-  });
-  // ---- bars: per channel, a spend bar (back) + revenue bar (front) ----
-  var bars=[];
-  CHK.forEach(function(k,ci){
-    var x=X0+ci*GAP;
-    // channel name label under axis
-    var cl=makeTextSprite(CH[k].name.replace(' Ads',''),CH[k].color,32);cl.position.set(x,-26,ZREV+34);group.add(cl);
-    [['s',ZSPEND,0x3C4653],['r',ZREV,hex2int(CH[k].color)]].forEach(function(row){
-      var m=new THREE.Mesh(new THREE.BoxGeometry(58,1,58),new THREE.MeshBasicMaterial({color:row[2],transparent:true,opacity:.9}));
-      m.position.set(x,0,row[1]);group.add(m);
-      var wf=new THREE.Mesh(new THREE.BoxGeometry(59,1,59),new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:.08}));
-      wf.position.set(x,0,row[1]);group.add(wf);
-      bars.push({mesh:m,wire:wf,ch:k,kind:row[0],x:x,z:row[1]});
+  var grid3=new THREE.GridHelper(560,10,0x3a4658,0x20272f);grid3.position.y=-24;group.add(grid3);
+  var RAD=150,HGT=36,slices=[],sel=-1;
+  var ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+  function buildPie(){
+    for(var k=pieGroup.children.length-1;k>=0;k--){var ch=pieGroup.children[k];pieGroup.remove(ch);if(ch.geometry)ch.geometry.dispose();}
+    slices=[];
+    var vis=CH.filter(function(c){return chOn[c.key];});
+    var tot=vis.reduce(function(a,c){return a+c.v;},0)||1, acc=-Math.PI/2;
+    vis.forEach(function(c){
+      var frac=c.v/tot, theta=frac*Math.PI*2, mid=acc+theta/2;
+      var geo=new THREE.CylinderGeometry(RAD,RAD,HGT,48,1,false,acc,theta);
+      var mesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:hex2int(c.color),transparent:true,opacity:.95}));
+      pieGroup.add(mesh);
+      slices.push({mesh:mesh,c:c,mid:mid,frac:frac});
+      acc+=theta;
     });
-  });
-  updateBars=function(){
-    bars.forEach(function(b){
-      var v=chVal(b.ch), val=b.kind==='s'?v.s:v.r, h=Math.max(3,val*SC), vis=chOn[b.ch];
-      b.mesh.visible=vis;b.wire.visible=vis;
-      b.mesh.scale.y=h;b.mesh.position.y=h/2;b.wire.scale.y=h;b.wire.position.y=h/2;
-    });
-  };
-  window.updateBars=updateBars;updateBars();
-  var drag=false,px=0,py=0,ry=0.5,rxr=0.05,vy=0.0015;
-  wrap.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
+    if(sel>=slices.length)sel=-1;
+    applySel();
+  }
+  var pieGroup=new THREE.Group();group.add(pieGroup);
+  function applySel(){slices.forEach(function(s,i){var off=(i===sel)?46:0;s.mesh.position.set(Math.sin(s.mid)*off,(i===sel)?10:0,Math.cos(s.mid)*off);s.mesh.material.opacity=(sel<0||i===sel)?0.98:0.5;});}
+  updateBars=function(){buildPie();};window.updateBars=updateBars;buildPie();
+  var drag=false,px=0,py=0,ry=0,rxr=0,vy=0.0016,moved=false;
+  wrap.addEventListener('pointerdown',function(e){drag=true;moved=false;px=e.clientX;py=e.clientY;wrap.classList.add('drag');});
   addEventListener('pointerup',function(){drag=false;wrap.classList.remove('drag');});
-  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){ry+=(e.clientX-px)*0.006;rxr+=(e.clientY-py)*0.005;rxr=Math.max(-0.3,Math.min(0.9,rxr));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
-  wrap.addEventListener('pointerleave',function(){tip.style.opacity=0;});
-  var proj=new THREE.Vector3();
-  function hover(mx,my,rw,rh){var best=-1,bd=44;for(var i=0;i<bars.length;i++){var b=bars[i];if(!chOn[b.ch])continue;proj.set(b.x,b.mesh.position.y,b.z).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}
-    if(best>=0){var b=bars[best],v=chVal(b.ch),val=b.kind==='s'?v.s:v.r;tip.innerHTML='<b>'+CH[b.ch].name+'</b><br>'+(b.kind==='s'?'spend':'revenue')+' '+fmtMoney(val)+'<br>ROAS '+CH[b.ch].roas.toFixed(2)+'x';tip.style.left=Math.min(mx+14,rw-165)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}else tip.style.opacity=0;}
+  wrap.addEventListener('pointermove',function(e){var r=wrap.getBoundingClientRect();if(drag){var dx=e.clientX-px;if(Math.abs(dx)>3||Math.abs(e.clientY-py)>3)moved=true;ry+=dx*0.006;rxr+=(e.clientY-py)*0.004;rxr=Math.max(-0.5,Math.min(0.5,rxr));px=e.clientX;py=e.clientY;}hover(e.clientX-r.left,e.clientY-r.top,r.width,r.height);});
+  wrap.addEventListener('pointerleave',function(){if(sel<0)tip.style.opacity=0;});
+  wrap.addEventListener('click',function(e){if(moved)return;var r=wrap.getBoundingClientRect();var i=pick(e.clientX-r.left,e.clientY-r.top,r.width,r.height);sel=(i===sel)?-1:i;applySel();if(sel>=0)showTip(sel,e.clientX-r.left,e.clientY-r.top,r.width,r.height);else tip.style.opacity=0;});
+  function pick(mx,my,rw,rh){ndc.set(mx/rw*2-1,-(my/rh)*2+1);ray.setFromCamera(ndc,camera);var hit=ray.intersectObjects(pieGroup.children,false);if(!hit.length)return -1;for(var i=0;i<slices.length;i++)if(slices[i].mesh===hit[0].object)return i;return -1;}
+  function showTip(i,mx,my,rw,rh){var s=slices[i];tip.innerHTML='<b>'+s.c.name+'</b><br>'+fmtM(s.c.v)+'<br>'+(s.frac*100).toFixed(1)+'% of media';tip.style.left=Math.min(mx+14,rw-165)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
+  function hover(mx,my,rw,rh){if(sel>=0)return;var i=pick(mx,my,rw,rh);if(i>=0)showTip(i,mx,my,rw,rh);else tip.style.opacity=0;}
   function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rxr-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
   function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}
   addEventListener('resize',resize);if('ResizeObserver' in window)new ResizeObserver(resize).observe(wrap);
   if(reduce)renderer.render(scene,camera);else loop();
 })();
 
-/* ---- Tableau Public embed loader (Embedding API v3) ---- */
-(function(){
-  var go=document.getElementById('vizGo'),input=document.getElementById('vizUrl'),err=document.getElementById('vizErr'),host=document.getElementById('tvizHost'),empty=document.getElementById('embedEmpty');
-  function load(){
-    var url=(input.value||'').trim();
-    if(!/^https?:\/\/(public\.tableau\.com|[\w.-]*\.?tableau\.com)\//i.test(url)){err.textContent='Enter a valid Tableau Public URL (https://public.tableau.com/views/…)';return;}
-    err.textContent='';
-    host.innerHTML='';
-    var v=document.createElement('tableau-viz');
-    v.setAttribute('src',url);v.setAttribute('toolbar','bottom');v.setAttribute('hide-tabs','');
-    host.appendChild(v);
-    empty.style.display='none';
-  }
-  go.addEventListener('click',load);
-  input.addEventListener('keydown',function(e){if(e.key==='Enter')load();});
-})();
-
 /* init */
-pc.value='20';   // guarantee the recommended-reallocation default on load (headline $28,330), even after bfcache restore
-renderChFilter();renderTable();runRealloc();
-requestAnimationFrame(function(){requestAnimationFrame(function(){drawTrend();drawQuad();});});
-setTimeout(function(){drawTrend();drawQuad();},400);
-addEventListener('resize',function(){drawTrend();drawQuad();});
-if('ResizeObserver' in window){new ResizeObserver(function(){drawTrend();}).observe(trend);new ResizeObserver(function(){drawQuad();}).observe(quad);}
+renderChFilter();renderTable();
+requestAnimationFrame(function(){requestAnimationFrame(function(){drawTrend();drawChmix();drawJuris();});});
+setTimeout(function(){drawTrend();drawChmix();drawJuris();},400);
+addEventListener('resize',function(){drawTrend();drawChmix();drawJuris();});
+if('ResizeObserver' in window){new ResizeObserver(function(){drawTrend();}).observe(trend);new ResizeObserver(function(){drawChmix();}).observe(chmix);new ResizeObserver(function(){drawJuris();}).observe(juris);}
 </script>
 </body>
 </html>
