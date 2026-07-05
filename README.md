@@ -1,57 +1,61 @@
 # Gaurav Warke — Portfolio
 
-> Data & Business Analytics · BI · Supply Chain · FinTech — Melbourne, AU
+[![Live](https://img.shields.io/badge/Live-Visit_the_site-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://portfolio-plum-eta-oqdpa0gzlv.vercel.app)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-4F46E5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gaurav-warke-b5493b394/)
+[![Profile](https://img.shields.io/badge/GitHub-1e1b2e?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GauravWarke)
 
-A single-file, zero-build interactive portfolio with a live **3D data-network** background (Three.js), per-section domain motifs, a fluid morphing shape, and a **Case Study Inspector** that frames every project as Problem → Architecture → Metric.
+> Business & Data Analyst · BI · Supply Chain · FinTech — Melbourne, AU
 
-**Live:** https://portfolio-plum-eta-oqdpa0gzlv.vercel.app/ &nbsp;·&nbsp; mirror: https://gauravwarke.github.io/Portfolio/
-**Contact:** gauravwarke8@gmail.com · [LinkedIn](https://www.linkedin.com/in/gaurav-warke-b5493b394) · [GitHub](https://github.com/GauravWarke)
+A single-file, zero-build interactive portfolio, plus **four interactive dashboards built on real Australian open data** (no synthetic numbers). Every dashboard leads with a plain-English takeaway for non-technical stakeholders, then opens into a distinct interactive 3D chart.
+
+**Live:** https://portfolio-plum-eta-oqdpa0gzlv.vercel.app
 
 ---
 
+## Dashboards
+
+| Dashboard | Data source | What it shows |
+| :--- | :--- | :--- |
+| **Australian Business Churn** | ABS Counts of Australian Businesses | Entries, exits (13.9% churn) and survival by state — 2.73M businesses |
+| **Government Ad Spend** | Dept of Finance · Audit Office NSW · data.qld.gov.au | Where the public advertising dollar goes, by media channel and jurisdiction |
+| **Retail Demand** | ABS Retail Trade | $37.9bn monthly retail turnover, by category and by state |
+| **GST Reconciliation** | Commonwealth Grants Commission | How the ~$102bn GST pool is carved up across all 8 states and territories |
+
+Each dashboard: a light editorial theme, a "What this means — in plain English" banner, a distinct interactive 3D chart (radial bars · pie · floating bubbles · stacked column), and a cited real data source.
+
 ## Tech
-- **HTML + CSS + vanilla JS** — no build step, one `index.html`
-- **Three.js** (r128, via CDN) — 3D data-network, fluid blob, per-section themes
-- Fonts: Sora · Inter · JetBrains Mono
-- Fully responsive, `prefers-reduced-motion` aware, graceful WebGL fallback
+
+- **HTML · CSS · vanilla JS** — no build step, one `index.html` plus standalone dashboards
+- **Three.js** (WebGL) for the 3D charts · **Canvas 2D** for the light 2D charts
+- Fonts: Archivo (grotesque) · Playfair Display (serif) · JetBrains Mono
+- Fully responsive · `prefers-reduced-motion` aware
+- Deployed on **Vercel**
 
 ## Run locally
+
 ```bash
 # any static server works — e.g. Python
 python -m http.server 5500
 # then open http://localhost:5500
 ```
 
-## Deploy
-
-### Option A — GitHub Pages (free, github.io URL)
-```bash
-git init
-git add .
-git commit -m "Portfolio"
-git branch -M main
-git remote add origin https://github.com/GauravWarke/Portfolio.git
-git push -u origin main
-```
-Then on GitHub: **Settings → Pages → Source: `main` / root → Save.**
-Your site goes live at `https://gauravwarke.github.io/Portfolio/`.
-
-### Option B — Vercel (same repo)
-1. Go to [vercel.com](https://vercel.com) → **Add New → Project** → import the same `portfolio` repo.
-2. Framework preset: **Other**. Build command: _none_. Output dir: `./`.
-3. Deploy. You get a `*.vercel.app` URL (and can add a custom domain).
-
-> You can run **both** at once — GitHub Pages and Vercel both serve from this one repo. Use the Vercel URL as your primary (it's faster + supports custom domains) and keep Pages as a backup.
-
 ## Structure
+
 ```
 my-portfolio/
-├── index.html          # the entire site
-├── README.md
-├── tailwind.config.js  # design tokens (for the React blueprint version)
-├── src/                # optional React/Vite version of the same site
-└── github-launch/      # READMEs for the 4 project repos + LinkedIn post (staging)
+├── index.html               # the homepage
+├── dashboards/
+│   ├── churn.html           # Australian Business Churn
+│   ├── market.html          # Government Ad Spend
+│   ├── demand.html          # Retail Demand
+│   └── reconciliation.html  # GST Reconciliation
+└── README.md
 ```
 
-## License
-MIT — © 2026 Gaurav Warke
+## Data sources
+
+Australian Bureau of Statistics (ABS) · Australian Department of Finance · Audit Office of NSW · data.qld.gov.au · Commonwealth Grants Commission. All figures are real, published open data.
+
+---
+
+Built by [Gaurav Warke](https://www.linkedin.com/in/gaurav-warke-b5493b394/) · [Live portfolio](https://portfolio-plum-eta-oqdpa0gzlv.vercel.app) · MIT © 2026
