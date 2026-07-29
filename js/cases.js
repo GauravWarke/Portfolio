@@ -33,7 +33,6 @@
     {ico:'⚡',l:'Open GST Reconciliation dashboard',h:'dashboard',run:function(){openUrl('dashboards/reconciliation.html',true);}},
     {ico:'⚡',l:'Open Retail Demand dashboard',h:'dashboard',run:function(){openUrl('dashboards/demand.html',true);}},
     {ico:'⚡',l:'Open Government Ad Spend dashboard',h:'dashboard',run:function(){openUrl('dashboards/market.html',true);}},
-    {ico:'◉',l:'Open JARVIS — Voice AI Assistant',h:'project',run:function(){openUrl('jarvis.html',true);}},
     {ico:'in',l:'Open LinkedIn',h:'link',run:function(){openUrl('https://www.linkedin.com/in/gaurav-warke-b5493b394',true);}},
     {ico:'gh',l:'Open GitHub',h:'link',run:function(){openUrl('https://github.com/GauravWarke',true);}},
     {ico:'✦',l:'Email / Hire Me',h:'contact',run:function(){openUrl('mailto:gauravwarke8@gmail.com');}}
