@@ -1,0 +1,42 @@
+// DAX measures for the portfolio model.
+// Create each with: Modeling -> New measure, then paste one definition.
+// Table names assume the query names in queries.m.
+
+// ---- BusinessChurn --------------------------------------------------------
+Total Businesses = SUM ( BusinessChurn[businesses] )
+
+Top State Share % =
+MAXX ( BusinessChurn, BusinessChurn[share_pct] )
+
+// ---- AdSpend --------------------------------------------------------------
+Total Ad Spend ($M) = SUM ( AdSpend[spend_m] )
+
+Digital Share % =
+DIVIDE (
+    CALCULATE ( SUM ( AdSpend[spend_m] ), AdSpend[channel] = "Digital" ),
+    SUM ( AdSpend[spend_m] )
+)
+
+// ---- RetailDemand ---------------------------------------------------------
+Latest Turnover ($M) =
+CALCULATE (
+    SUM ( RetailDemand[turnover_m] ),
+    LASTNONBLANK ( RetailDemand[date], 1 )
+)
+
+Turnover Growth % =
+VAR Latest =
+    CALCULATE ( SUM ( RetailDemand[turnover_m] ), LASTNONBLANK ( RetailDemand[date], 1 ) )
+VAR First =
+    CALCULATE ( SUM ( RetailDemand[turnover_m] ), FIRSTNONBLANK ( RetailDemand[date], 1 ) )
+RETURN
+    DIVIDE ( Latest - First, First )
+
+// ---- GstDistribution ------------------------------------------------------
+GST Pool ($bn) = SUM ( GstDistribution[gst_bn] )
+
+Largest Recipient =
+CALCULATE (
+    MAX ( GstDistribution[state] ),
+    TOPN ( 1, GstDistribution, GstDistribution[gst_bn], DESC )
+)

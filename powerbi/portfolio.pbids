@@ -1,0 +1,14 @@
+{
+  "version": "0.1",
+  "connections": [
+    {
+      "details": {
+        "protocol": "folder",
+        "address": {
+          "path": "C:\\Users\\GAURAV\\OneDrive\\Desktop\\my-portfolio\\data"
+        }
+      },
+      "mode": "Import"
+    }
+  ]
+}
