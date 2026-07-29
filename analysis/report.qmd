@@ -1,0 +1,131 @@
+---
+title: "Australian Open Data — Four Findings"
+subtitle: "A short analytical report · Gaurav Warke"
+author: "Gaurav Warke"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-location: left
+    page-layout: full
+    embed-resources: true
+    fig-width: 8
+    fig-height: 5
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(readr); library(dplyr); library(ggplot2); library(scales); library(jsonlite)
+
+root     <- normalizePath("..")
+data_dir <- file.path(root, "data")
+
+ink <- "#141311"; cream <- "#EFEDE7"; accent <- "#B5502E"
+theme_portfolio <- function() {
+  theme_minimal(base_size = 13) +
+    theme(plot.background = element_rect(fill = cream, colour = NA),
+          panel.background = element_rect(fill = cream, colour = NA),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(colour = alpha(ink, 0.08)),
+          plot.title = element_text(face = "bold", colour = ink),
+          axis.text = element_text(colour = alpha(ink, 0.8)))
+}
+```
+
+This report reads the same tidy artefacts that power the interactive dashboards
+(`data/*.csv`, written by `scripts/run_all.py` from published Australian open
+data). Every figure is reproducible: re-run the pipeline, re-render this report.
+
+## Headline numbers
+
+```{r kpis}
+retail <- fromJSON(file.path(data_dir, "retail_demand.json"))
+churn  <- fromJSON(file.path(data_dir, "business_churn.json"))
+gst    <- read_csv(file.path(data_dir, "gst_reconciliation_by_state.csv"), show_col_types = FALSE)
+
+tibble(
+  Metric = c("Retail turnover (Jun 2025)", "Retail YoY growth",
+             "Businesses nationally", "Business exit rate",
+             "GST pool distributed"),
+  Value = c(paste0("$", comma(retail$headline$turnover_m), "M"),
+            paste0("+", retail$headline$yoy_pct, "%"),
+            comma(churn$total_businesses),
+            paste0(churn$flows$exit_rate_pct, "%"),
+            paste0("$", round(sum(gst$gst_bn), 1), "bn"))
+) |> knitr::kable()
+```
+
+## 1. Where Australia's businesses are
+
+```{r fig-churn}
+d <- read_csv(file.path(data_dir, "business_churn_by_state.csv"), show_col_types = FALSE) |>
+  mutate(state = reorder(state, businesses))
+ggplot(d, aes(state, businesses, fill = share_pct)) +
+  geom_col(width = 0.72) +
+  geom_text(aes(label = paste0(comma(businesses), "  (", share_pct, "%)")),
+            hjust = -0.05, size = 3.2, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.22))) +
+  scale_fill_gradient(low = alpha(accent, 0.45), high = accent, guide = "none") +
+  labs(title = "Business base by state", x = NULL, y = "Businesses") +
+  theme_portfolio()
+```
+
+NSW and VIC together hold roughly 60% of the 2.73M actively trading businesses —
+a concentration any national go-to-market or servicing plan has to reckon with.
+
+## 2. Where the government advertising dollar goes
+
+```{r fig-ads}
+d <- read_csv(file.path(data_dir, "govt_ad_spend_by_channel.csv"), show_col_types = FALSE) |>
+  mutate(channel = reorder(channel, spend_m))
+ggplot(d, aes(channel, spend_m, fill = channel == "Digital")) +
+  geom_col(width = 0.72) +
+  geom_text(aes(label = paste0("$", spend_m, "M")), hjust = -0.1, size = 3.2, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_manual(values = c(`TRUE` = accent, `FALSE` = alpha(ink, 0.55)), guide = "none") +
+  labs(title = "Media placement by channel, 2023-24", x = NULL, y = "Spend ($M)") +
+  theme_portfolio()
+```
+
+Digital has overtaken television as the single largest channel — the shift every
+media plan is now built around.
+
+## 3. Retail demand trend
+
+```{r fig-retail}
+d <- read_csv(file.path(data_dir, "retail_demand_series.csv"), show_col_types = FALSE) |>
+  mutate(date = as.Date(paste0(period, "-01")))
+ggplot(d, aes(date, turnover_m)) +
+  geom_line(colour = accent, linewidth = 1.1) + geom_point(colour = accent, size = 2.4) +
+  scale_x_date(date_labels = "%b %Y") +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0.08, 0.12))) +
+  labs(title = "Seasonally adjusted monthly retail turnover", x = NULL, y = "Turnover ($M)") +
+  theme_portfolio()
+```
+
+Turnover has risen steadily to $37.9bn/month, up 4.9% year on year — demand is
+resilient, which matters for inventory and supply-risk planning.
+
+## 4. How the GST pool is shared
+
+```{r fig-gst}
+d <- read_csv(file.path(data_dir, "gst_reconciliation_by_state.csv"), show_col_types = FALSE) |>
+  mutate(state = reorder(state, gst_bn))
+ggplot(d, aes(state, gst_bn, fill = share_pct)) +
+  geom_col(width = 0.72) +
+  geom_text(aes(label = paste0("$", gst_bn, "bn")), hjust = -0.1, size = 3.2, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_gradient(low = alpha(accent, 0.45), high = accent, guide = "none") +
+  labs(title = "GST distribution by state/territory, 2026-27", x = NULL, y = "GST ($bn)") +
+  theme_portfolio()
+```
+
+The ~$102bn pool is redistributed on a needs basis: VIC and NSW receive the most
+in dollar terms, while smaller jurisdictions receive far more per person.

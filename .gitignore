@@ -27,3 +27,10 @@ data/.cache/
 __pycache__/
 *.py[cod]
 .ruff_cache/
+
+# R analysis: generated charts + rendered report
+analysis/figures/
+analysis/report.html
+analysis/report_files/
+.Rproj.user/
+.Rhistory
