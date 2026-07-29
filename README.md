@@ -25,8 +25,10 @@ Each dashboard: a light editorial theme, a "What this means — in plain English
 
 ## Tech
 
-- **HTML · CSS · vanilla JS** — no build step, one `index.html` plus standalone dashboards
+- **HTML · CSS · JavaScript** — no build step; chart logic lives in standalone JS modules (`js/`, `dashboards/js/`)
 - **Three.js** (WebGL) for the 3D charts · **Canvas 2D** for the light 2D charts
+- **Python** data pipeline (`scripts/`) — sources each dashboard's figures from its real open-data publisher, with an offline snapshot
+- **SQL** analytical layer (`sql/analysis.sql`) — models the four datasets and reproduces each dashboard's headline metrics
 - Fonts: Archivo (grotesque) · Playfair Display (serif) · JetBrains Mono
 - Fully responsive · `prefers-reduced-motion` aware
 - Deployed on **Vercel**
@@ -44,11 +46,15 @@ python -m http.server 5500
 ```
 my-portfolio/
 ├── index.html               # the homepage
+├── js/                      # homepage JS modules (site, hero3d, cases)
 ├── dashboards/
 │   ├── churn.html           # Australian Business Churn
 │   ├── market.html          # Government Ad Spend
 │   ├── demand.html          # Retail Demand
-│   └── reconciliation.html  # GST Reconciliation
+│   ├── reconciliation.html  # GST Reconciliation
+│   └── js/                  # per-dashboard chart modules
+├── scripts/                 # Python data pipeline (one fetch_*.py per dashboard)
+├── sql/analysis.sql         # SQL model + headline metrics for the four datasets
 └── README.md
 ```
 
