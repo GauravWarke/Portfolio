@@ -3,7 +3,7 @@
 #   Rscript analysis/figures.R
 #
 # Reads the tidy artefacts in data/ (written by scripts/run_all.py) and writes
-# four PNG charts into analysis/figures/. Nothing here is synthetic: every value
+# four PNG charts into assets/charts/. Nothing here is synthetic: every value
 # comes from the committed CSVs, which mirror the published Australian open data.
 #
 # Requires: readr, dplyr, ggplot2, scales
@@ -22,7 +22,8 @@ file_arg <- sub("^--file=", "", args[grep("^--file=", args)])
 here <- if (length(file_arg)) dirname(normalizePath(file_arg)) else getwd()
 root <- normalizePath(file.path(here, ".."))
 data_dir <- file.path(root, "data")
-out_dir  <- file.path(here, "figures")
+# Written next to the Python charts so the dashboards can show both stacks.
+out_dir  <- file.path(root, "assets", "charts")
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 # --- shared editorial theme (matches the portfolio: cream + ink) -------------
@@ -68,7 +69,7 @@ p1 <- ggplot(churn, aes(state, businesses, fill = share_pct)) +
        x = NULL, y = "Businesses",
        caption = "Source: ABS Counts of Australian Businesses (8165.0)") +
   theme_portfolio()
-save_chart(p1, "01_business_base_by_state.png")
+save_chart(p1, "r_business_base.png")
 
 # --- 2. Government ad spend by channel (Dept of Finance) ----------------------
 ads <- read_csv(file.path(data_dir, "govt_ad_spend_by_channel.csv"),
@@ -88,7 +89,7 @@ p2 <- ggplot(ads, aes(channel, spend_m, fill = channel == "Digital")) +
        x = NULL, y = "Spend ($M)",
        caption = "Source: Australian Department of Finance") +
   theme_portfolio()
-save_chart(p2, "02_ad_spend_by_channel.png")
+save_chart(p2, "r_ad_spend.png")
 
 # --- 3. Retail turnover trend (ABS 8501.0) -----------------------------------
 retail <- read_csv(file.path(data_dir, "retail_demand_series.csv"),
@@ -106,7 +107,7 @@ p3 <- ggplot(retail, aes(date, turnover_m)) +
        x = NULL, y = "Turnover ($M)",
        caption = "Source: ABS Retail Trade (8501.0)") +
   theme_portfolio()
-save_chart(p3, "03_retail_turnover_trend.png")
+save_chart(p3, "r_retail_trend.png")
 
 # --- 4. GST distribution by state (Commonwealth Grants Commission) ------------
 gst <- read_csv(file.path(data_dir, "gst_reconciliation_by_state.csv"),
@@ -125,6 +126,6 @@ p4 <- ggplot(gst, aes(state, gst_bn, fill = share_pct)) +
        x = NULL, y = "GST distributed ($bn)",
        caption = "Source: Commonwealth Grants Commission") +
   theme_portfolio()
-save_chart(p4, "04_gst_distribution_by_state.png")
+save_chart(p4, "r_gst_distribution.png")
 
-message("\nAll four figures written to analysis/figures/.")
+message("\nAll four figures written to assets/charts/.")
