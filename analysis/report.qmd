@@ -10,19 +10,22 @@ format:
     toc-location: left
     page-layout: full
     embed-resources: true
+    code-fold: true
+    code-tools: true
     fig-width: 8
     fig-height: 5
 execute:
-  echo: false
+  echo: true
   warning: false
   message: false
 ---
 
 ```{r setup}
+#| echo: false
 library(readr); library(dplyr); library(ggplot2); library(scales); library(jsonlite)
 
-root     <- normalizePath("..")
-data_dir <- file.path(root, "data")
+# Quarto renders with the .qmd's directory as cwd; data/ sits one level up.
+data_dir <- normalizePath(file.path("..", "data"))
 
 ink <- "#141311"; cream <- "#EFEDE7"; accent <- "#B5502E"
 theme_portfolio <- function() {
