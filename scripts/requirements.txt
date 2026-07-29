@@ -1,5 +1,8 @@
 # The data pipeline itself runs on the Python 3.11 standard library only
 # (urllib, json, csv) — no install needed to run scripts/run_all.py.
 #
+# Optional: build the shared analytical DB (scripts/load_duckdb.py):
+duckdb>=1.0
+#
 # Optional dev tooling used on this repo:
 ruff==0.6.9

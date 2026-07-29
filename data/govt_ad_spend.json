@@ -1,0 +1,68 @@
+{
+  "release": "Dept of Finance \u2014 Campaign Advertising reports",
+  "total_by_year_m": [
+    {
+      "year": "2021-22",
+      "spend_m": 339.2
+    },
+    {
+      "year": "2022-23",
+      "spend_m": 179.3
+    },
+    {
+      "year": "2023-24",
+      "spend_m": 250.6
+    }
+  ],
+  "latest_split_m": {
+    "year": "2023-24",
+    "media_m": 173.8,
+    "development_m": 76.6
+  },
+  "by_channel_m": [
+    {
+      "channel": "Digital",
+      "spend_m": 75.9,
+      "share_pct": 43.8
+    },
+    {
+      "channel": "Television",
+      "spend_m": 54.7,
+      "share_pct": 31.5
+    },
+    {
+      "channel": "Out of Home",
+      "spend_m": 17.7,
+      "share_pct": 10.2
+    },
+    {
+      "channel": "Radio",
+      "spend_m": 15.2,
+      "share_pct": 8.8
+    },
+    {
+      "channel": "Cinema",
+      "spend_m": 6.2,
+      "share_pct": 3.6
+    },
+    {
+      "channel": "Press",
+      "spend_m": 3.7,
+      "share_pct": 2.1
+    }
+  ],
+  "by_jurisdiction_m": [
+    {
+      "jurisdiction": "Commonwealth",
+      "spend_m": 173.8
+    },
+    {
+      "jurisdiction": "NSW",
+      "spend_m": 131.46
+    },
+    {
+      "jurisdiction": "QLD",
+      "spend_m": 50.7
+    }
+  ]
+}

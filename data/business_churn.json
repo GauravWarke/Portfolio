@@ -1,0 +1,57 @@
+{
+  "release": "ABS Counts of Australian Businesses (8165.0)",
+  "total_businesses": 2729648,
+  "flows": {
+    "entries": 437150,
+    "exits": 370500,
+    "entry_rate_pct": 16.4,
+    "exit_rate_pct": 13.9,
+    "net": 66650,
+    "net_pct": 2.5
+  },
+  "survival_3yr_pct": [
+    {
+      "segment": "All businesses",
+      "survival_pct": 48.0
+    },
+    {
+      "segment": "Employing",
+      "survival_pct": 61.0
+    },
+    {
+      "segment": "Non-employing",
+      "survival_pct": 43.3
+    },
+    {
+      "segment": "Health Care & Social Assistance",
+      "survival_pct": 82.7
+    }
+  ],
+  "by_state": [
+    {
+      "state": "NSW",
+      "businesses": 891123,
+      "share_pct": 32.6
+    },
+    {
+      "state": "VIC",
+      "businesses": 735805,
+      "share_pct": 27.0
+    },
+    {
+      "state": "QLD",
+      "businesses": 511835,
+      "share_pct": 18.8
+    },
+    {
+      "state": "WA",
+      "businesses": 260730,
+      "share_pct": 9.6
+    },
+    {
+      "state": "Other (SA/TAS/ACT/NT)",
+      "businesses": 330155,
+      "share_pct": 12.1
+    }
+  ]
+}

@@ -29,6 +29,7 @@ Each dashboard: a light editorial theme, a "What this means — in plain English
 - **Three.js** (WebGL) for the 3D charts · **Canvas 2D** for the light 2D charts
 - **Python** data pipeline (`scripts/`) — sources each dashboard's figures from its real open-data publisher, with an offline snapshot
 - **SQL** analytical layer (`sql/analysis.sql`) — models the four datasets and reproduces each dashboard's headline metrics
+- **Shared data layer** (`data/`, `scripts/load_duckdb.py`) — Power BI, Tableau and R all connect to the same artefacts; see [CONNECT.md](CONNECT.md)
 - Fonts: Archivo (grotesque) · Playfair Display (serif) · JetBrains Mono
 - Fully responsive · `prefers-reduced-motion` aware
 - Deployed on **Vercel**
