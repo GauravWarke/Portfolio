@@ -33,3 +33,6 @@ __pycache__/
 analysis/report_files/
 .Rproj.user/
 .Rhistory
+
+# Superseded by assets/charts/ (old R output path)
+analysis/figures/
