@@ -1,0 +1,8 @@
+relationship State_BusinessChurn
+	fromColumn: BusinessChurn.state
+	toColumn: State.State
+
+relationship State_GstDistribution
+	fromColumn: GstDistribution.StateGroup
+	toColumn: State.State
+

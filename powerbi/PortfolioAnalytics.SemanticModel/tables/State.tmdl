@@ -1,0 +1,26 @@
+/// Conformed state dimension at the coarsest common grain across datasets. Built from the business-counts file, which groups the smaller jurisdictions as 'Other (SA/TAS/ACT/NT)'.
+table State
+	lineageTag: ea352a40-b0e4-4aae-be69-6b9e22c11a00
+
+	/// GST distributed per actively trading business. Cross-dataset metric enabled by the conformed State dimension.
+	measure 'GST per Business ($)' = DIVIDE ( [GST Pool ($bn)] * 1000000000, [Total Businesses] )
+		formatString: $#,##0
+		displayFolder: Cross-dataset
+		lineageTag: 448ca665-5808-487b-ba70-89af14188cce
+
+	/// Business count sliced by the conformed State dimension.
+	measure 'Businesses per State Group' = CALCULATE ( [Total Businesses], ALLEXCEPT ( State, State[State] ) )
+		formatString: #,##0
+		displayFolder: Cross-dataset
+		lineageTag: d6d31a3a-8a34-420a-954c-5d1b5a08ada8
+
+	column State
+		dataType: string
+		isNullable: false
+		lineageTag: 082a1845-c4a7-4f9c-91b6-dd00e99e472a
+		sourceColumn: State
+
+	partition State = m
+		mode: import
+		source = let Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/GauravWarke/Portfolio/main/data/business_churn_by_state.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]), Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]), OnlyState = Table.SelectColumns(Headers, {"state"}), Distinct = Table.Distinct(OnlyState), Renamed = Table.RenameColumns(Distinct, {{"state", "State"}}), Sorted = Table.Sort(Renamed, {{"State", Order.Ascending}}), Typed = Table.TransformColumnTypes(Sorted, {{"State", type text}}) in Typed
+

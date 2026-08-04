@@ -33,6 +33,11 @@ table GstDistribution
 		lineageTag: 8cfb4657-62e4-4d0f-ad29-2e163c2d2d3f
 		sourceColumn: share_pct
 
+	/// Rolls SA, TAS, ACT and NT up to 'Other (SA/TAS/ACT/NT)' so GST data joins the conformed State dimension at a matching grain.
+	column StateGroup = IF ( GstDistribution[state] IN { "NSW", "VIC", "QLD", "WA" }, GstDistribution[state], "Other (SA/TAS/ACT/NT)" )
+		dataType: string
+		lineageTag: c695310f-6ee4-42e3-acb6-8d7a20eddd96
+
 	partition GstDistribution = m
 		mode: import
 		source = let Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/GauravWarke/Portfolio/main/data/gst_reconciliation_by_state.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]), Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]), Typed = Table.TransformColumnTypes(Headers, {{"state", type text}, {"gst_bn", type number}, {"share_pct", type number}}) in Typed

@@ -11,13 +11,12 @@ arrives with everything already modelled:
 
 | What | Detail |
 | :--- | :--- |
-| 4 tables | `BusinessChurn`, `AdSpend`, `RetailDemand`, `GstDistribution` |
+| 5 tables | `BusinessChurn`, `AdSpend`, `RetailDemand`, `GstDistribution` + a conformed `State` dimension |
 | Data source | Power Query (M) pointed at this repo's raw GitHub CSVs — refreshes on `git push` |
-| 13 DAX measures | Grouped into display folders, with number formatting applied |
+| 15 DAX measures | Grouped into display folders, with number formatting applied |
 | Date table | `RetailDemand` marked as a date table, so time-intelligence DAX works |
-
-Then just drag fields onto the canvas to build visuals. Report visuals are
-authored by you in Report view — this repo does not ship a fabricated report.
+| Star schema | `State` relates 1:* to `BusinessChurn` and `GstDistribution` |
+| Report page | An **Overview** page with 4 KPI cards and 4 charts mirroring the website dashboards |
 
 ### Measures included
 
@@ -26,15 +25,36 @@ authored by you in Report view — this repo does not ship a fabricated report.
 - **Retail Demand** — Latest Turnover ($M), First Turnover ($M), Turnover Growth %, Turnover YoY %
 - **GST Distribution** — GST Pool ($bn), Largest Recipient, Largest Recipient Share %
 
-### A note on relationships
+### The conformed `State` dimension
 
-No cross-table relationships are defined, and that is deliberate.
-`BusinessChurn` groups the smaller jurisdictions as `Other (SA/TAS/ACT/NT)`
+The two state-level datasets are published at different grains:
+`BusinessChurn` groups the smaller jurisdictions as `Other (SA/TAS/ACT/NT)`,
 while `GstDistribution` lists SA, WA, NT, TAS and ACT individually. Joining
-them on `state` would silently mismatch rows, so the tables are kept
-independent rather than related on an incompatible grain. If you later add a
-state-level dataset at a consistent grain, a shared `State` dimension is the
-right way to connect them.
+them directly on `state` would silently mismatch rows.
+
+The model resolves this properly rather than by guesswork:
+
+1. `State` is a dimension built from the business-counts file, so it carries the
+   **coarsest common grain** (NSW, VIC, QLD, WA, Other) and is derived from real
+   data rather than hardcoded.
+2. `GstDistribution` gains a calculated column `StateGroup` that rolls SA, TAS,
+   ACT and NT up to `Other (SA/TAS/ACT/NT)`.
+3. Both fact tables then relate many-to-one to `State`, giving a clean star
+   schema where a single slicer filters both consistently.
+
+This enables genuine cross-dataset analysis — see the `Cross-dataset` measure
+folder, e.g. **GST per Business ($)**, which is only computable because the two
+datasets now share a dimension.
+
+> Note the tradeoff: GST figures roll up to the coarser grain when sliced by
+> `State`. Use `GstDistribution[state]` directly if you need all 8 jurisdictions.
+
+### Report page
+
+`PortfolioAnalytics.Report` ships an **Overview** page laid out to mirror the
+website dashboards: four KPI cards across the top, then business base by state,
+ad spend by channel, retail turnover trend, and GST distribution. Adjust or add
+visuals freely in Report view.
 
 ## Alternative: wire it up manually
 
