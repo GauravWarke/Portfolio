@@ -11,3 +11,8 @@ analysis/report.html linguist-generated
 
 # Chart images are pipeline output, not source.
 assets/charts/*.png binary linguist-generated
+
+# Linguist classifies SQL as a "data" language and excludes it from the repo
+# language statistics by default. SQL is written and used here (the analytical
+# model in sql/, the database layer in supabase/), so opt it back in.
+*.sql linguist-detectable=true
