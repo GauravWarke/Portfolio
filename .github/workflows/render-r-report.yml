@@ -59,8 +59,8 @@ jobs:
 
       - name: Commit rendered charts and report
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Gaurav Warke"
+          git config user.email "gauravwarke8@gmail.com"
           git add -f analysis/report.html assets/charts
           if git diff --staged --quiet; then
             echo "No changes to commit."
