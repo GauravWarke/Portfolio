@@ -31,15 +31,16 @@ Supabase is Postgres, so Power BI connects natively:
 
 | Field | Value |
 | :--- | :--- |
-| Server | Session pooler host, e.g. `aws-0-ap-southeast-2.pooler.supabase.com` |
+| Server | `aws-0-ap-southeast-2.pooler.supabase.com` (Session pooler, Sydney) |
 | Database | `postgres` |
 | Port | `5432` |
 | Username | `postgres.hoxrzbwvsmwvpkitnwdp` |
 
 Or paste the M query in [`powerbi.m`](powerbi.m) into Advanced Editor.
 
-> Use the **Session pooler** connection string if your network is IPv6-limited.
-> Credentials go in Power BI's own credential prompt — never commit them.
+> The Session pooler is required, not optional: `db.hoxrzbwvsmwvpkitnwdp.supabase.co`
+> has no DNS record, because new Supabase projects do not publish a direct IPv4
+> database host. Credentials go in Power BI's own prompt — never commit them.
 
 ## 3. Query from the website
 
