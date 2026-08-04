@@ -1,10 +1,13 @@
-model PortfolioAnalytics
+model Model
 	culture: en-US
 	defaultPowerBIDataSourceVersion: powerBI_V3
-	sourceQueryCulture: en-US
+	sourceQueryCulture: en-IN
+	valueFilterBehavior: independent
 	dataAccessOptions
 		legacyRedirects
 		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["MCP-PBIModeling"]
 
@@ -13,4 +16,6 @@ ref table AdSpend
 ref table RetailDemand
 ref table GstDistribution
 ref table State
+
+ref cultureInfo en-US
 

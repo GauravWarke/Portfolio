@@ -1,37 +1,32 @@
 table BusinessChurn
-	lineageTag: 5bf7d645-3c10-431b-aa7a-7f15581525df
+	lineageTag: 0a365675-8f4a-4023-b2b7-f51d4e0d7ae2
 
 	measure 'Total Businesses' = SUM ( BusinessChurn[businesses] )
 		formatString: #,##0
-		displayFolder: Business Churn
-		lineageTag: 1fb21021-90da-4e64-8cf9-75fce4e83ee0
+		displayFolder: Business churn
+		lineageTag: c4e0fb1a-465b-4ba0-ba87-f2d6d852dfbe
 
-	measure 'Top State Share %' = MAXX ( BusinessChurn, BusinessChurn[share_pct] )
-		formatString: 0.0"%"
-		displayFolder: Business Churn
-		lineageTag: ba80a78e-31a6-4761-9fe9-c2c2a982f34b
-
-	measure 'State Count' = DISTINCTCOUNT ( BusinessChurn[state] )
-		formatString: #,##0
-		displayFolder: Business Churn
-		lineageTag: 92dc970d-7997-4625-a6a3-44f3ecfaef3d
+	measure 'Top State Share %' = MAX ( BusinessChurn[share_pct] )
+		formatString: 0.0\%
+		displayFolder: Business churn
+		lineageTag: 80e375f7-5507-48c7-bcfa-97cf4a949867
 
 	column state
 		dataType: string
 		isNullable: false
-		lineageTag: 8b8207a7-5d2f-4501-b17e-c69370e7429c
+		lineageTag: d5981f3e-3dfd-461e-a572-305795071852
 		sourceColumn: state
 
 	column businesses
 		dataType: int64
 		isNullable: false
-		lineageTag: 5b398cff-4a10-4d70-b8e8-275f92a6b378
+		lineageTag: 3521737c-2197-4832-8347-f6589f3d6559
 		sourceColumn: businesses
 
 	column share_pct
 		dataType: double
 		isNullable: false
-		lineageTag: 1b321102-809b-4eb8-837b-d9531fc4ad8c
+		lineageTag: cc80ce5a-ee49-4a87-bf99-fa327febf73b
 		sourceColumn: share_pct
 
 	partition BusinessChurn = m

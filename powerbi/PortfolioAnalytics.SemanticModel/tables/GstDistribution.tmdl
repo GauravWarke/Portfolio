@@ -1,42 +1,37 @@
 table GstDistribution
-	lineageTag: da70f76e-a3df-4855-a694-160e5af37414
+	lineageTag: bc8565de-a437-4e39-9148-1e5a13ca29bb
 
 	measure 'GST Pool ($bn)' = SUM ( GstDistribution[gst_bn] )
 		formatString: $#,##0.0
-		displayFolder: GST Distribution
-		lineageTag: 19332db3-6875-45fb-9936-9d0c11c47e83
+		displayFolder: GST
+		lineageTag: d6a31c71-8cee-4e26-afc5-30adeabda9ea
 
-	measure 'Largest Recipient' = CALCULATE ( MAX ( GstDistribution[state] ), TOPN ( 1, GstDistribution, GstDistribution[gst_bn], DESC ) )
-		displayFolder: GST Distribution
-		lineageTag: 4daf517d-29c8-4237-b365-fa63da3c48f9
-
-	measure 'Largest Recipient Share %' = MAXX ( GstDistribution, GstDistribution[share_pct] )
-		formatString: 0.0"%"
-		displayFolder: GST Distribution
-		lineageTag: 5650611e-40a1-423a-b447-7bbd44c6d963
+	measure 'Largest Recipient' = MAXX ( TOPN ( 1, GstDistribution, GstDistribution[gst_bn], DESC ), GstDistribution[state] )
+		displayFolder: GST
+		lineageTag: 57b70921-8c0a-4085-af0b-d9397fd52d7b
 
 	column state
 		dataType: string
 		isNullable: false
-		lineageTag: 4de07119-e954-4480-84cd-b354a4f42e3c
+		lineageTag: 9aeadb21-fe2e-4247-b14a-ceeb54cf93d0
 		sourceColumn: state
 
 	column gst_bn
 		dataType: double
 		isNullable: false
-		lineageTag: 5459d21b-038c-412d-a8f6-e071df72368e
+		lineageTag: d3b98479-0728-4d85-8188-bda56b393f0e
 		sourceColumn: gst_bn
 
 	column share_pct
 		dataType: double
 		isNullable: false
-		lineageTag: 8cfb4657-62e4-4d0f-ad29-2e163c2d2d3f
+		lineageTag: 90460061-062b-49ad-8dbb-7d7c6187e7fe
 		sourceColumn: share_pct
 
-	/// Rolls SA, TAS, ACT and NT up to 'Other (SA/TAS/ACT/NT)' so GST data joins the conformed State dimension at a matching grain.
+	/// Rolls SA, TAS, ACT and NT up to 'Other (SA/TAS/ACT/NT)' so GST joins the conformed State dimension at a matching grain.
 	column StateGroup = IF ( GstDistribution[state] IN { "NSW", "VIC", "QLD", "WA" }, GstDistribution[state], "Other (SA/TAS/ACT/NT)" )
 		dataType: string
-		lineageTag: c695310f-6ee4-42e3-acb6-8d7a20eddd96
+		lineageTag: cc35fe29-0d74-47d9-a1f1-ffa7371209c2
 
 	partition GstDistribution = m
 		mode: import
