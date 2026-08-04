@@ -8,20 +8,19 @@ site, Power BI, R and Python can all query one source over SQL.
 1. Supabase Dashboard → **SQL Editor** → **New query**.
 2. Paste [`schema.sql`](schema.sql) and **Run**.
 
-That creates a `portfolio` schema with four tables, seeds them from the
+That creates a `public` schema with four tables, seeds them from the
 committed `data/*.csv`, adds two helper views, and enables row-level security
 with **public read-only** access (correct for a portfolio built on open data —
 nothing here is private).
 
 | Table | Rows | Source |
 | :--- | ---: | :--- |
-| `portfolio.business_churn_by_state` | 5 | ABS Counts of Australian Businesses (8165.0) |
-| `portfolio.govt_ad_spend_by_channel` | 6 | Australian Department of Finance |
-| `portfolio.retail_demand_series` | 6 | ABS Retail Trade (8501.0) |
-| `portfolio.gst_reconciliation_by_state` | 8 | Commonwealth Grants Commission |
+| `business_churn_by_state` | 5 | ABS Counts of Australian Businesses (8165.0) |
+| `govt_ad_spend_by_channel` | 6 | Australian Department of Finance |
+| `retail_demand_series` | 6 | ABS Retail Trade (8501.0) |
+| `gst_reconciliation_by_state` | 8 | Commonwealth Grants Commission |
 
-Views: `portfolio.state_dim` (conformed state grain) and
-`portfolio.gst_by_state_group` (GST rolled up to that grain) — the SQL
+Views: `state_dim` (conformed state grain) and `gst_by_state_group` (GST rolled up to that grain) — the SQL
 equivalent of the Power BI `State` dimension.
 
 ## 2. Connect Power BI to Supabase
@@ -55,8 +54,8 @@ const rows = await fetch(url, {
 }).then(r => r.json());
 ```
 
-Add `?schema=portfolio` exposure under **Project Settings → API → Exposed
-schemas** so `portfolio` is queryable.
+No schema configuration is needed: the tables live in `public`, which
+PostgREST exposes by default.
 
 ## Regenerating
 

@@ -11,7 +11,7 @@ let
     // e.g. "aws-0-ap-southeast-2.pooler.supabase.com:5432"
     PoolerHost = "aws-0-<region>.pooler.supabase.com:5432",
     Source = PostgreSQL.Database(PoolerHost, "postgres"),
-    Data   = Source{[Schema="portfolio", Item="business_churn_by_state"]}[Data]
+    Data   = Source{[Schema="public", Item="business_churn_by_state"]}[Data]
 in
     Data
 
@@ -20,7 +20,7 @@ let
     // e.g. "aws-0-ap-southeast-2.pooler.supabase.com:5432"
     PoolerHost = "aws-0-<region>.pooler.supabase.com:5432",
     Source = PostgreSQL.Database(PoolerHost, "postgres"),
-    Data   = Source{[Schema="portfolio", Item="govt_ad_spend_by_channel"]}[Data]
+    Data   = Source{[Schema="public", Item="govt_ad_spend_by_channel"]}[Data]
 in
     Data
 
@@ -29,7 +29,7 @@ let
     // e.g. "aws-0-ap-southeast-2.pooler.supabase.com:5432"
     PoolerHost = "aws-0-<region>.pooler.supabase.com:5432",
     Source = PostgreSQL.Database(PoolerHost, "postgres"),
-    Data   = Source{[Schema="portfolio", Item="retail_demand_series"]}[Data],
+    Data   = Source{[Schema="public", Item="retail_demand_series"]}[Data],
     WithDate = Table.AddColumn(Data, "date", each Date.FromText([period] & "-01"), type date)
 in
     WithDate
@@ -39,7 +39,7 @@ let
     // e.g. "aws-0-ap-southeast-2.pooler.supabase.com:5432"
     PoolerHost = "aws-0-<region>.pooler.supabase.com:5432",
     Source = PostgreSQL.Database(PoolerHost, "postgres"),
-    Data   = Source{[Schema="portfolio", Item="gst_reconciliation_by_state"]}[Data]
+    Data   = Source{[Schema="public", Item="gst_reconciliation_by_state"]}[Data]
 in
     Data
 
@@ -48,7 +48,7 @@ let
     // e.g. "aws-0-ap-southeast-2.pooler.supabase.com:5432"
     PoolerHost = "aws-0-<region>.pooler.supabase.com:5432",
     Source = PostgreSQL.Database(PoolerHost, "postgres"),
-    Data   = Source{[Schema="portfolio", Item="state_dim"]}[Data],
+    Data   = Source{[Schema="public", Item="state_dim"]}[Data],
     Renamed = Table.RenameColumns(Data, {{"state", "State"}})
 in
     Renamed
