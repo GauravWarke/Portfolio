@@ -29,7 +29,7 @@
 
 // HERO — interactive plain-English project summary (for non-technical stakeholders)
 const HERO_SUM={
-  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.9%',numLbl:'annual exit (churn) rate',pct:48,center:'48%',sub:'SURVIVE 3Y'},
+  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.9%',numLbl:'annual exit (churn) rate',pct:69,center:'69.4%',sub:'SURVIVE 3Y'},
   mpi:{headline:'Tracks where government advertising money actually goes, and how fast it is shifting to digital.',num:'$250.6M',numLbl:'gov ad spend, 2023-24',pct:44,center:'44%',sub:'DIGITAL'},
   demand:{headline:'Reads national retail demand: what Australians are buying, by category and by state, each month.',num:'$37.9bn',numLbl:'monthly retail turnover',pct:80,center:'+4.9%',sub:'YEAR ON YEAR'},
   reconciliation:{headline:'Shows how the national GST pool is reconciled out to the states by need, not by where it was raised.',num:'$102bn',numLbl:'GST pool reconciled',pct:100,center:'8',sub:'STATES'}
@@ -159,9 +159,9 @@ const CASES={
     cat:'// FinTech · Retention & Attrition · Open Data',catColor:'var(--rose)',
     title:'Australian Business Churn: Who Survives and Who Exits',
     kpi:'13.9%',kpiColor:'var(--rose)',kpiLabel:'Annual Exit (Churn) Rate',
-    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and under half survive to year three.',
-    arch:['Pulls the ABS Counts of Australian Businesses release: real entries, exits and survival by state.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments three-year survival (employing vs non-employing, best and worst industry) to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
-    metric:'370,500 exits (13.9%) against 437,150 entries in 2024-25, a net +66,650; only 48% of businesses reach year three.',
+    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and 69.4% survive to year three.',
+    arch:['Parses ABS datacube 8165DC01.xlsx directly: entries, exits and survival by state and industry.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments survival by industry and state, from Agriculture at 74.9% down to Transport at 48.5%, to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
+    metric:'370,500 exits (13.9%) against 437,150 entries in 2024-25, a net +66,650; 69.4% of businesses reach year three and 63.1% reach year four.',
     tags:['ABS Open Data','Python','SQL','Retention Analytics','Data Storytelling'],
     repo:'https://github.com/GauravWarke/churn-revenue-risk-platform',
     dash:'dashboards/churn.html'

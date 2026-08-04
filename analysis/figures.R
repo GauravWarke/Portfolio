@@ -3,17 +3,18 @@
 #   Rscript analysis/figures.R
 #
 # Reads the tidy artefacts in data/ (written by scripts/run_all.py) and writes
-# four PNG charts into assets/charts/. Nothing here is synthetic: every value
+# six PNG charts into assets/charts/. Nothing here is synthetic: every value
 # comes from the committed CSVs, which mirror the published Australian open data.
 #
-# Requires: readr, dplyr, ggplot2, scales
-#   install.packages(c("readr", "dplyr", "ggplot2", "scales"))
+# Requires: readr, dplyr, ggplot2, scales, tidyr
+#   install.packages(c("readr", "dplyr", "ggplot2", "scales", "tidyr"))
 
 suppressPackageStartupMessages({
   library(readr)
   library(dplyr)
   library(ggplot2)
   library(scales)
+  library(tidyr)
 })
 
 # --- resolve paths relative to the repo root (works from any cwd) ------------
@@ -128,4 +129,48 @@ p4 <- ggplot(gst, aes(state, gst_bn, fill = share_pct)) +
   theme_portfolio()
 save_chart(p4, "r_gst_distribution.png")
 
-message("\nAll four figures written to assets/charts/.")
+# --- 5. Survival by industry (ABS 8165.0, Table 2) ---------------------------
+surv_ind <- read_csv(file.path(data_dir, "business_survival_by_industry.csv"),
+                     show_col_types = FALSE) |>
+  mutate(industry = reorder(industry, survival_4yr_pct))
+
+p5 <- ggplot(surv_ind, aes(industry, survival_4yr_pct, fill = survival_4yr_pct)) +
+  geom_col(width = 0.72) +
+  geom_text(aes(label = paste0(survival_4yr_pct, "%")),
+            hjust = -0.12, size = 3, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.14))) +
+  scale_fill_gradient(low = alpha(accent, 0.35), high = accent, guide = "none") +
+  labs(title = "Four-year business survival by industry",
+       subtitle = "Share of June 2021 businesses still trading in June 2025",
+       x = NULL, y = "Survival rate (%)",
+       caption = "Source: ABS Counts of Australian Businesses (8165.0), Table 2") +
+  theme_portfolio()
+save_chart(p5, "r_survival_industry.png", h = 7.2)
+
+# --- 6. Survival by state, 3-year vs 4-year (ABS 8165.0, Table 5) -------------
+surv_state <- read_csv(file.path(data_dir, "business_survival_by_state.csv"),
+                       show_col_types = FALSE) |>
+  tidyr::pivot_longer(c(survival_3yr_pct, survival_4yr_pct),
+                      names_to = "horizon", values_to = "rate") |>
+  mutate(horizon = ifelse(horizon == "survival_3yr_pct", "3 years", "4 years"),
+         state = reorder(state, rate))
+
+p6 <- ggplot(surv_state, aes(state, rate, fill = horizon)) +
+  geom_col(width = 0.7, position = position_dodge(width = 0.75)) +
+  geom_text(aes(label = paste0(rate, "%")),
+            position = position_dodge(width = 0.75),
+            hjust = -0.15, size = 2.9, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.16))) +
+  scale_fill_manual(values = c(`3 years` = alpha(ink, 0.45), `4 years` = accent),
+                    name = NULL) +
+  labs(title = "Business survival by state",
+       subtitle = "Businesses trading in June 2021 that were still trading later",
+       x = NULL, y = "Survival rate (%)",
+       caption = "Source: ABS Counts of Australian Businesses (8165.0), Table 5") +
+  theme_portfolio() +
+  theme(legend.position = "bottom")
+save_chart(p6, "r_survival_state.png")
+
+message("\nAll six figures written to assets/charts/.")

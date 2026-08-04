@@ -57,12 +57,12 @@ def save(fig: plt.Figure, name: str) -> None:
     print(f"  -> wrote {path.relative_to(ROOT)}")
 
 
-def barh(rows, label_key, value_key, fmt, title, subtitle, xlabel, out):
+def barh(rows, label_key, value_key, fmt, title, subtitle, xlabel, out, height=4.6):
     rows = sorted(rows, key=lambda r: float(r[value_key]))
     labels = [r[label_key] for r in rows]
     values = [float(r[value_key]) for r in rows]
 
-    fig, ax = plt.subplots(figsize=(8, 4.6))
+    fig, ax = plt.subplots(figsize=(8, height))
     style_axes(ax)
     ax.barh(labels, values, color=ACCENT, height=0.62)
     span = max(values) if values else 1
@@ -126,6 +126,41 @@ def main() -> None:
     ax.text(0, 1.02, "Seasonally adjusted monthly turnover · ABS Retail Trade",
             transform=ax.transAxes, fontsize=9.5, color=MUTED)
     save(fig, "py_retail_trend.png")
+
+    # Survival by industry — the widest spread in the data, so the clearest story
+    barh(
+        read_csv("business_survival_by_industry.csv"), "industry", "survival_4yr_pct",
+        lambda v: f"{v:.1f}%",
+        "Four-year business survival by industry",
+        "Share of June 2021 businesses still trading in June 2025 · ABS 8165.0",
+        "Survival rate (%)", "py_survival_industry.png", height=7.2,
+    )
+
+    # Survival by state, 3-year vs 4-year
+    rows = read_csv("business_survival_by_state.csv")
+    rows.sort(key=lambda r: float(r["survival_4yr_pct"]))
+    labels = [r["state"] for r in rows]
+    three = [float(r["survival_3yr_pct"]) for r in rows]
+    four = [float(r["survival_4yr_pct"]) for r in rows]
+    y = range(len(labels))
+
+    fig, ax = plt.subplots(figsize=(8, 4.6))
+    style_axes(ax)
+    ax.barh([i + 0.19 for i in y], three, height=0.36, color=MUTED, label="3 years")
+    ax.barh([i - 0.19 for i in y], four, height=0.36, color=ACCENT, label="4 years")
+    for i, (a, b) in enumerate(zip(three, four)):
+        ax.text(a + 0.4, i + 0.19, f"{a:.1f}%", va="center", fontsize=8.5, color=INK)
+        ax.text(b + 0.4, i - 0.19, f"{b:.1f}%", va="center", fontsize=8.5, color=INK)
+    ax.set_yticks(list(y))
+    ax.set_yticklabels(labels)
+    ax.set_xlim(0, max(three) * 1.18)
+    ax.set_xlabel("Survival rate (%)", color=INK, fontsize=9)
+    ax.set_title("Business survival by state", loc="left", fontsize=14,
+                 fontweight="bold", color=INK, pad=14)
+    ax.text(0, 1.02, "Businesses trading in June 2021 that were still trading later · ABS 8165.0",
+            transform=ax.transAxes, fontsize=9.5, color=MUTED)
+    ax.legend(frameon=False, fontsize=9, loc="lower right")
+    save(fig, "py_survival_state.png")
 
     print("\nAll matplotlib charts written to assets/charts/.")
 

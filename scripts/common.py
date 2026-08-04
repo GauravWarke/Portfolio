@@ -35,30 +35,40 @@ def _ensure_dirs() -> None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def get(url: str, *, timeout: int = 30, ttl_seconds: int = 86_400) -> bytes | None:
-    """Fetch ``url`` and cache it. Return ``None`` on any network failure.
+def get(url: str, *, timeout: int = 120, ttl_seconds: int = 86_400,
+        as_file: str | None = None):
+    """Fetch ``url`` and cache it.
+
+    Returns the response body as bytes, or — when ``as_file`` is given — the
+    path to the cached copy on disk, which is what the Excel reader needs.
 
     A cached copy younger than ``ttl_seconds`` is reused without a round-trip;
-    on failure we fall back to whatever cached copy exists, however old.
+    on failure we fall back to whatever cached copy exists, however old, so a
+    run still works offline against the last download.
     """
     _ensure_dirs()
-    key = "".join(c if c.isalnum() else "_" for c in url)[-120:]
-    cache_path = CACHE_DIR / f"{key}.bin"
+    if as_file:
+        cache_path = CACHE_DIR / as_file
+    else:
+        key = "".join(c if c.isalnum() else "_" for c in url)[-120:]
+        cache_path = CACHE_DIR / f"{key}.bin"
 
-    if cache_path.exists() and (time.time() - cache_path.stat().st_mtime) < ttl_seconds:
-        return cache_path.read_bytes()
+    fresh = cache_path.exists() and (time.time() - cache_path.stat().st_mtime) < ttl_seconds
+    if not fresh:
+        try:
+            req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+            with urlopen(req, timeout=timeout) as resp:  # noqa: S310 (trusted gov URLs)
+                body = resp.read()
+            cache_path.write_bytes(body)
+        except (URLError, TimeoutError, OSError) as exc:  # offline / endpoint moved
+            print(f"  ! download failed ({exc})", file=sys.stderr)
+            if not cache_path.exists():
+                if as_file:
+                    raise SystemExit(f"cannot proceed without {url}") from exc
+                return None
+            print("  using the previously downloaded copy", file=sys.stderr)
 
-    try:
-        req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
-        with urlopen(req, timeout=timeout) as resp:  # noqa: S310 (trusted gov URLs)
-            body = resp.read()
-        cache_path.write_bytes(body)
-        return body
-    except (URLError, TimeoutError, OSError) as exc:  # offline / endpoint moved
-        print(f"  ! network fetch failed ({exc}); using snapshot fallback", file=sys.stderr)
-        if cache_path.exists():
-            return cache_path.read_bytes()
-        return None
+    return str(cache_path) if as_file else cache_path.read_bytes()
 
 
 def write_json(name: str, payload: Any) -> pathlib.Path:

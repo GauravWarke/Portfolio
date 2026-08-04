@@ -1,21 +1,22 @@
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fmt(n){return n.toLocaleString('en-AU');}
 
-/* ---------- REAL DATA — ABS Counts of Australian Businesses (Jul 2024 – Jun 2025) ---------- */
+/* ---------- REAL DATA — parsed from ABS datacube 8165DC01.xlsx by scripts/fetch_business_churn.py ---------- */
 var NAT={total:2729648,entries:437150,exits:370500,entryRate:16.4,exitRate:13.9,net:66650,netPct:2.5};
 var STATES=[
-  {name:'New South Wales',   short:'NSW',        v:891123,add:20040,color:'#2f3b4d'},
-  {name:'Victoria',          short:'VIC',        v:735805,add:16486,color:'#456187'},
-  {name:'Queensland',        short:'QLD',        v:511835,add:14769,color:'#5B7BA6'},
-  {name:'Other states & territories',short:'SA·TAS·NT·ACT',v:330155,add:4478,color:'#6E7C63'},
-  {name:'Western Australia', short:'WA',         v:260730,add:10877,color:'#B0853C'}
+  {name:'New South Wales',   short:'NSW',        v:916603,add:20040,color:'#2f3b4d'},
+  {name:'Victoria',          short:'VIC',        v:754400,add:16486,color:'#456187'},
+  {name:'Queensland',        short:'QLD',        v:524024,add:13579,color:'#5B7BA6'},
+  {name:'Other states & territories',short:'SA·TAS·NT·ACT',v:268348,add:5558,color:'#6E7C63'},
+  {name:'Western Australia', short:'WA',         v:266273,add:10877,color:'#B0853C'}
 ];
-/* 3-year business survival by segment (%) — ABS */
+/* Four-year survival, Jun 2021 -> Jun 2025 (%) — ABS 8165.0 Tables 2 and 5 */
 var SURV=[
-  {name:'Health Care (best industry)',v:82.7,color:'#4E7C5A'},
-  {name:'Employing businesses',       v:61.0,color:'#456187'},
-  {name:'All businesses',             v:48.0,color:'#B0853C'},
-  {name:'Non-employing',              v:43.3,color:'#9A5B3B'}
+  {name:'Agriculture (best industry)', v:74.9,color:'#4E7C5A'},
+  {name:'Health Care & Social Assist.',v:71.5,color:'#456187'},
+  {name:'All industries',              v:63.1,color:'#B0853C'},
+  {name:'Accommodation & Food',        v:54.7,color:'#9A5B3B'},
+  {name:'Transport & Warehousing',     v:48.5,color:'#8C4A46'}
 ];
 
 function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}

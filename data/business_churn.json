@@ -1,7 +1,10 @@
 {
   "release": "ABS Counts of Australian Businesses (8165.0)",
+  "reference_period": "2024-25",
+  "source_file": "https://www.abs.gov.au/statistics/economy/business-indicators/counts-australian-businesses-including-entries-and-exits/jul2021-jun2025/8165DC01.xlsx",
   "total_businesses": 2729648,
   "flows": {
+    "opening_stock": 2662998,
     "entries": 437150,
     "exits": 370500,
     "entry_rate_pct": 16.4,
@@ -9,49 +12,36 @@
     "net": 66650,
     "net_pct": 2.5
   },
-  "survival_3yr_pct": [
-    {
-      "segment": "All businesses",
-      "survival_pct": 48.0
-    },
-    {
-      "segment": "Employing",
-      "survival_pct": 61.0
-    },
-    {
-      "segment": "Non-employing",
-      "survival_pct": 43.3
-    },
-    {
-      "segment": "Health Care & Social Assistance",
-      "survival_pct": 82.7
-    }
-  ],
+  "survival_national": {
+    "base_period": "June 2021",
+    "survival_3yr_pct": 69.4,
+    "survival_4yr_pct": 63.1
+  },
   "by_state": [
     {
       "state": "NSW",
-      "businesses": 891123,
-      "share_pct": 32.6
+      "businesses": 916603,
+      "share_pct": 33.6
     },
     {
       "state": "VIC",
-      "businesses": 735805,
-      "share_pct": 27.0
+      "businesses": 754400,
+      "share_pct": 27.6
     },
     {
       "state": "QLD",
-      "businesses": 511835,
-      "share_pct": 18.8
-    },
-    {
-      "state": "WA",
-      "businesses": 260730,
-      "share_pct": 9.6
+      "businesses": 524024,
+      "share_pct": 19.2
     },
     {
       "state": "Other (SA/TAS/ACT/NT)",
-      "businesses": 330155,
-      "share_pct": 12.1
+      "businesses": 268348,
+      "share_pct": 9.8
+    },
+    {
+      "state": "WA",
+      "businesses": 266273,
+      "share_pct": 9.8
     }
   ]
 }

@@ -32,6 +32,7 @@ jobs:
             any::dplyr
             any::ggplot2
             any::scales
+            any::tidyr
             any::jsonlite
             any::knitr
             any::rmarkdown
