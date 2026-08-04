@@ -77,7 +77,8 @@ failing the run if they disagree.
 | 2,729,648 businesses; 437,150 entries; 370,500 exits; 16.4% / 13.9% | parsed from ABS 8165DC01, Table 4 |
 | Businesses by state (NSW 916,603 · VIC 754,400 · QLD 524,024 · WA 266,273) | parsed from ABS 8165DC01, Table 4 — reconciles to the national total |
 | Survival by state and by industry (69.4% at 3 years, 63.1% at 4 years) | parsed from ABS 8165DC01, Tables 2 and 5 |
-| Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | verified against the ABS release |
+| Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | parsed from ABS 8501.0, series A3348585R |
+| Retail turnover by state (Jun 2025, seasonally adjusted) | parsed from ABS 8501.0, table 850103 — sums to 100.0% of national |
 | GST: VIC $27.9bn, NSW $26.1bn, QLD $18.4bn (pool ~ $102.4bn) | verified against the CGC |
 | Government ad-spend channel split | published totals; channel split not yet parsed from source |
 
@@ -86,10 +87,7 @@ rates that were not ABS figures (NSW 891,123 and a 48% three-year survival
 rate). Parsing the datacube replaced them with the published values — NSW
 916,603 and 69.4% — and the reconciliation check now prevents a repeat.
 
-**Known inconsistency:** the retail series in `data/retail_demand_series.csv`
-computes 4.7% growth from Jun-24 to Jun-25, while ABS publishes +4.9% YoY. The
-endpoints are correct; the intermediate points are indicative. Quote the ABS
-figure, not one derived from this series.
+**Resolved:** an earlier version carried an indicative retail series that computed 4.7% growth against the ABS published +4.9%. `scripts/fetch_retail_demand.py` now parses series A3348585R from the ABS time-series workbook — 519 monthly observations — so month-on-month and year-on-year growth are computed from the source and reconcile exactly (+1.2% MoM, +4.9% YoY). The state series sums to 100.0% of the national total.
 
 ---
 

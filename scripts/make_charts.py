@@ -162,6 +162,28 @@ def main() -> None:
     ax.legend(frameon=False, fontsize=9, loc="lower right")
     save(fig, "py_survival_state.png")
 
+    # Retail turnover by state, annotated with year-on-year growth
+    rows = read_csv("retail_demand_by_state.csv")
+    rows.sort(key=lambda r: float(r["turnover_m"]))
+    labels = [r["state"] for r in rows]
+    values = [float(r["turnover_m"]) for r in rows]
+    growth = [float(r["yoy_pct"]) for r in rows]
+
+    fig, ax = plt.subplots(figsize=(8, 4.8))
+    style_axes(ax)
+    ax.barh(labels, values, color=ACCENT, height=0.62)
+    span = max(values)
+    for i, (v, g) in enumerate(zip(values, growth)):
+        ax.text(v + span * 0.015, i, f"${v:,.0f}M   {g:+.1f}% YoY",
+                va="center", fontsize=8.5, color=INK)
+    ax.set_xlim(0, span * 1.32)
+    ax.set_xlabel("Monthly turnover ($M, seasonally adjusted)", color=INK, fontsize=9)
+    ax.set_title("Retail turnover by state", loc="left", fontsize=14,
+                 fontweight="bold", color=INK, pad=14)
+    ax.text(0, 1.02, "June 2025, seasonally adjusted · ABS Retail Trade (8501.0)",
+            transform=ax.transAxes, fontsize=9.5, color=MUTED)
+    save(fig, "py_retail_by_state.png")
+
     print("\nAll matplotlib charts written to assets/charts/.")
 
 

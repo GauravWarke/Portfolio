@@ -173,4 +173,24 @@ p6 <- ggplot(surv_state, aes(state, rate, fill = horizon)) +
   theme(legend.position = "bottom")
 save_chart(p6, "r_survival_state.png")
 
-message("\nAll six figures written to assets/charts/.")
+# --- 7. Retail turnover by state (ABS 8501.0, table 850103) ------------------
+retail_state <- read_csv(file.path(data_dir, "retail_demand_by_state.csv"),
+                         show_col_types = FALSE) |>
+  mutate(state = reorder(state, turnover_m))
+
+p7 <- ggplot(retail_state, aes(state, turnover_m, fill = yoy_pct)) +
+  geom_col(width = 0.72) +
+  geom_text(aes(label = paste0("$", comma(turnover_m), "M   ",
+                               ifelse(yoy_pct >= 0, "+", ""), yoy_pct, "% YoY")),
+            hjust = -0.05, size = 3, colour = ink) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.36))) +
+  scale_fill_gradient(low = alpha(accent, 0.4), high = accent, guide = "none") +
+  labs(title = "Retail turnover by state",
+       subtitle = "June 2025, seasonally adjusted",
+       x = NULL, y = "Monthly turnover ($M)",
+       caption = "Source: ABS Retail Trade (8501.0), table 850103") +
+  theme_portfolio()
+save_chart(p7, "r_retail_by_state.png")
+
+message("\nAll seven figures written to assets/charts/.")
