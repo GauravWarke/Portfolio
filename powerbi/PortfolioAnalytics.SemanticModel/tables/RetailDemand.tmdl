@@ -1,0 +1,47 @@
+table RetailDemand
+	lineageTag: cd7c192f-592c-4af4-9465-126e56d036e9
+	dataCategory: Time
+
+	measure 'Latest Turnover ($M)' = CALCULATE ( SUM ( RetailDemand[turnover_m] ), LASTNONBLANK ( RetailDemand[date], 1 ) )
+		formatString: $#,##0.0
+		displayFolder: Retail Demand
+		lineageTag: 83523238-c246-4639-b686-c5d06f7bc35a
+
+	measure 'First Turnover ($M)' = CALCULATE ( SUM ( RetailDemand[turnover_m] ), FIRSTNONBLANK ( RetailDemand[date], 1 ) )
+		formatString: $#,##0.0
+		displayFolder: Retail Demand
+		lineageTag: 95ffcc95-cba3-4f2e-93a0-de727c739659
+
+	measure 'Turnover Growth %' = DIVIDE ( [Latest Turnover ($M)] - [First Turnover ($M)], [First Turnover ($M)] )
+		formatString: 0.0%
+		displayFolder: Retail Demand
+		lineageTag: e4193381-6938-4b2e-94aa-4cf471c75660
+
+	measure 'Turnover YoY %' = VAR CurrentTurnover = SUM ( RetailDemand[turnover_m] ) VAR PriorYearTurnover = CALCULATE ( SUM ( RetailDemand[turnover_m] ), SAMEPERIODLASTYEAR ( RetailDemand[date] ) ) RETURN DIVIDE ( CurrentTurnover - PriorYearTurnover, PriorYearTurnover )
+		formatString: 0.0%
+		displayFolder: Retail Demand
+		lineageTag: 6968c053-0c3c-43a6-a0ae-fb9c4c5b5236
+
+	column period
+		dataType: string
+		isNullable: false
+		lineageTag: d0c79256-ce1c-4217-b262-cb33392642aa
+		sourceColumn: period
+
+	column turnover_m
+		dataType: double
+		isNullable: false
+		lineageTag: 13659375-b022-407a-9517-d0ddd76cf63d
+		sourceColumn: turnover_m
+
+	column date
+		dataType: dateTime
+		isUnique
+		isNullable: false
+		lineageTag: 44be3c36-a581-48be-bc90-b273e2edb2de
+		sourceColumn: date
+
+	partition RetailDemand = m
+		mode: import
+		source = let Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/GauravWarke/Portfolio/main/data/retail_demand_series.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]), Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]), Typed = Table.TransformColumnTypes(Headers, {{"period", type text}, {"turnover_m", type number}}), WithDate = Table.AddColumn(Typed, "date", each Date.FromText([period] & "-01"), type date) in WithDate
+

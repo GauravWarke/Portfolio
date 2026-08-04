@@ -1,0 +1,39 @@
+table AdSpend
+	lineageTag: dcbdb454-0dac-4f93-822d-49b8bcc6d081
+
+	measure 'Total Ad Spend ($M)' = SUM ( AdSpend[spend_m] )
+		formatString: $#,##0.0
+		displayFolder: Ad Spend
+		lineageTag: 7a651539-11ff-493a-b180-8fa4c561cb96
+
+	measure 'Digital Share %' = DIVIDE ( CALCULATE ( SUM ( AdSpend[spend_m] ), AdSpend[channel] = "Digital" ), SUM ( AdSpend[spend_m] ) )
+		formatString: 0.0%
+		displayFolder: Ad Spend
+		lineageTag: d9d3e610-f568-44ec-bfb7-8ca249f314ee
+
+	measure 'Top Channel' = CALCULATE ( MAX ( AdSpend[channel] ), TOPN ( 1, AdSpend, AdSpend[spend_m], DESC ) )
+		displayFolder: Ad Spend
+		lineageTag: 772cafa7-90b5-44fd-8712-a80d562cd94f
+
+	column channel
+		dataType: string
+		isNullable: false
+		lineageTag: f1c6ced1-230a-4184-9c5a-d3be151fe03e
+		sourceColumn: channel
+
+	column spend_m
+		dataType: double
+		isNullable: false
+		lineageTag: ed1c216c-b7e5-44a6-a905-d511dd16705d
+		sourceColumn: spend_m
+
+	column share_pct
+		dataType: double
+		isNullable: false
+		lineageTag: 8438fc66-721a-4ba0-9f5e-90ef155b68f1
+		sourceColumn: share_pct
+
+	partition AdSpend = m
+		mode: import
+		source = let Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/GauravWarke/Portfolio/main/data/govt_ad_spend_by_channel.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]), Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]), Typed = Table.TransformColumnTypes(Headers, {{"channel", type text}, {"spend_m", type number}, {"share_pct", type number}}) in Typed
+
