@@ -32,9 +32,10 @@ Supabase is Postgres, so Power BI connects natively:
 
 | Field | Value |
 | :--- | :--- |
-| Server | `db.<your-project-ref>.supabase.co` (Project Settings → Database) |
+| Server | Session pooler host, e.g. `aws-0-ap-southeast-2.pooler.supabase.com` |
 | Database | `postgres` |
 | Port | `5432` |
+| Username | `postgres.hoxrzbwvsmwvpkitnwdp` |
 
 Or paste the M query in [`powerbi.m`](powerbi.m) into Advanced Editor.
 
@@ -48,7 +49,7 @@ Supabase exposes an auto-generated REST API. Because RLS allows anonymous
 public — it grants only what RLS permits):
 
 ```js
-const url = 'https://<project-ref>.supabase.co/rest/v1/business_churn_by_state?select=*';
+const url = 'https://hoxrzbwvsmwvpkitnwdp.supabase.co/rest/v1/business_churn_by_state?select=*';
 const rows = await fetch(url, {
   headers: { apikey: SUPABASE_ANON_KEY, Accept: 'application/json' }
 }).then(r => r.json());
