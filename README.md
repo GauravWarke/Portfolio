@@ -91,19 +91,6 @@ computes 4.7% growth from Jun-24 to Jun-25, while ABS publishes +4.9% YoY. The
 endpoints are correct; the intermediate points are indicative. Quote the ABS
 figure, not one derived from this series.
 
---- | :--- |
-| Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | verified against ABS |
-| 2,729,648 businesses; 437,150 entries; 370,500 exits; 16.4% / 13.9% | verified against ABS |
-| GST: VIC $27.9bn, NSW $26.1bn, QLD $18.4bn (pool ≈ $102.4bn) | verified against CGC |
-| Business counts **by state** and 3-year survival rates | **not verified** — published only in ABS datacubes |
-| Government ad-spend channel split | **not verified** |
-
-**Known inconsistency:** the retail series in `data/retail_demand_series.csv`
-computes 4.7% growth from Jun-24 to Jun-25, while ABS publishes +4.9% YoY. The
-endpoints are correct; the intermediate points are indicative and do not
-reconcile to the published rate. Quote the ABS YoY figure, not one derived from
-this series.
-
 ---
 
 Built by [Gaurav Warke](https://www.linkedin.com/in/gaurav-warke-b5493b394/) · [Live portfolio](https://portfolio-plum-eta-oqdpa0gzlv.vercel.app) · MIT © 2026
