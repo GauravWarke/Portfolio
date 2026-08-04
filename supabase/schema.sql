@@ -23,6 +23,8 @@ insert into public.business_churn_by_state (state, businesses, share_pct) values
   ('Other (SA/TAS/ACT/NT)', 330155, 12.1);
 
 alter table public.business_churn_by_state enable row level security;
+revoke all on public.business_churn_by_state from anon, authenticated;
+grant select on public.business_churn_by_state to anon, authenticated;
 create policy "public read business_churn_by_state" on public.business_churn_by_state for select to anon, authenticated using (true);
 
 -- ========================================================================
@@ -45,6 +47,8 @@ insert into public.govt_ad_spend_by_channel (channel, spend_m, share_pct) values
   ('Press', 3.7, 2.1);
 
 alter table public.govt_ad_spend_by_channel enable row level security;
+revoke all on public.govt_ad_spend_by_channel from anon, authenticated;
+grant select on public.govt_ad_spend_by_channel to anon, authenticated;
 create policy "public read govt_ad_spend_by_channel" on public.govt_ad_spend_by_channel for select to anon, authenticated using (true);
 
 -- ========================================================================
@@ -66,6 +70,8 @@ insert into public.retail_demand_series (period, turnover_m) values
   ('2025-06', 37906.6);
 
 alter table public.retail_demand_series enable row level security;
+revoke all on public.retail_demand_series from anon, authenticated;
+grant select on public.retail_demand_series to anon, authenticated;
 create policy "public read retail_demand_series" on public.retail_demand_series for select to anon, authenticated using (true);
 
 -- ========================================================================
@@ -90,6 +96,8 @@ insert into public.gst_reconciliation_by_state (state, gst_bn, share_pct) values
   ('ACT', 2.1, 2.1);
 
 alter table public.gst_reconciliation_by_state enable row level security;
+revoke all on public.gst_reconciliation_by_state from anon, authenticated;
+grant select on public.gst_reconciliation_by_state to anon, authenticated;
 create policy "public read gst_reconciliation_by_state" on public.gst_reconciliation_by_state for select to anon, authenticated using (true);
 
 -- Conformed state grain, mirroring the Power BI State dimension
@@ -103,4 +111,7 @@ create or replace view public.gst_by_state_group as
   from public.gst_reconciliation_by_state group by 1;
 
 grant usage on schema public to anon, authenticated;
-grant select on all tables in schema public to anon, authenticated;
+
+-- Views: read-only for anonymous callers, same as the tables.
+revoke all on public.state_dim, public.gst_by_state_group from anon, authenticated;
+grant select on public.state_dim, public.gst_by_state_group to anon, authenticated;

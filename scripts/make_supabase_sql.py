@@ -93,7 +93,15 @@ def main() -> None:
         lines.append("")
 
         # Open data, so anonymous read is correct; writes stay closed.
+        # Two independent layers, deliberately:
+        #   1. RLS with a select-only policy (no insert/update/delete policy).
+        #   2. Revoking the write privileges themselves, so a future permissive
+        #      policy cannot silently open writes. Without this, DELETE returns
+        #      204 (having matched zero rows) rather than being refused
+        #      outright, which reads as success to a caller.
         lines.append(f"alter table {SCHEMA}.{table} enable row level security;")
+        lines.append(f"revoke all on {SCHEMA}.{table} from anon, authenticated;")
+        lines.append(f"grant select on {SCHEMA}.{table} to anon, authenticated;")
         lines.append(f'create policy "public read {table}" on {SCHEMA}.{table} '
                      f"for select to anon, authenticated using (true);")
         lines.append("")
@@ -111,7 +119,10 @@ def main() -> None:
         f"  from {SCHEMA}.gst_reconciliation_by_state group by 1;",
         "",
         f"grant usage on schema {SCHEMA} to anon, authenticated;",
-        f"grant select on all tables in schema {SCHEMA} to anon, authenticated;",
+        "",
+        "-- Views: read-only for anonymous callers, same as the tables.",
+        f"revoke all on {SCHEMA}.state_dim, {SCHEMA}.gst_by_state_group from anon, authenticated;",
+        f"grant select on {SCHEMA}.state_dim, {SCHEMA}.gst_by_state_group to anon, authenticated;",
     ]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
