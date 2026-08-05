@@ -16,7 +16,7 @@ arrives with everything already modelled:
 | 15 DAX measures | Grouped into display folders, with number formatting applied |
 | Date table | `RetailDemand` marked as a date table, so time-intelligence DAX works |
 | Star schema | `State` relates 1:* to `BusinessChurn` and `GstDistribution` |
-| Report page | An **Overview** page with 4 KPI cards and 4 charts mirroring the website dashboards |
+| Report pages | **Overview** (4 KPI cards + 4 charts, mirroring the website) and **Cross-dataset** (GST per business via the conformed dimension) |
 
 ### Measures included
 
@@ -49,12 +49,30 @@ datasets now share a dimension.
 > Note the tradeoff: GST figures roll up to the coarser grain when sliced by
 > `State`. Use `GstDistribution[state]` directly if you need all 8 jurisdictions.
 
-### Report page
+### Report pages
 
-`PortfolioAnalytics.Report` ships an **Overview** page laid out to mirror the
-website dashboards: four KPI cards across the top, then business base by state,
-ad spend by channel, retail turnover trend, and GST distribution. Adjust or add
-visuals freely in Report view.
+`PortfolioAnalytics.Report` is written in **PBIR** — the folder-based report
+format — rather than a single legacy `report.json`, because PBIR has published
+JSON schemas. That means the definition can be checked against Microsoft's own
+specification instead of merely being valid JSON:
+
+```bash
+python powerbi/build_report.py --validate
+```
+
+This downloads the schemas from `developer.microsoft.com` and asserts the
+required properties and value domains for all 14 files, plus that no visual
+extends past the 1280x720 canvas.
+
+> Scope of that check, stated plainly: it establishes conformance to the
+> published contract. It is not a substitute for opening the report in Power BI
+> Desktop, which has not been done here. Opening `.pbip` files requires
+> **File → Options → Preview features → Power BI Project**.
+
+Two pages: **Overview** mirrors the website dashboards (four KPI cards, then
+business base by state, ad spend by channel, retail turnover, GST
+distribution), and **Cross-dataset** shows GST per business, which is only
+computable because both fact tables share the `State` dimension.
 
 ## Alternative: wire it up manually
 

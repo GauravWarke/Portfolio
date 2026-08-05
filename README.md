@@ -82,7 +82,7 @@ failing the run if they disagree. The retail and GST parsers apply the same chec
 | Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | parsed from ABS 8501.0, series A3348585R |
 | Retail turnover by state (Jun 2025, seasonally adjusted) | parsed from ABS 8501.0, table 850103 — sums to 100.0% of national |
 | GST distribution and relativities (pool $102.52bn) | parsed from the CGC 2026 Update — reconciles to the published pool |
-| Government ad-spend channel split | published totals; channel split not yet parsed from source (the department publishes PDFs only) |
+| Government ad-spend by channel ($173.8M across 7 channels) | parsed from the Dept of Finance 2023-24 report — reconciles to the published total |
 
 **Corrected in this repo:** earlier versions carried state counts and survival
 rates that were not ABS figures (NSW 891,123 and a 48% three-year survival

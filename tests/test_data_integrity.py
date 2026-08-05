@@ -143,6 +143,36 @@ def test_wa_relativity_respects_the_floor():
         assert float(row["relativity"]) >= 0.75, row["state"]
 
 
+# --- government ad spend ------------------------------------------------------
+
+def test_ad_spend_channels_reconcile_to_published_total():
+    payload = read_json("govt_ad_spend.json")
+    channels = sum(c["spend_m"] for c in payload["by_channel"])
+    assert channels == pytest.approx(payload["media_placement_total_m"], abs=0.05)
+    assert payload["media_placement_total_m"] == pytest.approx(173.8, abs=0.05)
+
+
+def test_ad_spend_includes_every_channel():
+    """Magazine was missing in an earlier version, leaving the total 0.4 short."""
+    names = {c["channel"] for c in read_json("govt_ad_spend.json")["by_channel"]}
+    assert names == {"Digital", "Television", "Out of Home", "Radio",
+                     "Cinema", "Press", "Magazine"}
+
+
+def test_audience_segments_are_not_counted_as_channels():
+    """Regional, Ethnic and First Nations are cuts of the spend, not channels."""
+    payload = read_json("govt_ad_spend.json")
+    channels = {c["channel"] for c in payload["by_channel"]}
+    segments = {a["segment"] for a in payload["by_audience"]}
+    assert not (channels & segments)
+    assert sum(a["spend_m"] for a in payload["by_audience"]) > 0
+
+
+def test_digital_is_the_largest_channel():
+    top = max(read_json("govt_ad_spend.json")["by_channel"], key=lambda c: c["spend_m"])
+    assert top["channel"] == "Digital"
+
+
 # --- cross-cutting -----------------------------------------------------------
 
 @pytest.mark.parametrize("name", [
@@ -154,6 +184,7 @@ def test_wa_relativity_respects_the_floor():
     "gst_reconciliation_by_state.csv",
     "gst_relativities.csv",
     "govt_ad_spend_by_channel.csv",
+    "govt_ad_spend_by_audience.csv",
 ])
 def test_dataset_is_present_and_non_empty(name):
     rows = read_csv(name)
@@ -163,6 +194,7 @@ def test_dataset_is_present_and_non_empty(name):
 
 @pytest.mark.parametrize("name", [
     "business_churn.json", "retail_demand.json", "gst_reconciliation.json",
+    "govt_ad_spend.json",
 ])
 def test_json_records_its_source(name):
     """Every dataset must say where it came from."""

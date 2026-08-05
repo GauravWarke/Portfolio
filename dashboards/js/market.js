@@ -8,16 +8,25 @@ var FED=[
   {y:'2022-23',total:179300000,media:null,dev:null},
   {y:'2023-24',total:250600000,media:173800000,dev:76600000}
 ];
-/* 2023-24 media placement by channel — Dept of Finance 2023-24 report */
+/* 2023-24 media placement by channel — parsed from the Dept of Finance report
+   by scripts/fetch_govt_ad_spend.py; the seven channels sum to the published
+   $173.8M media placement total. */
 var CH=[
   {key:'digital',name:'Digital',   v:75900000,color:'#2f3b4d'},
   {key:'tv',     name:'Television', v:54700000,color:'#456187'},
   {key:'ooh',    name:'Out-of-home',v:17700000,color:'#6E7C63'},
   {key:'radio',  name:'Radio',     v:15200000,color:'#B0853C'},
   {key:'cinema', name:'Cinema',    v:6200000, color:'#9A5B3B'},
-  {key:'press',  name:'Press',     v:3700000, color:'#8B877F'}
+  {key:'press',  name:'Press',     v:3700000, color:'#8B877F'},
+  {key:'mag',    name:'Magazine',  v:400000,  color:'#7C8A93'}
 ];
-var chOn={digital:true,tv:true,ooh:true,radio:true,cinema:true,press:true};
+var chOn={digital:true,tv:true,ooh:true,radio:true,cinema:true,press:true,mag:true};
+/* Audience cuts of that spend — subsets, not additional channels */
+var AUD=[
+  {name:'Regional',      v:34200000},
+  {name:'Ethnic',        v:10100000},
+  {name:'First Nations', v:6800000}
+];
 /* cross-jurisdiction — latest published media / placement spend */
 var JUR=[
   {name:'Commonwealth',v:173800000,yr:'2023-24',color:'#2f3b4d'},

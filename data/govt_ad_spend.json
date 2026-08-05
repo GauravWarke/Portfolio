@@ -1,29 +1,13 @@
 {
-  "release": "Dept of Finance \u2014 Campaign Advertising reports",
-  "total_by_year_m": [
-    {
-      "year": "2021-22",
-      "spend_m": 339.2
-    },
-    {
-      "year": "2022-23",
-      "spend_m": 179.3
-    },
-    {
-      "year": "2023-24",
-      "spend_m": 250.6
-    }
-  ],
-  "latest_split_m": {
-    "year": "2023-24",
-    "media_m": 173.8,
-    "development_m": 76.6
-  },
-  "by_channel_m": [
+  "release": "Department of Finance \u2014 Campaign Advertising Report 2023-24",
+  "source_file": "https://www.finance.gov.au/sites/default/files/2024-12/campaign-advertising-by-australian-government-departments-and-entities-report-2023-24.docx",
+  "financial_year": "2023-24",
+  "media_placement_total_m": 173.8,
+  "by_channel": [
     {
       "channel": "Digital",
       "spend_m": 75.9,
-      "share_pct": 43.8
+      "share_pct": 43.7
     },
     {
       "channel": "Television",
@@ -38,7 +22,7 @@
     {
       "channel": "Radio",
       "spend_m": 15.2,
-      "share_pct": 8.8
+      "share_pct": 8.7
     },
     {
       "channel": "Cinema",
@@ -49,20 +33,26 @@
       "channel": "Press",
       "spend_m": 3.7,
       "share_pct": 2.1
+    },
+    {
+      "channel": "Magazine",
+      "spend_m": 0.4,
+      "share_pct": 0.2
     }
   ],
-  "by_jurisdiction_m": [
+  "by_audience": [
     {
-      "jurisdiction": "Commonwealth",
-      "spend_m": 173.8
+      "segment": "Regional",
+      "spend_m": 34.2
     },
     {
-      "jurisdiction": "NSW",
-      "spend_m": 131.46
+      "segment": "Ethnic",
+      "spend_m": 10.1
     },
     {
-      "jurisdiction": "QLD",
-      "spend_m": 50.7
+      "segment": "First Nations",
+      "spend_m": 6.8
     }
-  ]
+  ],
+  "audience_note": "Audience segments are cuts of the channel spend, not additional channels, so they are not part of the total."
 }
