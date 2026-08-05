@@ -1,61 +1,92 @@
 {
-  "release": "CGC GST revenue sharing \u2014 2026-27 distribution",
-  "pool_by_year_bn": [
-    {
-      "year": "2024-25",
-      "pool_bn": 85.0
-    },
-    {
-      "year": "2025-26",
-      "pool_bn": 89.0
-    },
-    {
-      "year": "2026-27",
-      "pool_bn": 102.4
-    }
-  ],
-  "wa_relativity_floor": 0.75,
-  "by_state_bn": [
-    {
-      "state": "VIC",
-      "gst_bn": 27.9,
-      "share_pct": 27.2
-    },
+  "release": "Commonwealth Grants Commission \u2014 2026 Update",
+  "source_file": "https://www.cgc.gov.au/sites/default/files/2026-03/2026%20Update.docx",
+  "reference_year": "2026-27",
+  "pool_bn": 102.52,
+  "no_worse_off_bn": 5.04,
+  "total_including_nwo_bn": null,
+  "by_state": [
     {
       "state": "NSW",
-      "gst_bn": 26.1,
+      "gst_bn": 26.123,
       "share_pct": 25.5
     },
     {
+      "state": "VIC",
+      "gst_bn": 27.867,
+      "share_pct": 27.2
+    },
+    {
       "state": "QLD",
-      "gst_bn": 18.4,
+      "gst_bn": 18.438,
       "share_pct": 18.0
     },
     {
-      "state": "SA",
-      "gst_bn": 9.5,
-      "share_pct": 9.3
-    },
-    {
       "state": "WA",
-      "gst_bn": 9.3,
+      "gst_bn": 9.337,
       "share_pct": 9.1
     },
     {
-      "state": "NT",
-      "gst_bn": 5.1,
-      "share_pct": 5.0
+      "state": "SA",
+      "gst_bn": 9.548,
+      "share_pct": 9.3
     },
     {
       "state": "TAS",
-      "gst_bn": 4.0,
+      "gst_bn": 3.968,
       "share_pct": 3.9
     },
     {
       "state": "ACT",
-      "gst_bn": 2.1,
-      "share_pct": 2.1
+      "gst_bn": 2.095,
+      "share_pct": 2.0
+    },
+    {
+      "state": "NT",
+      "gst_bn": 5.142,
+      "share_pct": 5.0
     }
   ],
-  "computed_pool_bn": 102.4
+  "relativities": [
+    {
+      "state": "NSW",
+      "relativity": 0.81964,
+      "share_pct": 25.5
+    },
+    {
+      "state": "VIC",
+      "relativity": 1.05742,
+      "share_pct": 27.2
+    },
+    {
+      "state": "QLD",
+      "relativity": 0.87237,
+      "share_pct": 18.0
+    },
+    {
+      "state": "WA",
+      "relativity": 0.81964,
+      "share_pct": 9.1
+    },
+    {
+      "state": "SA",
+      "relativity": 1.3592,
+      "share_pct": 9.3
+    },
+    {
+      "state": "TAS",
+      "relativity": 1.88285,
+      "share_pct": 3.9
+    },
+    {
+      "state": "ACT",
+      "relativity": 1.16179,
+      "share_pct": 2.0
+    },
+    {
+      "state": "NT",
+      "relativity": 5.24149,
+      "share_pct": 5.0
+    }
+  ]
 }

@@ -1,19 +1,19 @@
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function bn(v){return '$'+v.toFixed(1)+'bn';}
 
-/* ---------- REAL DATA — CGC Guide to the 2026-27 GST Distribution ($bn) ---------- */
+/* ---------- REAL DATA — parsed from the CGC 2026 Update by scripts/fetch_gst_reconciliation.py ---------- */
 var GST=[
-  {name:'Victoria',          short:'VIC', v:27.9,color:'#2f3b4d'},
-  {name:'New South Wales',   short:'NSW', v:26.1,color:'#456187'},
-  {name:'Queensland',        short:'QLD', v:18.4,color:'#5B7BA6'},
-  {name:'South Australia',   short:'SA',  v:9.5, color:'#6E7C63'},
-  {name:'Western Australia', short:'WA',  v:9.3, color:'#8a8a5e'},
-  {name:'Northern Territory',short:'NT',  v:5.1, color:'#B0853C'},
-  {name:'Tasmania',          short:'TAS', v:4.0, color:'#9A5B3B'},
-  {name:'ACT',               short:'ACT', v:2.1, color:'#8B877F'}
+  {name:'Victoria',          short:'VIC', v:27.867,color:'#2f3b4d'},
+  {name:'New South Wales',   short:'NSW', v:26.123,color:'#456187'},
+  {name:'Queensland',        short:'QLD', v:18.438,color:'#5B7BA6'},
+  {name:'South Australia',   short:'SA',  v:9.548, color:'#6E7C63'},
+  {name:'Western Australia', short:'WA',  v:9.337, color:'#8a8a5e'},
+  {name:'Northern Territory',short:'NT',  v:5.142, color:'#B0853C'},
+  {name:'Tasmania',          short:'TAS', v:3.968, color:'#9A5B3B'},
+  {name:'ACT',               short:'ACT', v:2.095, color:'#8B877F'}
 ];
-/* total GST pool over time ($bn) — CGC / Commonwealth budget */
-var POOL=[{y:'2023-24',v:85},{y:'2024-25',v:89},{y:'2026-27',v:102.4}];
+/* Total GST pool by year ($bn) — CGC 2026 Update, Table 1 */
+var POOL=[{y:'2025-26',v:96.554},{y:'2026-27',v:102.518}];
 
 function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
 

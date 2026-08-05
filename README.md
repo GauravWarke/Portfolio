@@ -63,14 +63,16 @@ my-portfolio/
 
 Australian Bureau of Statistics (ABS) · Australian Department of Finance · Audit Office of NSW · data.qld.gov.au · Commonwealth Grants Commission. All figures are real, published open data.
 
-### Provenance and what is verified
+### Provenance, verification and tests
 
 The pipeline downloads the publishers' own files and reads the figures out of
 them, so every number traces to a cell in a source document rather than to a
 value typed into this repo. `scripts/fetch_business_churn.py` parses ABS
 datacube `8165DC01.xlsx` with `scripts/xlsx_reader.py` (standard library only)
 and **reconciles the state counts against the published national total**,
-failing the run if they disagree.
+failing the run if they disagree. The retail and GST parsers apply the same check against their own published totals.
+
+`tests/test_data_integrity.py` asserts these properties on every CI run: that each dataset reconciles to its publisher's stated total, that shares sum to 100%, that survival is monotonic, that the retail series recomputes to the published growth rate, and that the specific wrong values an earlier version shipped can never reappear.
 
 | Figure | Status |
 | :--- | :--- |
@@ -79,8 +81,8 @@ failing the run if they disagree.
 | Survival by state and by industry (69.4% at 3 years, 63.1% at 4 years) | parsed from ABS 8165DC01, Tables 2 and 5 |
 | Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | parsed from ABS 8501.0, series A3348585R |
 | Retail turnover by state (Jun 2025, seasonally adjusted) | parsed from ABS 8501.0, table 850103 — sums to 100.0% of national |
-| GST: VIC $27.9bn, NSW $26.1bn, QLD $18.4bn (pool ~ $102.4bn) | verified against the CGC |
-| Government ad-spend channel split | published totals; channel split not yet parsed from source |
+| GST distribution and relativities (pool $102.52bn) | parsed from the CGC 2026 Update — reconciles to the published pool |
+| Government ad-spend channel split | published totals; channel split not yet parsed from source (the department publishes PDFs only) |
 
 **Corrected in this repo:** earlier versions carried state counts and survival
 rates that were not ABS figures (NSW 891,123 and a 48% three-year survival
