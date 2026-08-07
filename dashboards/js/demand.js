@@ -19,7 +19,7 @@ var STATES=[
   {name:'WA',mom:0.3},{name:'TAS',mom:0.4},{name:'NT',mom:0.8},{name:'ACT',mom:1.6}
 ];
 
-function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
+function fitCanvas(cv){if(!cv)return null;var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
 
 /* ---------- trend line ---------- */
 var trend=document.getElementById('trend');
@@ -144,4 +144,7 @@ renderStates();renderTable();
 requestAnimationFrame(function(){requestAnimationFrame(function(){drawTrend();drawCats();});});
 setTimeout(function(){drawTrend();drawCats();},400);
 addEventListener('resize',function(){drawTrend();drawCats();});
-if('ResizeObserver' in window){new ResizeObserver(function(){drawTrend();}).observe(trend);new ResizeObserver(function(){drawCats();}).observe(cats);}
+/* Some charts are rendered ahead of time in R, so their canvas may not be on the
+   page. Only observe the ones that are. */
+function observeIfPresent(el,fn){if(el)new ResizeObserver(fn).observe(el);}
+if('ResizeObserver' in window){observeIfPresent(trend,drawTrend);observeIfPresent(cats,drawCats);}

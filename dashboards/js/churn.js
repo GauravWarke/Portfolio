@@ -45,49 +45,6 @@ function drawFlow(){
   cx.textAlign='left';
 }
 
-/* ---------- business base by state (horizontal) ---------- */
-var statesC=document.getElementById('states');
-function drawStates(){
-  var f=fitCanvas(statesC);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
-  var rows=STATES.slice().sort(function(a,b){return b.v-a.v;});
-  var niceMax=1000000, padL=112, padR=124, top=12, botAxis=20;
-  var plotW=Math.max(60,W-padL-padR), areaH=H-top-botAxis;
-  var rh=areaH/rows.length, bh=Math.min(30,rh*0.62);
-  // scale gridlines + axis labels — gives the eye a fixed scale to read against
-  cx.textAlign='center';cx.font='9px "JetBrains Mono", monospace';
-  [0,250000,500000,750000,1000000].forEach(function(v){
-    var gx=padL+v/niceMax*plotW;
-    cx.strokeStyle='rgba(20,19,17,.07)';cx.lineWidth=1;cx.beginPath();cx.moveTo(gx,top-4);cx.lineTo(gx,H-botAxis+2);cx.stroke();
-    cx.fillStyle='#9b968d';cx.fillText(v?(v/1000000)+'M':'0',gx,H-5);
-  });
-  rows.forEach(function(d,i){
-    var y=top+rh*i+rh/2, w=(d.v/niceMax)*plotW, pct=(d.v/NAT.total*100);
-    cx.fillStyle='#3a3833';cx.textAlign='right';cx.font='bold 10px "JetBrains Mono", monospace';cx.fillText(d.short,padL-8,y+3);
-    cx.fillStyle=d.color;cx.textAlign='left';
-    var x=padL,h=bh,rr=3;cx.beginPath();cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
-    cx.fillStyle='#141311';cx.font='bold 12px "JetBrains Mono", monospace';cx.fillText(fmt(d.v),padL+w+8,y-1);
-    cx.fillStyle='#8B877F';cx.font='9px "JetBrains Mono", monospace';cx.fillText(pct.toFixed(1)+'% of AU',padL+w+8,y+11);
-  });
-  cx.textAlign='left';
-}
-
-/* ---------- survival by segment ---------- */
-var survC=document.getElementById('survive');
-function drawSurv(){
-  var f=fitCanvas(survC);if(!f)return;var cx=f.cx,W=f.W,H=f.H;cx.clearRect(0,0,W,H);
-  var padL=150,padR=46,top=8,rh=(H-top-6)/SURV.length,bh=Math.min(24,rh*0.6);
-  cx.font='11px "JetBrains Mono", monospace';
-  SURV.forEach(function(d,i){
-    var y=top+rh*i+rh/2,w=(d.v/100)*(W-padL-padR);
-    cx.fillStyle='#57544E';cx.textAlign='right';cx.fillText(d.name,padL-8,y+4);
-    cx.fillStyle=d.color;cx.textAlign='left';
-    var x=padL,h=bh,rr=3;cx.beginPath();cx.moveTo(x,y-h/2);cx.lineTo(x+Math.max(w-rr,0),y-h/2);cx.arcTo(x+w,y-h/2,x+w,y-h/2+rr,rr);cx.lineTo(x+w,y+h/2-rr);cx.arcTo(x+w,y+h/2,x+w-rr,y+h/2,rr);cx.lineTo(x,y+h/2);cx.closePath();cx.fill();
-    cx.fillStyle='#141311';cx.font='bold 11px "JetBrains Mono", monospace';cx.fillText(d.v.toFixed(1)+'%',padL+w+7,y+4);
-    cx.font='11px "JetBrains Mono", monospace';
-  });
-  cx.textAlign='left';
-}
-
 /* ---------- table ---------- */
 function renderTable(){
   var rows=STATES.slice().sort(function(a,b){return b.v-a.v;});
@@ -160,7 +117,10 @@ function hex2int(h){return parseInt(h.slice(1),16);}
 
 /* init */
 renderTable();
-requestAnimationFrame(function(){requestAnimationFrame(function(){drawFlow();drawStates();drawSurv();});});
-setTimeout(function(){drawFlow();drawStates();drawSurv();},400);
-addEventListener('resize',function(){drawFlow();drawStates();drawSurv();});
-if('ResizeObserver' in window){new ResizeObserver(function(){drawFlow();}).observe(flow);new ResizeObserver(function(){drawStates();}).observe(statesC);new ResizeObserver(function(){drawSurv();}).observe(survC);}
+requestAnimationFrame(function(){requestAnimationFrame(drawFlow);});
+setTimeout(drawFlow,400);
+addEventListener('resize',drawFlow);
+/* Some charts are rendered ahead of time in R, so their canvas may not be on the
+   page. Only observe the ones that are. */
+function observeIfPresent(el,fn){if(el)new ResizeObserver(fn).observe(el);}
+if('ResizeObserver' in window){observeIfPresent(flow,drawFlow);}

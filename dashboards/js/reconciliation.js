@@ -15,7 +15,7 @@ var GST=[
 /* Total GST pool by year ($bn) — CGC 2026 Update, Table 1 */
 var POOL=[{y:'2025-26',v:96.554},{y:'2026-27',v:102.518}];
 
-function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
+function fitCanvas(cv){if(!cv)return null;var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
 
 /* ---------- per-state distribution (horizontal) ---------- */
 var pool=document.getElementById('pool');
@@ -120,4 +120,7 @@ renderTable();
 requestAnimationFrame(function(){requestAnimationFrame(function(){drawPool();drawTrend();});});
 setTimeout(function(){drawPool();drawTrend();},400);
 addEventListener('resize',function(){drawPool();drawTrend();});
-if('ResizeObserver' in window){new ResizeObserver(function(){drawPool();}).observe(pool);new ResizeObserver(function(){drawTrend();}).observe(trend);}
+/* Some charts are rendered ahead of time in R, so their canvas may not be on the
+   page. Only observe the ones that are. */
+function observeIfPresent(el,fn){if(el)new ResizeObserver(fn).observe(el);}
+if('ResizeObserver' in window){observeIfPresent(pool,drawPool);observeIfPresent(trend,drawTrend);}
