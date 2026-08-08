@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import pathlib
 import sys
 import time
@@ -40,6 +41,11 @@ WAF_HOSTS = ("cgc.gov.au", "finance.gov.au")
 RETRIES = 3
 RETRY_BACKOFF_SECONDS = 3
 
+# A host that refuses a whole network takes the full timeout on every attempt,
+# which is minutes of a CI run spent waiting for a certain failure. Setting
+# PIPELINE_HTTP_TIMEOUT caps it there without shortening it for a real run.
+TIMEOUT_CEILING = int(os.environ.get("PIPELINE_HTTP_TIMEOUT", "0")) or None
+
 
 def agent_for(url: str) -> str:
     return BROWSER_AGENT if any(h in url for h in WAF_HOSTS) else USER_AGENT
@@ -57,6 +63,8 @@ def http_get(url: str, *, timeout: int = 120) -> bytes:
         "Accept": "*/*",
         "Accept-Language": "en-AU,en;q=0.9",
     }
+    if TIMEOUT_CEILING:
+        timeout = min(timeout, TIMEOUT_CEILING)
     last: Exception | None = None
     for attempt in range(1, RETRIES + 1):
         try:

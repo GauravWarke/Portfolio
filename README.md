@@ -4,6 +4,9 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-4F46E5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/gaurav-warke-b5493b394/)
 [![Profile](https://img.shields.io/badge/GitHub-1e1b2e?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GauravWarke)
 
+[![Data integrity](https://github.com/GauravWarke/Portfolio/actions/workflows/render-r-report.yml/badge.svg)](https://github.com/GauravWarke/Portfolio/actions/workflows/render-r-report.yml)
+[![Reproduced from source](https://github.com/GauravWarke/Portfolio/actions/workflows/reproduce-data.yml/badge.svg)](https://github.com/GauravWarke/Portfolio/actions/workflows/reproduce-data.yml)
+
 > Business & Data Analyst · BI · Supply Chain · FinTech — Melbourne, AU
 
 Four interactive dashboards built on Australian open data. **Every figure you see was read out of the publisher's own file**: ABS Excel datacubes, ABS time-series workbooks, and Word reports from the Commonwealth Grants Commission and the Department of Finance.
@@ -87,6 +90,10 @@ run if they disagree. The retail and GST parsers do the same against their own
 published totals.
 
 `tests/test_data_integrity.py` re-asserts all of this on every CI run: that each dataset reconciles to its publisher's stated total, that shares add up to 100%, that survival is monotonic, that the retail series recomputes to the published growth rate, and that the specific wrong values an earlier version shipped can never come back.
+
+That proves the committed numbers hang together. Proving they're what the sources actually say takes a second workflow. `reproduce-data.yml` runs weekly on a clean machine with no cache, downloads all four publishers' files again, re-derives every dataset, and **fails if a single value differs from what's committed**. So a parser can't quietly regress, and a publisher revising their figures shows up as a red check instead of going unnoticed.
+
+Two caveats worth stating plainly. `cgc.gov.au` and `finance.gov.au` sit behind a WAF that drops requests from a non-browser User-Agent, so the pipeline sends a browser agent to those two hosts; the files are public downloads with no login or rate limit involved. And `finance.gov.au` answers its landing page with a bot-detection interstitial, which this repo does not try to defeat. That one source is therefore checked only to the extent that its pinned file is still published, and the freshness script says so rather than reporting a pass it hasn't earned.
 
 | Figure | Status |
 | :--- | :--- |

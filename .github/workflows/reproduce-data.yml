@@ -29,20 +29,13 @@ jobs:
         run: pip install pytest
 
       # No cache is restored, so every file is downloaded from the publisher.
+      # Fails if a re-derived figure differs from the committed one. A source
+      # that will not answer a GitHub runner is reported, not treated as an
+      # error -- see the script's docstring.
       - name: Re-derive every dataset from source
-        run: python scripts/run_all.py
-
-      - name: Fail if any published figure changed
-        run: |
-          if git diff --quiet -- data/; then
-            echo "Every dataset re-derived byte-identically from source."
-          else
-            echo "::error::Re-deriving from source produced different data."
-            echo "Either a publisher revised their figures, or a parser regressed."
-            git diff --stat -- data/
-            git diff -- data/
-            exit 1
-          fi
+        env:
+          PIPELINE_HTTP_TIMEOUT: "90"
+        run: python scripts/reproduce_check.py
 
       - name: Run the integrity tests against the re-derived data
         run: python -m pytest tests/ -v
