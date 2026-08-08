@@ -1,0 +1,48 @@
+name: Reproduce data from source
+
+# Re-derives every published figure from the publishers' own files on a clean
+# machine with no cache, then fails if the result differs from what is
+# committed. The integrity tests prove the committed numbers are internally
+# consistent; this proves they are what the sources actually say.
+#
+# Not run on every push: it downloads ~18 MB from four government sites, and an
+# unrelated commit should not send traffic their way. Weekly, plus on demand.
+on:
+  schedule:
+    - cron: "30 20 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      # No cache is restored, so every file is downloaded from the publisher.
+      - name: Re-derive every dataset from source
+        run: python scripts/run_all.py
+
+      - name: Fail if any published figure changed
+        run: |
+          if git diff --quiet -- data/; then
+            echo "Every dataset re-derived byte-identically from source."
+          else
+            echo "::error::Re-deriving from source produced different data."
+            echo "Either a publisher revised their figures, or a parser regressed."
+            git diff --stat -- data/
+            git diff -- data/
+            exit 1
+          fi
+
+      - name: Run the integrity tests against the re-derived data
+        run: python -m pytest tests/ -v

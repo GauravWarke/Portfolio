@@ -19,24 +19,30 @@ to a failure here is to look at what changed, update the pinned URL, re-run the
 pipeline, and update the expected values in ``tests/`` in the same commit.
 
 Network failures are reported but do not fail the run: an unreachable
-publisher is not evidence of a new release. The CGC and Finance sites are
-slow, hence the generous timeout.
+publisher is not evidence of a new release. Requests go through
+``common.http_get``, which retries and sends the User-Agent each host will
+actually serve -- without that, cgc.gov.au and finance.gov.au reset the
+connection and two of the four sources could never be checked at all.
 """
 from __future__ import annotations
 
 import re
 import sys
-import urllib.error
-import urllib.request
 
 import fetch_business_churn as churn
 import fetch_govt_ad_spend as ads
 import fetch_gst_reconciliation as gst
 import fetch_retail_demand as retail
-
-USER_AGENT = "gaurav-warke-portfolio/1.0 (+https://github.com/GauravWarke/Portfolio)"
+from common import http_get
 
 # name -> (landing page, pinned file URL, pattern matching the file we parse)
+#
+# A pattern of None means the landing page cannot be read programmatically, so
+# the release listing cannot be compared. finance.gov.au answers with an Akamai
+# bot-detection interstitial rather than the page; defeating that is not
+# something this repo will do, and the file itself is served without it. Those
+# sources fall back to confirming the pinned file is still published, and are
+# reported as needing a manual look rather than being quietly passed.
 SOURCES = {
     "ABS business counts (8165.0)": (
         churn.RELEASE_PAGE, churn.DATACUBE_URL, r"8165DC01\.xlsx"),
@@ -45,16 +51,14 @@ SOURCES = {
     "CGC GST update": (
         gst.REPORT_PAGE, gst.REPORT_DOCX, r"[Uu]pdate\.docx"),
     "Finance campaign advertising": (
-        ads.REPORT_PAGE, ads.REPORT_DOCX, r"campaign-advertising[^\"']*\.docx"),
+        ads.REPORT_PAGE, ads.REPORT_DOCX, None),
 }
 
 
 def fetch(url: str) -> str | None:
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=180) as resp:  # noqa: S310
-            return resp.read().decode("utf-8", errors="replace")
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        return http_get(url, timeout=180).decode("utf-8", errors="replace")
+    except (OSError, TimeoutError) as exc:
         print(f"    could not reach the landing page ({exc})")
         return None
 
@@ -75,12 +79,31 @@ def latest_link(html: str, page_url: str, pattern: str) -> str | None:
     return absolute(sorted(found)[-1], page_url)
 
 
+def still_published(url: str) -> bool:
+    """Confirm the pinned file is still served, without reading the listing."""
+    try:
+        return http_get(url, timeout=300)[:2] == b"PK"
+    except (OSError, TimeoutError) as exc:
+        print(f"    the pinned file could not be downloaded ({exc})")
+        return False
+
+
 def main() -> None:
     print("Checking each source for a newer release\n")
-    stale, unreachable = [], []
+    stale, unreachable, manual = [], [], []
 
     for name, (page, pinned, pattern) in SOURCES.items():
         print(f"  {name}")
+
+        if pattern is None:
+            if still_published(pinned):
+                print("    pinned file still published; the release listing is "
+                      "not machine-readable, so check the page by hand")
+                manual.append(name)
+            else:
+                unreachable.append(name)
+            continue
+
         html = fetch(page)
         if html is None:
             unreachable.append(name)
@@ -102,6 +125,9 @@ def main() -> None:
             stale.append(name)
 
     print()
+    if manual:
+        print(f"  {len(manual)} source(s) verified only as still published, "
+              f"not compared against a listing: {', '.join(manual)}")
     if unreachable:
         print(f"  {len(unreachable)} source(s) could not be checked: "
               f"{', '.join(unreachable)}")

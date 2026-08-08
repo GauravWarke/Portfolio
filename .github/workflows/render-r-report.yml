@@ -87,6 +87,7 @@ jobs:
         run: quarto render analysis/report.qmd
 
       - name: Commit rendered charts and report
+
         run: |
           git config user.name "Gaurav Warke"
           git config user.email "gauravwarke8@gmail.com"

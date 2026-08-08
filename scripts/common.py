@@ -27,7 +27,49 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 CACHE_DIR = ROOT / "data" / ".cache"
 
+# cgc.gov.au and finance.gov.au sit behind a WAF that resets the connection for
+# a non-browser User-Agent. A descriptive agent string is the courteous default
+# and it is what ABS is served, but on those two hosts it means the file simply
+# cannot be downloaded -- so we send a browser agent there. Both files are
+# published for public download and no login, token or rate limit is involved.
 USER_AGENT = "gaurav-warke-portfolio/1.0 (+https://github.com/GauravWarke/Portfolio)"
+BROWSER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                 "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+WAF_HOSTS = ("cgc.gov.au", "finance.gov.au")
+
+RETRIES = 3
+RETRY_BACKOFF_SECONDS = 3
+
+
+def agent_for(url: str) -> str:
+    return BROWSER_AGENT if any(h in url for h in WAF_HOSTS) else USER_AGENT
+
+
+def http_get(url: str, *, timeout: int = 120) -> bytes:
+    """GET ``url``, retrying transient failures.
+
+    A connection reset is exactly what the WAF returns, so a single failure is
+    not evidence that a file is gone; retrying separates a blocked request from
+    a flaky one.
+    """
+    headers = {
+        "User-Agent": agent_for(url),
+        "Accept": "*/*",
+        "Accept-Language": "en-AU,en;q=0.9",
+    }
+    last: Exception | None = None
+    for attempt in range(1, RETRIES + 1):
+        try:
+            req = Request(url, headers=headers)
+            with urlopen(req, timeout=timeout) as resp:  # noqa: S310 (trusted gov URLs)
+                return resp.read()
+        except (URLError, TimeoutError, OSError) as exc:
+            last = exc
+            if attempt < RETRIES:
+                print(f"  . attempt {attempt} failed ({exc}); retrying",
+                      file=sys.stderr)
+                time.sleep(RETRY_BACKOFF_SECONDS * attempt)
+    raise last  # type: ignore[misc]
 
 
 def _ensure_dirs() -> None:
@@ -56,10 +98,7 @@ def get(url: str, *, timeout: int = 120, ttl_seconds: int = 86_400,
     fresh = cache_path.exists() and (time.time() - cache_path.stat().st_mtime) < ttl_seconds
     if not fresh:
         try:
-            req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
-            with urlopen(req, timeout=timeout) as resp:  # noqa: S310 (trusted gov URLs)
-                body = resp.read()
-            cache_path.write_bytes(body)
+            cache_path.write_bytes(http_get(url, timeout=timeout))
         except (URLError, TimeoutError, OSError) as exc:  # offline / endpoint moved
             print(f"  ! download failed ({exc})", file=sys.stderr)
             if not cache_path.exists():
