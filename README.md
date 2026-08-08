@@ -6,9 +6,9 @@
 
 > Business & Data Analyst · BI · Supply Chain · FinTech — Melbourne, AU
 
-Four interactive dashboards built on Australian open data, where **every published figure is parsed out of the publisher's own file** — ABS Excel datacubes, ABS time-series workbooks, and Word reports from the Commonwealth Grants Commission and the Department of Finance.
+Four interactive dashboards built on Australian open data. **Every figure you see was read out of the publisher's own file**: ABS Excel datacubes, ABS time-series workbooks, and Word reports from the Commonwealth Grants Commission and the Department of Finance.
 
-Each parser reconciles its output against the total the publisher states and fails the run if they disagree, and 18 integrity tests re-assert that on every push. Charts are generated in **R (ggplot2)** and **Python (matplotlib)**, the model is built in **Power BI** and **SQL**, and every dashboard opens with a plain-English takeaway before the detail.
+No number was typed in by hand. Each parser checks its own output against the total the publisher states, and stops the run if the two don't match. 18 integrity tests re-run that check on every push. The charts come from **R (ggplot2)** and **Python (matplotlib)**, the model is built in **Power BI** and **SQL**, and each dashboard leads with a plain-English takeaway before it gets into the detail.
 
 **Live:** https://portfolio-plum-eta-oqdpa0gzlv.vercel.app
 
@@ -23,25 +23,26 @@ Each parser reconciles its output against the total the publisher states and fai
 | **Retail Demand** | ABS Retail Trade | $37.9bn monthly retail turnover, by category and by state |
 | **GST Reconciliation** | Commonwealth Grants Commission | How the ~$102bn GST pool is carved up across all 8 states and territories |
 
-Each dashboard: a light editorial theme, a "What this means — in plain English" banner, a distinct interactive 3D chart (radial bars · pie · floating bubbles · stacked column), and a cited real data source.
+Every dashboard shares the same shape: a light editorial theme, a "What this means — in plain English" banner up top, its own interactive 3D chart (radial bars, pie, floating bubbles, stacked column), and a cited data source you can go and check.
 
 ## Tech
 
-- **Python** (`scripts/`) — one parser per source. `xlsx_reader.py` and `docx_reader.py` read
-  Excel and Word straight from `zipfile` + `xml.etree`, so the pipeline needs no pandas or
-  openpyxl. Each parser reconciles against the publisher's stated total before writing.
-- **R** (`analysis/`) — `figures.R` renders seven ggplot2 charts; `survival_model.R` derives
-  annual hazard rates, fits an exponential survival model per industry and estimates median
-  lifetime; `report.qmd` renders the whole analysis to a Quarto report.
+- **Python** (`scripts/`) — one parser per source. `xlsx_reader.py` and `docx_reader.py` crack
+  open Excel and Word files using nothing but `zipfile` and `xml.etree`, so the pipeline runs
+  without pandas or openpyxl. Every parser reconciles against the publisher's stated total
+  before it writes anything.
+- **R** (`analysis/`) — `figures.R` draws seven ggplot2 charts. `survival_model.R` works out
+  annual hazard rates, fits an exponential survival model per industry, and estimates median
+  lifetime. `report.qmd` pulls the whole analysis together into a Quarto report.
 - **SQL** (`sql/analysis.sql`) — models the datasets and reproduces each headline metric.
 - **Power BI** (`powerbi/`) — a TMDL semantic model with 15 DAX measures and a star schema
   built on a conformed `State` dimension, plus a PBIR report validated against Microsoft's
   published JSON schemas.
 - **Supabase** (`supabase/`) — the same data as Postgres, with row-level security and
   read-only anonymous access.
-- **Tests** (`tests/`) — 18 integrity checks run in CI before anything renders.
-- **HTML · CSS · JavaScript** — no build step; Three.js for the 3D charts, Canvas 2D for the
-  rest. Fully responsive, `prefers-reduced-motion` aware, deployed on **Vercel**.
+- **Tests** (`tests/`) — 18 integrity checks that run in CI before anything renders.
+- **HTML · CSS · JavaScript** — no build step. Three.js handles the 3D charts, Canvas 2D does
+  the rest. Fully responsive, respects `prefers-reduced-motion`, deployed on **Vercel**.
 
 ## Run locally
 
@@ -77,14 +78,15 @@ Australian Bureau of Statistics (ABS) · Australian Department of Finance · Aud
 
 ### Provenance, verification and tests
 
-The pipeline downloads the publishers' own files and reads the figures out of
-them, so every number traces to a cell in a source document rather than to a
-value typed into this repo. `scripts/fetch_business_churn.py` parses ABS
-datacube `8165DC01.xlsx` with `scripts/xlsx_reader.py` (standard library only)
-and **reconciles the state counts against the published national total**,
-failing the run if they disagree. The retail and GST parsers apply the same check against their own published totals.
+The pipeline downloads the publishers' files and reads the numbers straight out
+of them, so each figure traces back to a cell in a source document instead of a
+value someone typed into this repo. `scripts/fetch_business_churn.py` parses ABS
+datacube `8165DC01.xlsx` using `scripts/xlsx_reader.py` (standard library only)
+and **checks the state counts against the published national total**, failing the
+run if they disagree. The retail and GST parsers do the same against their own
+published totals.
 
-`tests/test_data_integrity.py` asserts these properties on every CI run: that each dataset reconciles to its publisher's stated total, that shares sum to 100%, that survival is monotonic, that the retail series recomputes to the published growth rate, and that the specific wrong values an earlier version shipped can never reappear.
+`tests/test_data_integrity.py` re-asserts all of this on every CI run: that each dataset reconciles to its publisher's stated total, that shares add up to 100%, that survival is monotonic, that the retail series recomputes to the published growth rate, and that the specific wrong values an earlier version shipped can never come back.
 
 | Figure | Status |
 | :--- | :--- |
@@ -97,11 +99,11 @@ failing the run if they disagree. The retail and GST parsers apply the same chec
 | Government ad-spend by channel ($173.8M across 7 channels) | parsed from the Dept of Finance 2023-24 report — reconciles to the published total |
 
 **Corrected in this repo:** earlier versions carried state counts and survival
-rates that were not ABS figures (NSW 891,123 and a 48% three-year survival
-rate). Parsing the datacube replaced them with the published values — NSW
-916,603 and 69.4% — and the reconciliation check now prevents a repeat.
+rates that were never ABS figures (NSW 891,123, and a 48% three-year survival
+rate). Parsing the datacube replaced them with the published values, NSW 916,603
+and 69.4%, and the reconciliation check now stops that from happening again.
 
-**Resolved:** an earlier version carried an indicative retail series that computed 4.7% growth against the ABS published +4.9%. `scripts/fetch_retail_demand.py` now parses series A3348585R from the ABS time-series workbook — 519 monthly observations — so month-on-month and year-on-year growth are computed from the source and reconcile exactly (+1.2% MoM, +4.9% YoY). The state series sums to 100.0% of the national total.
+**Resolved:** an earlier version used an indicative retail series that came out at 4.7% growth against the ABS published +4.9%. `scripts/fetch_retail_demand.py` now parses series A3348585R from the ABS time-series workbook, all 519 monthly observations, so month-on-month and year-on-year growth are computed from the source and reconcile exactly (+1.2% MoM, +4.9% YoY). The state series sums to 100.0% of the national total.
 
 ---
 
