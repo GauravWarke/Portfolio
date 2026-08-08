@@ -11,7 +11,7 @@
 
 Four interactive dashboards built on Australian open data. **Every figure you see was read out of the publisher's own file**: ABS Excel datacubes, ABS time-series workbooks, and Word reports from the Commonwealth Grants Commission and the Department of Finance.
 
-No number was typed in by hand. Each parser checks its own output against the total the publisher states, and stops the run if the two don't match. 18 integrity tests re-run that check on every push. The charts come from **R (ggplot2)** and **Python (matplotlib)**, the model is built in **Power BI** and **SQL**, and each dashboard leads with a plain-English takeaway before it gets into the detail.
+No number was typed in by hand. Each parser checks its own output against the total the publisher states, and stops the run if the two don't match. 33 integrity tests re-run that check on every push. The charts come from **R (ggplot2)** and **Python (matplotlib)**, the model is built in **Power BI** and **SQL**, and each dashboard leads with a plain-English takeaway before it gets into the detail.
 
 **Live:** https://portfolio-plum-eta-oqdpa0gzlv.vercel.app
 
@@ -43,7 +43,7 @@ Every dashboard shares the same shape: a light editorial theme, a "What this mea
   published JSON schemas.
 - **Supabase** (`supabase/`) — the same data as Postgres, with row-level security and
   read-only anonymous access.
-- **Tests** (`tests/`) — 18 integrity checks that run in CI before anything renders.
+- **Tests** (`tests/`) — 33 integrity checks that run in CI before anything renders.
 - **HTML · CSS · JavaScript** — no build step. Three.js handles the 3D charts, Canvas 2D does
   the rest. Fully responsive, respects `prefers-reduced-motion`, deployed on **Vercel**.
 
@@ -91,9 +91,13 @@ published totals.
 
 `tests/test_data_integrity.py` re-asserts all of this on every CI run: that each dataset reconciles to its publisher's stated total, that shares add up to 100%, that survival is monotonic, that the retail series recomputes to the published growth rate, and that the specific wrong values an earlier version shipped can never come back.
 
-That proves the committed numbers hang together. Proving they're what the sources actually say takes a second workflow. `reproduce-data.yml` runs weekly on a clean machine with no cache, downloads all four publishers' files again, re-derives every dataset, and **fails if a single value differs from what's committed**. So a parser can't quietly regress, and a publisher revising their figures shows up as a red check instead of going unnoticed.
+That proves the committed numbers hang together. Proving they're what the sources actually say takes a second workflow. `reproduce-data.yml` runs weekly on a clean machine with no cache, downloads the publishers' files again, re-derives every dataset it can reach, and **fails if a single value differs from what's committed**. So a parser can't quietly regress, and a publisher revising their figures shows up as a red check instead of going unnoticed.
 
-Two caveats worth stating plainly. `cgc.gov.au` and `finance.gov.au` sit behind a WAF that drops requests from a non-browser User-Agent, so the pipeline sends a browser agent to those two hosts; the files are public downloads with no login or rate limit involved. And `finance.gov.au` answers its landing page with a bot-detection interstitial, which this repo does not try to defeat. That one source is therefore checked only to the extent that its pinned file is still published, and the freshness script says so rather than reporting a pass it hasn't earned.
+Three limits worth stating plainly rather than papering over:
+
+- `cgc.gov.au` and `finance.gov.au` drop requests carrying a non-browser User-Agent, so the pipeline sends a browser agent to those two hosts. Both files are public downloads; no login, token or rate limit is involved.
+- Neither of those hosts answers GitHub's datacenter ranges at all, so the weekly CI run re-derives **2 of 4 sources** and says which two it skipped. From an ordinary connection all four resolve, and `python scripts/reproduce_check.py` re-derives 4 of 4 byte-identically. The job reports an unreachable host instead of failing on it, because a red check that only means "a government site blocked a datacenter" tells you nothing about the data.
+- `finance.gov.au` serves its landing page behind a bot-detection interstitial, which this repo does not attempt to defeat. That source is therefore checked only as far as confirming its pinned file is still published, and the freshness script labels it that way rather than reporting a pass it hasn't earned.
 
 | Figure | Status |
 | :--- | :--- |
