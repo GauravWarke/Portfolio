@@ -3,11 +3,20 @@ name: Render R report
 on:
   push:
     branches: [main]
+    # Anything that can change a published figure, or the checks that guard one,
+    # has to trigger this workflow. Listing only the chart script left the
+    # parsers, the readers they depend on, and the tests themselves ungated:
+    # a parser could regress, or a test could be broken, without CI ever running.
     paths:
       - "analysis/**"
       - "data/**"
-      - "scripts/make_charts.py"
+      - "scripts/**"
+      - "tests/**"
       - ".github/workflows/render-r-report.yml"
+  # Publishers issue new releases without notice. A weekly run makes staleness
+  # show up as a failing check rather than as figures that quietly age.
+  schedule:
+    - cron: "0 20 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -58,6 +67,18 @@ jobs:
 
       - name: Test data integrity
         run: python -m pytest tests/ -v
+
+      # Reports a publisher release newer than the one we pin. Only enforced on
+      # the scheduled run: a push should not fail because ABS published
+      # something unrelated to the change being made.
+      - name: Check for newer source releases
+        if: github.event_name == 'schedule'
+        run: python scripts/check_freshness.py
+
+      - name: Check for newer source releases (advisory)
+        if: github.event_name != 'schedule'
+        continue-on-error: true
+        run: python scripts/check_freshness.py
 
       - name: Render matplotlib figures (Python)
         run: python scripts/make_charts.py
