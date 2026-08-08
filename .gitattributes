@@ -16,3 +16,7 @@ assets/charts/*.png binary linguist-generated
 # language statistics by default. SQL is written and used here (the analytical
 # model in sql/, the database layer in supabase/), so opt it back in.
 *.sql linguist-detectable=true
+
+# Pipeline artefacts are byte-compared across platforms by reproduce-data.yml,
+# so they must not be line-ending converted on checkout.
+data/** -text

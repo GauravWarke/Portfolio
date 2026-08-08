@@ -121,7 +121,10 @@ def get(url: str, *, timeout: int = 120, ttl_seconds: int = 86_400,
 def write_json(name: str, payload: Any) -> pathlib.Path:
     _ensure_dirs()
     path = DATA_DIR / name
-    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    # newline="" for the same reason as write_csv: Windows would otherwise
+    # translate every \n to \r\n and the artefact would differ by platform.
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        fh.write(json.dumps(payload, indent=2))
     print(f"  -> wrote {path.relative_to(ROOT)}")
     return path
 
@@ -129,8 +132,12 @@ def write_json(name: str, payload: Any) -> pathlib.Path:
 def write_csv(name: str, rows: Iterable[dict[str, Any]], fieldnames: list[str]) -> pathlib.Path:
     _ensure_dirs()
     path = DATA_DIR / name
+    # csv defaults to CRLF on every platform while git stores LF, which makes a
+    # file regenerated on Windows differ from the same file regenerated on
+    # Linux even when every value matches. Pinning the terminator keeps the
+    # reproducibility check comparing figures rather than line endings.
     with path.open("w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fieldnames)
+        writer = csv.DictWriter(fh, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     print(f"  -> wrote {path.relative_to(ROOT)}")
