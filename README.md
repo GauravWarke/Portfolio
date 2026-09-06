@@ -28,6 +28,20 @@ No number was typed in by hand. Each parser checks its own output against the to
 
 Every dashboard shares the same shape: a light editorial theme, a "What this means — in plain English" banner up top, its own interactive 3D chart (radial bars, pie, floating bubbles, stacked column), and a cited data source you can go and check.
 
+## Documentation
+
+Requirements, test and risk documentation for the four dashboards lives in
+[`docs/`](docs/):
+
+| Document | What it covers |
+| :--- | :--- |
+| [Business requirements](docs/business-requirements.md) | Why each dashboard exists, who it is for, what counts as success |
+| [Functional requirements](docs/functional-requirements.md) | What each parser and dashboard must do, source by source |
+| [User stories](docs/user-stories.md) | The same requirements from the user's side, with acceptance criteria |
+| [UAT plan](docs/uat-plan.md) | How to verify a build, and which test covers which requirement |
+| [Risk register](docs/risk-register.md) | What can break, how likely, and what catches it |
+| [Data pipeline](docs/data-pipeline.md) | Process model, data dictionary, reconciliation rules |
+
 ## Tech
 
 - **Python** (`scripts/`) — one parser per source. `xlsx_reader.py` and `docx_reader.py` crack
