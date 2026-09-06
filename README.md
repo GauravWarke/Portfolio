@@ -115,9 +115,9 @@ Three limits worth stating plainly rather than papering over:
 
 | Figure | Status |
 | :--- | :--- |
-| 2,729,648 businesses; 437,150 entries; 370,500 exits; 16.4% / 13.9% | parsed from ABS 8165DC01, Table 4 |
-| Businesses by state (NSW 916,603 · VIC 754,400 · QLD 524,024 · WA 266,273) | parsed from ABS 8165DC01, Table 4 — reconciles to the national total |
-| Survival by state and by industry (69.4% at 3 years, 63.1% at 4 years) | parsed from ABS 8165DC01, Tables 2 and 5 |
+| 2,814,778 businesses; 460,461 entries; 375,331 exits; 16.9% / 13.8% | parsed from ABS 8165DC01, Table 4 (2025-26 release) |
+| Businesses by state (NSW 942,658 · VIC 773,986 · QLD 543,277 · WA 278,520) | parsed from ABS 8165DC01, Table 4 — reconciles to the national total |
+| Survival by state and by industry (68.1% at 3 years, 61.9% at 4 years) | parsed from ABS 8165DC01, Tables 2 and 5 |
 | Retail turnover $37,906.6M, +1.2% MoM, +4.9% YoY (Jun 2025) | parsed from ABS 8501.0, series A3348585R |
 | Retail turnover by state (Jun 2025, seasonally adjusted) | parsed from ABS 8501.0, table 850103 — sums to 100.0% of national |
 | GST distribution and relativities (pool $102.52bn) | parsed from the CGC 2026 Update — reconciles to the published pool |
@@ -125,8 +125,16 @@ Three limits worth stating plainly rather than papering over:
 
 **Corrected in this repo:** earlier versions carried state counts and survival
 rates that were never ABS figures (NSW 891,123, and a 48% three-year survival
-rate). Parsing the datacube replaced them with the published values, NSW 916,603
-and 69.4%, and the reconciliation check now stops that from happening again.
+rate). Parsing the datacube replaced them with the published values for that
+release, NSW 916,603 and 69.4%, and the reconciliation check now stops that
+from happening again.
+
+**Re-pinned in this repo:** ABS has since published a newer release of the same
+datacube (`jul2022-jun2026`, reference period 2025-26), superseding the file
+above. This is a routine annual update, not a data-quality fix — the previous
+figures (916,603, 69.4%) were correct for the release they were pinned to. The
+pin in `scripts/fetch_business_churn.py` now points at the current release, and
+`scripts/check_freshness.py` flags it again the next time ABS publishes.
 
 **Resolved:** an earlier version used an indicative retail series that came out at 4.7% growth against the ABS published +4.9%. `scripts/fetch_retail_demand.py` now parses series A3348585R from the ABS time-series workbook, all 519 monthly observations, so month-on-month and year-on-year growth are computed from the source and reconcile exactly (+1.2% MoM, +4.9% YoY). The state series sums to 100.0% of the national total.
 

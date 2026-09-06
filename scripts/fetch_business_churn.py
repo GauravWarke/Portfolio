@@ -32,9 +32,9 @@ RELEASE_PAGE = (
 )
 DATACUBE_URL = (
     "https://www.abs.gov.au/statistics/economy/business-indicators/"
-    "counts-australian-businesses-including-entries-and-exits/jul2021-jun2025/8165DC01.xlsx"
+    "counts-australian-businesses-including-entries-and-exits/jul2022-jun2026/8165DC01.xlsx"
 )
-REFERENCE_PERIOD = "2024-25"
+REFERENCE_PERIOD = "2025-26"
 
 # Column positions in Table 4 (0-indexed), taken from the published layout.
 C_START, C_ENTRIES, C_EXITS, C_END = 1, 4, 7, 9

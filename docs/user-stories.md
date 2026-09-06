@@ -25,8 +25,8 @@ story in the set (US-13, at 1 point).
 - All 19 ABS industry divisions appear, none dropped
 - Both three-year and four-year survival shown for each
 - Divisions are ordered, so the spread from best to worst is readable at a glance
-- Agriculture, Forestry and Fishing reads 79.8% at three years
-- Transport, Postal and Warehousing reads 55.5% at three years
+- Agriculture, Forestry and Fishing reads 79.4% at three years
+- Transport, Postal and Warehousing reads 54.6% at three years
 - Four-year survival is never higher than three-year survival for any division
 
 ### US-02. Churn flows for the national picture
@@ -38,10 +38,10 @@ story in the set (US-13, at 1 point).
 
 **Acceptance criteria**
 
-- Entries (437,150), exits (370,500) and net (+66,650) all shown
-- Entry and exit rates shown as percentages of opening stock (16.4%, 13.9%)
+- Entries (460,461), exits (375,331) and net (+85,130) all shown
+- Entry and exit rates shown as percentages of opening stock (16.9%, 13.8%)
 - Rates are derived from the flows, not read from a stated figure
-- The total business count (2,729,648) is labelled with its reference period
+- The total business count (2,814,778) is labelled with its reference period
 
 ### US-03. Regional comparison
 **2 points** · implements FR-BC-04, FR-BC-05

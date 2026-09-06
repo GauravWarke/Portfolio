@@ -64,7 +64,7 @@ A figure that does not reconcile is a data defect, and it blocks the build.
 
 | Source | Publisher | Format | Cadence | Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| Counts of Australian Businesses (8165.0), `8165DC01.xlsx` | ABS | Excel datacube | Annual | 2024-25 |
+| Counts of Australian Businesses (8165.0), `8165DC01.xlsx` | ABS | Excel datacube | Annual | 2025-26 |
 | Retail Trade (8501.0), series `A3348585R` and table `850103` | ABS | Excel time series | Monthly | June 2025 |
 | Campaign Advertising Report 2023-24 | Dept of Finance | Word | Annual | 2023-24 |
 | 2026 Update, GST Revenue Sharing Relativities | CGC | Word, ~17 MB | Annual | 2026-27 |

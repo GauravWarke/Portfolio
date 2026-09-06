@@ -29,7 +29,7 @@
 
 // HERO — interactive plain-English project summary (for non-technical stakeholders)
 const HERO_SUM={
-  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.9%',numLbl:'annual exit (churn) rate',pct:69,center:'69.4%',sub:'SURVIVE 3Y'},
+  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.8%',numLbl:'annual exit (churn) rate',pct:68,center:'68.1%',sub:'SURVIVE 3Y'},
   mpi:{headline:'Tracks where government advertising money actually goes, and how fast it is shifting to digital.',num:'$250.6M',numLbl:'gov ad spend, 2023-24',pct:44,center:'44%',sub:'DIGITAL'},
   demand:{headline:'Reads national retail demand: what Australians are buying, by category and by state, each month.',num:'$37.9bn',numLbl:'monthly retail turnover',pct:80,center:'+4.9%',sub:'YEAR ON YEAR'},
   reconciliation:{headline:'Shows how the national GST pool is reconciled out to the states by need, not by where it was raised.',num:'$102bn',numLbl:'GST pool reconciled',pct:100,center:'8',sub:'STATES'}
@@ -62,7 +62,7 @@ const HERO_SUM={
 
 // PROJECTS — Relief-Decor bento gallery (hand-built mini-visuals per case study)
 const PROJECTS=[
-  {id:'churn',span:'s4',cat:'FinTech · Retention · Open Data',title:'Australian Business Churn',csub:'ABS entries, exits & survival',kpi:'13.9%',kpiSub:'annual exit rate',chart:'scatter',dash:'dashboards/churn.html'},
+  {id:'churn',span:'s4',cat:'FinTech · Retention · Open Data',title:'Australian Business Churn',csub:'ABS entries, exits & survival',kpi:'13.8%',kpiSub:'annual exit rate',chart:'scatter',dash:'dashboards/churn.html'},
   {id:'mpi',span:'s2',cat:'Data & BI · Media',title:'Government Ad Spend',csub:'Commonwealth + state open data',kpi:'$250.6M',kpiSub:'ad spend analysed',chart:'bars',dash:'dashboards/market.html'},
   {id:'demand',span:'s3',cat:'Supply Chain · Demand',title:'Australian Retail Demand',csub:'ABS retail turnover',kpi:'$37.9bn',kpiSub:'monthly demand',chart:'line',dash:'dashboards/demand.html'},
   {id:'reconciliation',span:'s3',cat:'Public Finance · FinTech',title:'GST Reconciliation',csub:'CGC state distribution',kpi:'$102bn',kpiSub:'GST pool',chart:'treemap',dash:'dashboards/reconciliation.html'}
@@ -158,10 +158,10 @@ const CASES={
   churn:{
     cat:'// FinTech · Retention & Attrition · Open Data',catColor:'var(--rose)',
     title:'Australian Business Churn: Who Survives and Who Exits',
-    kpi:'13.9%',kpiColor:'var(--rose)',kpiLabel:'Annual Exit (Churn) Rate',
-    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and 69.4% survive to year three.',
-    arch:['Parses ABS datacube 8165DC01.xlsx directly: entries, exits and survival by state and industry.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments survival by industry and state, from Agriculture at 74.9% down to Transport at 48.5%, to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
-    metric:'370,500 exits (13.9%) against 437,150 entries in 2024-25, a net +66,650; 69.4% of businesses reach year three and 63.1% reach year four.',
+    kpi:'13.8%',kpiColor:'var(--rose)',kpiLabel:'Annual Exit (Churn) Rate',
+    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and 68.1% survive to year three.',
+    arch:['Parses ABS datacube 8165DC01.xlsx directly: entries, exits and survival by state and industry.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments survival by industry and state, from Agriculture at 74.5% down to Transport at 47.3%, to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
+    metric:'375,331 exits (13.8%) against 460,461 entries in 2025-26, a net +85,130; 68.1% of businesses reach year three and 61.9% reach year four.',
     tags:['ABS Open Data','Python','SQL','Retention Analytics','Data Storytelling'],
     repo:'https://github.com/GauravWarke/churn-revenue-risk-platform',
     dash:'dashboards/churn.html'

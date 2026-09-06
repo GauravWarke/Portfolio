@@ -30,7 +30,7 @@ Requirement IDs are grouped by area: `FR-P` platform, `FR-BC` business churn,
 ## 2. Business churn and survival
 
 **Source:** ABS *Counts of Australian Businesses, including Entries and Exits*
-(cat. 8165.0), datacube `8165DC01.xlsx`, reference period 2024-25.
+(cat. 8165.0), datacube `8165DC01.xlsx`, reference period 2025-26.
 
 **Sheets used:** Table 2 (survival by industry division), Table 4 (businesses
 by main state), Table 5 (survival by main state).
@@ -51,20 +51,23 @@ by main state), Table 5 (survival by main state).
 
 | Figure | Value |
 | :--- | :--- |
-| Businesses operating | 2,729,648 |
-| Entries | 437,150 (16.4%) |
-| Exits | 370,500 (13.9%) |
-| Net | +66,650 (+2.5%) |
-| Survival, 3 year / 4 year | 69.4% / 63.1% |
-| Best industry, 3 year | Agriculture, Forestry and Fishing, 79.8% |
-| Worst industry, 3 year | Transport, Postal and Warehousing, 55.5% |
-| NSW / VIC / QLD / WA | 916,603 / 754,400 / 524,024 / 266,273 |
+| Businesses operating | 2,814,778 |
+| Entries | 460,461 (16.9%) |
+| Exits | 375,331 (13.8%) |
+| Net | +85,130 (+3.1%) |
+| Survival, 3 year / 4 year | 68.1% / 61.9% |
+| Best industry, 3 year | Agriculture, Forestry and Fishing, 79.4% |
+| Worst industry, 3 year | Transport, Postal and Warehousing, 54.6% |
+| NSW / VIC / QLD / WA | 942,658 / 773,986 / 543,277 / 278,520 |
 
 FR-BC-09 exists because this repository shipped wrong numbers once. An earlier
 version carried a NSW count of 891,123 and a three-year survival rate of 48%,
 neither of which was ever an ABS figure. Parsing the datacube replaced them with
-916,603 and 69.4%, and the test now names the superseded values explicitly so
-they cannot come back unnoticed.
+916,603 and 69.4%, for that release, and the test now names the superseded
+values explicitly so they cannot come back unnoticed. ABS has since published a
+newer release (reference period 2025-26); the current NSW count is 942,658 and
+three-year survival is 68.1%, which is a routine annual update rather than a
+further correction.
 
 ---
 

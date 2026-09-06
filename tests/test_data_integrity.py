@@ -46,7 +46,7 @@ def test_state_counts_reconcile_to_national_total():
 
 
 def test_business_total_matches_abs_release():
-    assert read_json("business_churn.json")["total_businesses"] == 2_729_648
+    assert read_json("business_churn.json")["total_businesses"] == 2_814_778
 
 
 def test_business_shares_sum_to_100():
@@ -56,10 +56,10 @@ def test_business_shares_sum_to_100():
 
 def test_entry_and_exit_rates_match_published():
     flows = read_json("business_churn.json")["flows"]
-    assert flows["entries"] == 437_150
-    assert flows["exits"] == 370_500
-    assert flows["entry_rate_pct"] == pytest.approx(16.4, abs=0.05)
-    assert flows["exit_rate_pct"] == pytest.approx(13.9, abs=0.05)
+    assert flows["entries"] == 460_461
+    assert flows["exits"] == 375_331
+    assert flows["entry_rate_pct"] == pytest.approx(16.9, abs=0.05)
+    assert flows["exit_rate_pct"] == pytest.approx(13.8, abs=0.05)
 
 
 def test_no_state_count_is_a_placeholder():
@@ -84,8 +84,8 @@ def test_survival_rates_are_percentages():
 
 def test_national_survival_matches_abs():
     survival = read_json("business_churn.json")["survival_national"]
-    assert survival["survival_3yr_pct"] == pytest.approx(69.4, abs=0.05)
-    assert survival["survival_4yr_pct"] == pytest.approx(63.1, abs=0.05)
+    assert survival["survival_3yr_pct"] == pytest.approx(68.1, abs=0.05)
+    assert survival["survival_4yr_pct"] == pytest.approx(61.9, abs=0.05)
 
 
 # --- retail ------------------------------------------------------------------

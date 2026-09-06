@@ -2,21 +2,21 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fmt(n){return n.toLocaleString('en-AU');}
 
 /* ---------- REAL DATA — parsed from ABS datacube 8165DC01.xlsx by scripts/fetch_business_churn.py ---------- */
-var NAT={total:2729648,entries:437150,exits:370500,entryRate:16.4,exitRate:13.9,net:66650,netPct:2.5};
+var NAT={total:2814778,entries:460461,exits:375331,entryRate:16.9,exitRate:13.8,net:85130,netPct:3.1};
 var STATES=[
-  {name:'New South Wales',   short:'NSW',        v:916603,add:20040,color:'#2f3b4d'},
-  {name:'Victoria',          short:'VIC',        v:754400,add:16486,color:'#456187'},
-  {name:'Queensland',        short:'QLD',        v:524024,add:13579,color:'#5B7BA6'},
-  {name:'Other states & territories',short:'SA·TAS·NT·ACT',v:268348,add:5558,color:'#6E7C63'},
-  {name:'Western Australia', short:'WA',         v:266273,add:10877,color:'#B0853C'}
+  {name:'New South Wales',   short:'NSW',        v:942658,color:'#2f3b4d'},
+  {name:'Victoria',          short:'VIC',        v:773986,color:'#456187'},
+  {name:'Queensland',        short:'QLD',        v:543277,color:'#5B7BA6'},
+  {name:'Other states & territories',short:'SA·TAS·NT·ACT',v:276337,color:'#6E7C63'},
+  {name:'Western Australia', short:'WA',         v:278520,color:'#B0853C'}
 ];
-/* Four-year survival, Jun 2021 -> Jun 2025 (%) — ABS 8165.0 Tables 2 and 5 */
+/* Four-year survival, Jun 2022 -> Jun 2026 (%) — ABS 8165.0 Tables 2 and 5 */
 var SURV=[
-  {name:'Agriculture (best industry)', v:74.9,color:'#4E7C5A'},
-  {name:'Health Care & Social Assist.',v:71.5,color:'#456187'},
-  {name:'All industries',              v:63.1,color:'#B0853C'},
-  {name:'Accommodation & Food',        v:54.7,color:'#9A5B3B'},
-  {name:'Transport & Warehousing',     v:48.5,color:'#8C4A46'}
+  {name:'Agriculture (best industry)', v:74.5,color:'#4E7C5A'},
+  {name:'Health Care & Social Assist.',v:70.2,color:'#456187'},
+  {name:'All industries',              v:61.9,color:'#B0853C'},
+  {name:'Accommodation & Food',        v:53.7,color:'#9A5B3B'},
+  {name:'Transport & Warehousing',     v:47.3,color:'#8C4A46'}
 ];
 
 function fitCanvas(cv){var r=cv.getBoundingClientRect();if(r.width<2)return null;var dpr=Math.min(devicePixelRatio||1,2);cv.width=r.width*dpr;cv.height=r.height*dpr;var cx=cv.getContext('2d');cx.setTransform(dpr,0,0,dpr,0,0);return {cx:cx,W:r.width,H:r.height};}
@@ -52,10 +52,9 @@ function renderTable(){
   document.getElementById('tbody').innerHTML=rows.map(function(d){
     var pct=(d.v/NAT.total*100),w=(d.v/maxV*100);
     return '<tr><td class="mono"><span class="chip"><i style="background:'+d.color+'"></i>'+d.name+'</span></td>'+
-      '<td class="num mono">'+fmt(d.v)+'</td><td class="num mono">'+pct.toFixed(1)+'%</td>'+
-      '<td class="num"><span class="up">+'+fmt(d.add)+'</span></td></tr>';
+      '<td class="num mono">'+fmt(d.v)+'</td><td class="num mono">'+pct.toFixed(1)+'%</td></tr>';
   }).join('')+
-    '<tr><td class="mono"><b>Australia</b></td><td class="num mono"><b>'+fmt(NAT.total)+'</b></td><td class="num mono">100%</td><td class="num"><span class="up">+'+fmt(NAT.net)+'</span></td></tr>';
+    '<tr><td class="mono"><b>Australia</b></td><td class="num mono"><b>'+fmt(NAT.total)+'</b></td><td class="num mono">100%</td></tr>';
 }
 
 /* ================= 3D STATE BARS ================= */
@@ -107,7 +106,7 @@ function hex2int(h){return parseInt(h.slice(1),16);}
   wrap.addEventListener('click',function(e){if(moved)return;var r=wrap.getBoundingClientRect();var i=pick(e.clientX-r.left,e.clientY-r.top,r.width,r.height);sel=(i===sel)?-1:i;applySel();if(sel>=0)showTip(sel,e.clientX-r.left,e.clientY-r.top,r.width,r.height);else tip.style.opacity=0;});
   var proj=new THREE.Vector3();
   function pick(mx,my,rw,rh){var best=-1,bd=46;for(var i=0;i<bars.length;i++){var b=bars[i];proj.set(b.g.position.x,b.h,b.g.position.z).applyMatrix4(group.matrixWorld).project(camera);var sx=(proj.x*0.5+0.5)*rw,sy=(-proj.y*0.5+0.5)*rh;var dd=Math.hypot(sx-mx,sy-my);if(dd<bd){bd=dd;best=i;}}return best;}
-  function showTip(i,mx,my,rw,rh){var d=bars[i].d;tip.innerHTML='<b>'+d.name+'</b><br>'+fmt(d.v)+' businesses<br>'+(d.v/NAT.total*100).toFixed(1)+'% of Australia · +'+fmt(d.add);tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
+  function showTip(i,mx,my,rw,rh){var d=bars[i].d;tip.innerHTML='<b>'+d.name+'</b><br>'+fmt(d.v)+' businesses<br>'+(d.v/NAT.total*100).toFixed(1)+'% of Australia';tip.style.left=Math.min(mx+14,rw-185)+'px';tip.style.top=Math.max(my-10,6)+'px';tip.style.opacity=1;}
   function hover(mx,my,rw,rh){if(sel>=0)return;var i=pick(mx,my,rw,rh);if(i>=0)showTip(i,mx,my,rw,rh);else tip.style.opacity=0;}
   function loop(){if(!drag)ry+=vy;group.rotation.y+=(ry-group.rotation.y)*0.08;group.rotation.x+=(rx-group.rotation.x)*0.08;renderer.render(scene,camera);if(!reduce)requestAnimationFrame(loop);}
   function resize(){W=wrap.clientWidth;H=wrap.clientHeight;if(W<2||H<2)return;camera.aspect=W/H;camera.updateProjectionMatrix();renderer.setSize(W,H,false);if(reduce)renderer.render(scene,camera);}

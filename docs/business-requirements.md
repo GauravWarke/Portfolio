@@ -26,7 +26,7 @@ summary hides the variation that actually drives a decision.
 
 | Dashboard | The number everyone quotes | What it hides |
 | :--- | :--- | :--- |
-| Business churn | 13.9% national exit rate | Three-year survival runs from 79.8% (Agriculture) to 55.5% (Transport) |
+| Business churn | 13.8% national exit rate | Three-year survival runs from 79.4% (Agriculture) to 54.6% (Transport) |
 | Government ad spend | $173.8M total | Digital alone is $75.9M, and three audience cuts are easily double-counted |
 | Retail demand | +4.9% year on year | State growth runs from +2.3% (TAS) to +5.8% (VIC) |
 | GST reconciliation | $102.52bn pool | Relativities range from 0.81964 (NSW and WA) to 5.24149 (NT) |
@@ -36,7 +36,10 @@ hand out of a government report, nobody can tell later whether a number is what
 the publisher said or what somebody typed. This repository had exactly that
 problem in an earlier version: it carried a NSW business count of 891,123 and a
 three-year survival rate of 48%, neither of which was ever an ABS figure. Both
-were replaced by parsing the datacube (916,603 and 69.4%).
+were replaced by parsing the datacube (916,603 and 69.4%, for that release).
+ABS has since published a newer release (reference period 2025-26), which is a
+routine annual update rather than a further correction: NSW now reads 942,658
+and three-year survival 68.1%.
 
 ## 3. Objectives
 

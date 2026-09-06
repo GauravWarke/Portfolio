@@ -67,14 +67,14 @@ These run in CI. The table maps each check to the requirement it verifies.
 
 | Test | Verifies | Requirement |
 | :--- | :--- | :--- |
-| `test_state_counts_reconcile_to_national_total` | State counts sum exactly to 2,729,648 | FR-BC-05 |
+| `test_state_counts_reconcile_to_national_total` | State counts sum exactly to 2,814,778 | FR-BC-05 |
 | `test_business_total_matches_abs_release` | Total equals the ABS published figure | FR-BC-02 |
 | `test_business_shares_sum_to_100` | State shares sum to 100% (±0.2) | FR-BC-04 |
-| `test_entry_and_exit_rates_match_published` | 437,150 entries, 370,500 exits, 16.4% / 13.9% | FR-BC-03 |
+| `test_entry_and_exit_rates_match_published` | 460,461 entries, 375,331 exits, 16.9% / 13.8% | FR-BC-03 |
 | `test_no_state_count_is_a_placeholder` | Superseded values cannot return | FR-BC-09 |
 | `test_survival_falls_with_time` | Four-year survival never exceeds three-year | FR-BC-06 |
 | `test_survival_rates_are_percentages` | All survival values within 0 to 100 | FR-BC-06 |
-| `test_national_survival_matches_abs` | 69.4% and 63.1% | FR-BC-06 |
+| `test_national_survival_matches_abs` | 68.1% and 61.9% | FR-BC-06 |
 
 ### 4.2 Retail demand
 
@@ -143,7 +143,7 @@ because an uncheckable figure is the thing this project exists to avoid.
 2. Find each in the corresponding file in `data/`
 3. Confirm they match
 
-**Suggested five:** 2,729,648 (`business_churn.json`); 55.5%
+**Suggested five:** 2,814,778 (`business_churn.json`); 54.6%
 (`business_survival_by_industry.csv`, Transport); $75.9M
 (`govt_ad_spend_by_channel.csv`, Digital); $37,906.6M (`retail_demand.json`);
 5.24149 (`gst_relativities.csv`, NT).
