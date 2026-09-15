@@ -437,12 +437,8 @@ body.insp-lock{overflow:hidden}
         <div class="hv-viz" id="hvViz"></div>
       </div>
       <div class="hv-foot">
-        <div class="hv-pills">
-          <button class="hv-pill on" data-id="churn" type="button">FinTech &amp; Retention</button>
-          <button class="hv-pill" data-id="mpi" type="button">Data &amp; BI</button>
-          <button class="hv-pill" data-id="demand" type="button">Supply Chain</button>
-          <button class="hv-pill" data-id="reconciliation" type="button">Public Finance</button>
-        </div>
+        <!-- built from WORK in js/projects.js -->
+        <div class="hv-pills"></div>
         <div class="hv-loc">Real Australian open data</div>
       </div>
     </div>
@@ -455,7 +451,7 @@ body.insp-lock{overflow:hidden}
 <section id="about">
   <div class="container">
     <div class="about-statement">
-      <div class="about-label">About Us</div>
+      <div class="about-label">About Me</div>
       <h2 class="big-statement">Analytics for teams who <em>live, ship,</em> and <em>decide</em> fast.</h2>
     </div>
 
@@ -541,15 +537,11 @@ body.insp-lock{overflow:hidden}
 <section id="projects">
   <div class="container">
     <div class="stag">Case Studies</div>
-    <h2 class="stitle">Featured <em>Projects</em></h2>
-    <p class="ssub">Four real Australian questions, answered with real public data: the source, what it shows, and the decision it points to. No synthetic numbers.</p>
+    <h2 class="stitle">What I <em>can do</em></h2>
+    <p class="ssub">Real Australian questions, answered with real public data: the source, what it shows, and the decision it points to. Every figure traces back to a cell in the publisher's own file. No synthetic numbers.</p>
     <!-- numbered capability strip -->
-    <div class="cap-strip" id="capStrip">
-      <div class="cap on" data-id="churn"><span class="cap-n">01</span><h4>FinTech &amp; Retention</h4><p>Business churn: entries, exits and survival, ABS data.</p></div>
-      <div class="cap" data-id="mpi"><span class="cap-n">02</span><h4>Data &amp; BI</h4><p>Government advertising spend: channels, trends, states.</p></div>
-      <div class="cap" data-id="demand"><span class="cap-n">03</span><h4>Supply Chain</h4><p>Retail demand by category and state, ABS turnover.</p></div>
-      <div class="cap" data-id="reconciliation"><span class="cap-n">04</span><h4>Public Finance</h4><p>How the national GST pool is reconciled to the states.</p></div>
-    </div>
+    <!-- built from WORK in js/projects.js -->
+    <div class="cap-strip" id="capStrip"></div>
     <p class="cap-hint">↑ click a domain to jump to its case study</p>
   </div>
 
@@ -710,6 +702,8 @@ body.insp-lock{overflow:hidden}
   </aside>
 </div>
 
+<!-- projects.js holds the WORK list: add a dashboard there and the whole page follows -->
+<script src="js/projects.js"></script>
 <script src="js/site.js"></script>
 
 <!-- THREE.JS — Global 3D data-network (full-page background) -->

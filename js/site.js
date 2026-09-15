@@ -28,15 +28,18 @@
 })();
 
 // HERO — interactive plain-English project summary (for non-technical stakeholders)
-const HERO_SUM={
-  churn:{headline:'Reads business churn at the scale of a whole economy: who opens, who closes, who survives.',num:'13.8%',numLbl:'annual exit (churn) rate',pct:68,center:'68.1%',sub:'SURVIVE 3Y'},
-  mpi:{headline:'Tracks where government advertising money actually goes, and how fast it is shifting to digital.',num:'$250.6M',numLbl:'gov ad spend, 2023-24',pct:44,center:'44%',sub:'DIGITAL'},
-  demand:{headline:'Reads national retail demand: what Australians are buying, by category and by state, each month.',num:'$37.9bn',numLbl:'monthly retail turnover',pct:80,center:'+4.9%',sub:'YEAR ON YEAR'},
-  reconciliation:{headline:'Shows how the national GST pool is reconciled out to the states by need, not by where it was raised.',num:'$102bn',numLbl:'GST pool reconciled',pct:100,center:'8',sub:'STATES'}
-};
+// Panel content and the domain pills both come from WORK (js/projects.js).
+const HERO_SUM=WORK.reduce(function(m,w){if(w.hero)m[w.id]=w.hero;return m;},{});
 (function(){
-  var pills=document.querySelectorAll('.hv-pill'), cur='churn';
   var $=function(id){return document.getElementById(id);};
+  // build the domain pills from WORK so a new project appears here automatically
+  var pillWrap=document.querySelector('.hv-pills');
+  if(pillWrap){
+    pillWrap.innerHTML=WORK.filter(function(w){return w.hero;}).map(function(w,i){
+      return '<button class="hv-pill'+(i?'':' on')+'" data-id="'+w.id+'" type="button">'+w.label+'</button>';
+    }).join('');
+  }
+  var pills=document.querySelectorAll('.hv-pill'), cur=(WORK[0]||{}).id;
   function donut(pct,center,sub){
     var R=52,C=(2*Math.PI*R).toFixed(1),off=(C*(1-pct/100)).toFixed(1);
     return '<svg viewBox="0 0 130 130" role="img">'
@@ -57,16 +60,11 @@ const HERO_SUM={
   pills.forEach(function(b){b.addEventListener('click',function(){render(b.dataset.id);});});
   var more=$('hvMore');
   if(more)more.addEventListener('click',function(){if(typeof openCase==='function')openCase(cur);});
-  render('churn');
+  if(cur)render(cur);
 })();
 
 // PROJECTS — Relief-Decor bento gallery (hand-built mini-visuals per case study)
-const PROJECTS=[
-  {id:'churn',span:'s4',cat:'FinTech · Retention · Open Data',title:'Australian Business Churn',csub:'ABS entries, exits & survival',kpi:'13.8%',kpiSub:'annual exit rate',chart:'scatter',dash:'dashboards/churn.html'},
-  {id:'mpi',span:'s2',cat:'Data & BI · Media',title:'Government Ad Spend',csub:'Commonwealth + state open data',kpi:'$250.6M',kpiSub:'ad spend analysed',chart:'bars',dash:'dashboards/market.html'},
-  {id:'demand',span:'s3',cat:'Supply Chain · Demand',title:'Australian Retail Demand',csub:'ABS retail turnover',kpi:'$37.9bn',kpiSub:'monthly demand',chart:'line',dash:'dashboards/demand.html'},
-  {id:'reconciliation',span:'s3',cat:'Public Finance · FinTech',title:'GST Reconciliation',csub:'CGC state distribution',kpi:'$102bn',kpiSub:'GST pool',chart:'treemap',dash:'dashboards/reconciliation.html'}
-];
+const PROJECTS=WORK;
 (function(){
   // ---- hand-drawn SVG mini-visuals, one per project, echoing the real dashboard chart ----
   var COL=['#F7F1EF','#C9C4BC','#8E8880'];
@@ -91,20 +89,35 @@ const PROJECTS=[
       s+='<path d="'+pa+'" fill="none" stroke="'+COL[1]+'" stroke-width="2.5"/>';
       s+='<path d="'+pf+'" fill="none" stroke="'+COL[2]+'" stroke-width="2.5" stroke-dasharray="5 4"/>';
       s+='<circle cx="'+(26+5*30)+'" cy="'+(150-0.6*130)+'" r="4" fill="'+COL[0]+'"/><circle cx="'+(26+7*30)+'" cy="'+(150-0.72*130)+'" r="4" fill="'+COL[0]+'"/>';
+    } else if(type==='area'){
+      var av2=[0.3,0.45,0.4,0.58,0.52,0.7,0.66,0.82],pt='';
+      for(i=0;i<av2.length;i++){var Xa=26+i*40,Ya=150-av2[i]*130;pt+=(i?'L':'M')+Xa+' '+Ya.toFixed(0)+' ';}
+      s+='<path d="'+pt+'L'+(26+(av2.length-1)*40)+' 150 L26 150 Z" fill="'+COL[1]+'" opacity=".35"/>';
+      s+='<path d="'+pt+'" fill="none" stroke="'+COL[0]+'" stroke-width="2.5"/>';
     } else if(type==='treemap'){
       var rects=[[30,14,150,80],[184,14,120,52],[184,70,58,60],[246,70,58,60],[30,98,80,46],[114,98,66,46]];
       for(i=0;i<rects.length;i++){var r2=rects[i];s+='<rect x="'+r2[0]+'" y="'+r2[1]+'" width="'+r2[2]+'" height="'+r2[3]+'" rx="4" fill="'+COL[i%3]+'" opacity="'+(0.85-i*0.09).toFixed(2)+'"/>';}
     }
     return frame(s);
   }
+  // capability strip — numbered, built from WORK so the numbering never goes stale
+  var strip=document.getElementById('capStrip');
+  if(strip){
+    strip.innerHTML=WORK.map(function(w,i){
+      return '<div class="cap'+(i?'':' on')+'" data-id="'+w.id+'"><span class="cap-n">'+
+        String(i+1).padStart(2,'0')+'</span><h4>'+w.label+'</h4><p>'+w.blurb+'</p></div>';
+    }).join('');
+  }
   var bento=document.getElementById('bento');
   bento.innerHTML=PROJECTS.map(function(p){
-    return '<article class="tile '+p.span+'" data-id="'+p.id+'">'+
-      '<div class="tile-prev"><span class="tile-cat">'+p.cat+'</span>'+
-        '<span class="tile-kpi"><b>'+p.kpi+'</b><span>'+p.kpiSub+'</span></span>'+charts(p.chart)+'</div>'+
-      '<div class="tile-cap"><div><h4>'+p.title+'</h4><div class="csub">'+p.csub+'</div></div>'+
-        '<div class="tile-links">'+
-          '<a class="tile-live" href="'+p.dash+'" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>Live ↗</a>'+
+    // every field except id/title is optional, so each block is emitted only if present
+    var kpi=p.kpi?'<span class="tile-kpi"><b>'+p.kpi+'</b><span>'+(p.kpiSub||'')+'</span></span>':'';
+    var live=p.dash?'<a class="tile-live" href="'+p.dash+'" target="_blank" onclick="event.stopPropagation()"><span class="ld"></span>Live ↗</a>':'';
+    return '<article class="tile '+(p.span||'s3')+'" data-id="'+p.id+'">'+
+      '<div class="tile-prev"><span class="tile-cat">'+(p.cat||p.label||'')+'</span>'+
+        kpi+charts(p.chart)+'</div>'+
+      '<div class="tile-cap"><div><h4>'+p.title+'</h4><div class="csub">'+(p.csub||'')+'</div></div>'+
+        '<div class="tile-links">'+live+
           '<a href="#" onclick="event.preventDefault();event.stopPropagation();openCase(\''+p.id+'\')">Case study →</a>'+
         '</div></div>'+
     '</article>';
@@ -121,52 +134,21 @@ const PROJECTS=[
 })();
 
 // CASE STUDY INSPECTOR — Triple-M data
-const CASES={
-  reconciliation:{
-    cat:'// Public Finance · FinTech · Open Data',catColor:'var(--teal)',
-    title:'GST Reconciliation: Carving the National Pool to the States',
-    kpi:'≈$102bn',kpiColor:'var(--teal)',kpiLabel:'GST Pool Reconciled 2026-27',
-    market:'GST is one national pool, reconciled out to eight states and territories by need, not by where it was raised. It is the fairness mechanism sitting under the federation, and it is rarely shown clearly.',
-    arch:['Uses the Commonwealth Grants Commission distribution figures for all eight states and territories.','Reconciles each jurisdiction’s share against the total pool so the split is legible on one scale.','Tracks the pool’s growth over time and flags the legislated WA 0.75 relativity floor.','Explains horizontal fiscal equalisation in plain English before the interactive detail.'],
-    metric:'≈$102bn reconciled in 2026-27: Victoria $27.9bn and NSW $26.1bn lead, while the NT receives $5.1bn for under a million people.',
-    tags:['Open Data','Public Finance','FinTech','Data Storytelling'],
-    repo:'https://github.com/GauravWarke/expense-reconciliation-engine',
-    dash:'dashboards/reconciliation.html'
-  },
-  mpi:{
-    cat:'// Media Analytics · Public Sector · Open Data',catColor:'var(--blue)',
-    title:'Government Advertising Spend: Where the Public Dollar Goes',
-    kpi:'$250.6M',kpiColor:'var(--blue)',kpiLabel:'Commonwealth Ad Spend 2023-24',
-    market:'Public advertising money is scrutinised but rarely made legible. This unifies the Commonwealth and state advertising reports to show how much governments spend reaching citizens, on which media, and how fast the mix is shifting to digital.',
-    arch:['Ingests the Dept of Finance campaign-advertising reports plus NSW and QLD open data.','Splits placement vs development and breaks media down by real channel: digital, TV, radio, out-of-home, cinema, press.','Adds a cross-jurisdiction comparison so Commonwealth and state spend read on one scale.','Leads with a plain-English takeaway for non-technical readers.'],
-    metric:'$250.6M total in 2023-24 ($173.8M placed in media); digital is now 44% of the media budget, ahead of television.',
-    tags:['Open Data','Data & BI','Media Analytics','Data Storytelling'],
-    repo:'https://github.com/GauravWarke/market-performance-intelligence',
-    dash:'dashboards/market.html'
-  },
-  demand:{
-    cat:'// Supply Chain · Demand · Open Data',catColor:'var(--emerald)',
-    title:'Australian Retail Demand: What the Country is Buying',
-    kpi:'$37.9bn',kpiColor:'var(--emerald)',kpiLabel:'Monthly Retail Turnover',
-    market:'Demand is the signal under every inventory and staffing call. This reads the ABS retail turnover series to show what Australians are actually spending, by category and by state, and where the mix is rotating.',
-    arch:['Pulls the ABS Retail Trade release: seasonally adjusted turnover, real monthly readings.','Reconciles the category split (food, household goods, cafés and the rest) exactly to the national total.','Tracks a rolling trend and month-on-month growth by state.','Surfaces the takeaway in plain language ahead of the interactive detail.'],
-    metric:'$37.9bn in June 2025, +4.9% year on year; household goods rising (+2.3%) while cafés & takeaway slipped (-0.4%).',
-    tags:['ABS Open Data','Forecasting','Supply Chain','Data Storytelling'],
-    repo:'https://github.com/GauravWarke/demand-supply-risk-forecasting',
-    dash:'dashboards/demand.html'
-  },
-  churn:{
-    cat:'// FinTech · Retention & Attrition · Open Data',catColor:'var(--rose)',
-    title:'Australian Business Churn: Who Survives and Who Exits',
-    kpi:'13.8%',kpiColor:'var(--rose)',kpiLabel:'Annual Exit (Churn) Rate',
-    market:'Attrition is the quiet killer of value: the same retention question a bank or SaaS firm asks of its customers, asked here of a whole economy. About 1 in 7 Australian businesses exits every year, and 68.1% survive to year three.',
-    arch:['Parses ABS datacube 8165DC01.xlsx directly: entries, exits and survival by state and industry.','Frames exits as a churn rate and entries as gross adds to read the net movement of the base.','Segments survival by industry and state, from Agriculture at 74.5% down to Transport at 47.3%, to locate where retention effort pays.','Presents the takeaway in plain English first, with the interactive detail underneath.'],
-    metric:'375,331 exits (13.8%) against 460,461 entries in 2025-26, a net +85,130; 68.1% of businesses reach year three and 61.9% reach year four.',
-    tags:['ABS Open Data','Python','SQL','Retention Analytics','Data Storytelling'],
-    repo:'https://github.com/GauravWarke/churn-revenue-risk-platform',
-    dash:'dashboards/churn.html'
-  }
-};
+// Built from WORK (js/projects.js) — the inspector reads whatever each entry provides.
+const CASES=WORK.reduce(function(m,w){
+  m[w.id]={
+    cat:'// '+(w.cat||w.label||'').replace(/·/g,'·'),catColor:w.accent||'var(--teal)',
+    title:w.title,
+    kpi:w.kpi||'',kpiColor:w.accent||'var(--teal)',kpiLabel:w.kpiSub||'',
+    market:w.market||w.blurb||'',
+    arch:w.arch||[],
+    metric:w.metric||'',
+    tags:w.tags||[],
+    repo:w.repo,
+    dash:w.dash
+  };
+  return m;
+},{});
 
 const insp=document.getElementById('insp');
 function openCase(id){
